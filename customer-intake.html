@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Order - AI Forms</title>
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        /* (keep existing styles) */
+        .profile-preview-card { border-left-width: 5px; }
+        .profile-complete-high { border-left-color: #198754; }
+        .profile-complete-medium { border-left-color: #ffc107; }
+        .profile-complete-low { border-left-color: #dc3545; }
+        .missing-field-item { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <!-- (keep existing sidebar, header, etc.) -->
+    <div id="main-content">
+        <div class="container-fluid">
+            <h1 class="mb-4">Create New Order</h1>
+
+            <!-- Customer Search Section -->
+            <div class="card card-body mb-4">
+                <h4 class="section-heading">1. Find Existing Customer</h4>
+                <div class="row">
+                    <div class="col-md-9 form-group">
+                        <label for="customerSearchInput" class="form-label">Search by Mobile Number or Customer ID</label>
+                        <input type="text" class="form-control" id="customerSearchInput" placeholder="Enter mobile or CUS-...">
+                    </div>
+                    <div class="col-md-3 form-group align-self-end">
+                        <button type="button" class="btn btn-primary w-100" id="searchCustomerBtn">Search</button>
+                    </div>
+                </div>
+                <div id="customerSearchResult" class="mt-3"></div>
+            </div>
+            
+            <form id="customerIntakeForm">
+                <h4 class="section-heading">2. Order Details</h4>
+                <p class="text-muted">Fill out the details for this specific order.</p>
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="customerName" class="form-label">Customer Name (for this order)</label>
+                        <input type="text" class="form-control" id="customerName" name="customerName">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="customerMobile" class="form-label">Mobile Number (for this order)</label>
+                        <input type="tel" class="form-control" id="customerMobile" name="customerMobile">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="customerEmail" class="form-label">Email Address (for this order)</label>
+                        <input type="email" class="form-control" id="customerEmail" name="customerEmail">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="examName" class="form-label">Exam Name / Form Type*</label>
+                        <input type="text" class="form-control" id="examName" name="examName" required>
+                    </div>
+                </div>
+
+                <h4 class="section-heading mt-4">3. Document Uploads (Optional AI Scan)</h4>
+                <!-- (Document upload sections remain the same) -->
+                
+                <button type="submit" class="btn btn-primary btn-lg w-100 mt-4">Create Order (1 Credit)</button>
+            </form>
+            <div id="formStatus" class="mt-3 text-center"></div>
+        </div>
+    </div>
+
+    <!-- Missing Data Modal -->
+    <div class="modal fade" id="missingDataModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill"></i> Incomplete Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Customer: <strong id="modalCustomerName"></strong></p>
+                    <p>Profile: <strong id="modalCompletionPercent"></strong>% Complete</p>
+                    <hr>
+                    <p class="fw-bold">The following critical data is missing:</p>
+                    <ul id="missingFieldsList" class="list-group">
+                        <!-- Missing fields will be populated here -->
+                    </ul>
+                    <p class="mt-3">Proceeding without this data may result in incomplete form filling.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="skipBtn">Skip & Continue</button>
+                    <button type="button" class="btn btn-primary" id="fillMissingBtn">Fill Missing Data Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- (Other modals like success and insufficient credits remain) -->
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // --- EMBEDDED completion-utils.js ---
+        const ALL_FIELDS = [
+            'fullName', 'fatherName', 'motherName', 'husbandName', 'dob', 'age', 'gender', 'maritalStatus', 'religion', 'category', 'bloodGroup', 'nationality',
+            'mobileNumber', 'alternativeMobile', 'emailId', 'landlineNumber',
+            'permHouseNo', 'permVillageTown', 'permPostOffice', 'permPoliceStation', 'permBlock', 'permDistrict', 'permState', 'permPinCode',
+            'corrHouseNo', 'corrVillageTown', 'corrPostOffice', 'corrPoliceStation', 'corrBlock', 'corrDistrict', 'corrState', 'corrPinCode',
+            'aadhaarNumber', 'panNumber', 'voterIdNumber', 'drivingLicenseNumber', 'passportNumber',
+            'tenthBoard', 'tenthSchool', 'tenthRoll', 'tenthYear', 'tenthMarks', 'tenthTotalMarks', 'tenthPercentage', 'tenthDivision', 'tenthCertNum',
+            'twelfthBoard', 'twelfthSchool', 'twelfthStream', 'twelfthRoll', 'twelfthYear', 'twelfthMarks', 'twelfthTotalMarks', 'twelfthPercentage', 'twelfthDivision', 'twelfthCertNum',
+            'gradDegree', 'gradUni', 'gradCollege', 'gradSubject', 'gradYear', 'gradMarks', 'gradOutOf', 'gradPercentage', 'gradDivision',
+            'pgDegree', 'pgUni', 'pgSubject', 'pgYear', 'pgMarks', 'pgPercentage',
+            'casteCertNumber', 'casteCertIssuedDate', 'casteIssuedBy', 'incomeCertNumber', 'incomeCertDate', 'annualIncome', 'domicileCertNumber', 'ewsCertNumber', 'disabilityCertNumber', 'disabilityType', 'disabilityPercentage',
+            'occupation', 'organizationName', 'designation', 'monthlyIncome', 'yearsExperience', 'employerAddress',
+            'bankName', 'branchName', 'accountNumber', 'ifscCode', 'accountType',
+            'fatherOccupation', 'fatherIncome', 'motherOccupation', 'numBrothers', 'numSisters'
+        ];
+
+        const CRITICAL_FIELDS = [
+            'fullName', 'fatherName', 'motherName', 'dob', 'gender',
+            'mobileNumber', 'emailId', 'aadhaarNumber',
+            'permHouseNo', 'permVillageTown', 'permDistrict', 'permState', 'permPinCode',
+            'tenthBoard', 'tenthYear', 'tenthPercentage',
+            'twelfthBoard', 'twelfthYear', 'twelfthPercentage'
+        ];
+
+        function calculateCompletion(customerData) {
+            if (!customerData) return { percent: 0, total: ALL_FIELDS.length, filled: 0, empty: ALL_FIELDS.length };
+            const filledFields = ALL_FIELDS.filter(field => customerData[field] && String(customerData[field]).trim() !== '');
+            const total = ALL_FIELDS.length;
+            const filled = filledFields.length;
+            const percent = total > 0 ? Math.round((filled / total) * 100) : 0;
+            return { percent, total, filled, empty: total - filled };
+        }
+
+        function getMissingCriticalFields(customerData) {
+            if (!customerData) return CRITICAL_FIELDS;
+            return CRITICAL_FIELDS.filter(field => !customerData[field] || String(customerData[field]).trim() === '');
+        }
+        // --- END EMBEDDED completion-utils.js ---
+
+
+        // ... (Firebase initialization, global state, UI elements) ...
+        let foundCustomerId = null; 
+        const missingDataModal = new bootstrap.Modal(document.getElementById('missingDataModal'));
+
+        // ... (Auth state and logout logic remains the same) ...
+
+        // --- Customer Search Logic ---
+        searchCustomerBtn.addEventListener('click', () => { /* ... */ });
+
+        async function findAndFillCustomer(searchTerm, searchBy) {
+            // ... (search logic) ...
+            if (querySnapshot.empty) {
+                // ...
+            } else {
+                // ... (rest of findAndFillCustomer logic from previous step)
+            }
+        }
+
+        // --- Form Submission Logic (Updated) ---
+        customerIntakeForm.addEventListener('submit', async (e) => {
+            // ... (submission logic from previous step) ...
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Customer Profile - AI Form Filler</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+
+    <script>
+    const firebaseConfig = {
+        apiKey: 'AIzaSyCGnA0-2QiSQ2Dg8n3xhzBxjvVKcXKf9P0',
+        authDomain: 'form-filling-service-5a261.firebaseapp.com',
+        projectId: 'form-filling-service-5a261',
+        storageBucket: 'form-filling-service-5a261.firebasestorage.app',
+        messagingSenderId: '417118407948',
+        appId: '1:417118407948:web:4daf44a54875a1b0f6cd29'
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    </script>
+
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding-bottom: 50px; }
+        .sticky-progress { position: sticky; top: 70px; z-index: 100; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .card { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .form-label { font-weight: 600; font-size: 0.9rem; color: #4a5568; }
+        .section-title { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 10px 20px; border-radius: 10px 10px 0 0; margin: -24px -24px 20px -24px; font-weight: bold; }
+        
+        /* Field Status Indicators */
+        .field-container { position: relative; }
+        .status-icon { position: absolute; right: 10px; top: 38px; font-size: 0.8rem; transition: all 0.3s; }
+        .field-filled { border-color: #4caf50 !important; background-color: #f0fdf4 !important; }
+        .field-empty { border-color: #cbd5e0; }
+        .text-success-custom { color: #4caf50; }
+        .text-muted-custom { color: #cbd5e0; }
+
+        .form-control:focus { box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2); }
+        .nav-tabs .nav-link { color: #4a5568; font-weight: 600; border: none; padding: 12px 20px; }
+        .nav-tabs .nav-link.active { color: #667eea; border-bottom: 3px solid #667eea; background: transparent; }
+    </style>
+</head>
+<body>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark mb-4 sticky-top" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="dashboard.html"><i class="fas fa-robot"></i> AI Form Filler</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="dashboard.html">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="my-customers.html">Customers</a></li>
+                <li class="nav-item"><a class="nav-link active" href="customer-profile.html">Create Profile</a></li>
+                <li class="nav-item"><a class="nav-link text-warning" href="#" onclick="handleLogout()">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">Master Customer Profile</h2>
+            <p class="text-muted">Universal profile for SSC, Railways, Banking, UPSC & State Exams.</p>
+        </div>
+        <div class="text-end">
+            <button type="button" class="btn btn-success btn-lg" onclick="saveMasterProfile()">
+                <i class="fas fa-save"></i> Save Everything
+            </button>
+        </div>
+    </div>
+
+    <!-- Progress Tracker -->
+    <div class="sticky-progress">
+        <div class="d-flex justify-content-between mb-2">
+            <span class="fw-bold">Profile Completion</span>
+            <span id="completionText" class="fw-bold text-primary">0%</span>
+        </div>
+        <div class="progress" style="height: 10px;">
+            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+        </div>
+        <div class="row mt-3 text-center small">
+            <div class="col"><i class="fas fa-check-circle text-success"></i> <span id="filledCount">0</span> Filled</div>
+            <div class="col"><i class="fas fa-circle text-muted"></i> <span id="remainingCount">100+</span> Remaining</div>
+            <div id="autoSaveStatus" class="col text-muted"><i class="fas fa-sync"></i> Ready</div>
+        </div>
+    </div>
+
+    <form id="masterProfileForm">
+        <!-- Tabs for Sections -->
+        <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+            <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#personal">Personal</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#address">Address</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#reservation">Reservation</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#education">Education</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#documents">Documents</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#bank">Bank & Other</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#schemes">🌾 Schemes</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#formlog">📋 Form History</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- PERSONAL SECTION -->
+            <div class="tab-pane fade show active" id="personal">
+                <div class="card p-4">
+                    <h4 class="section-title">1. Personal Details</h4>
+                    <div class="row">
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Full Name <small class="text-muted">(auto-splits below)</small></label>
+                            <input type="text" class="form-control profile-field" name="fullName" placeholder="As per Aadhaar/10th" id="fullNameInput">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control profile-field" name="firstName" placeholder="Auto-filled from Full Name" id="firstNameInput">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Middle Name</label>
+                            <input type="text" class="form-control profile-field" name="middleName" placeholder="Auto-filled from Full Name" id="middleNameInput">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Last Name / Surname</label>
+                            <input type="text" class="form-control profile-field" name="lastName" placeholder="Auto-filled from Full Name" id="lastNameInput">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Father's Name</label>
+                            <input type="text" class="form-control profile-field" name="fatherName">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Mother's Name</label>
+                            <input type="text" class="form-control profile-field" name="motherName">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Husband's Name (if applicable)</label>
+                            <input type="text" class="form-control profile-field" name="husbandName">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control profile-field" name="dob">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Gender</label>
+                            <select class="form-select profile-field" name="gender">
+                                <option value="">Select...</option>
+                                <option>Male</option><option>Female</option><option>Transgender</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Category (Caste)</label>
+                            <select class="form-select profile-field" name="category">
+                                <option value="">Select...</option>
+                                <option>UR (General)</option><option>OBC-NCL</option><option>OBC-CL</option><option>SC</option><option>ST</option><option>EWS</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Religion</label>
+                            <select class="form-select profile-field" name="religion">
+                                <option value="">Select...</option>
+                                <option>Hindu</option><option>Muslim</option><option>Christian</option><option>Sikh</option><option>Buddhist</option><option>Jain</option><option>Other</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Nationality</label>
+                            <input type="text" class="form-control profile-field" name="nationality" value="Indian">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Marital Status</label>
+                            <select class="form-select profile-field" name="maritalStatus">
+                                <option value="">Select...</option>
+                                <option>Unmarried</option><option>Married</option><option>Widow/Widower</option><option>Divorced</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Mobile Number</label>
+                            <input type="tel" class="form-control profile-field" name="mobileNumber" placeholder="10-digit mobile">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Email ID</label>
+                            <input type="email" class="form-control profile-field" name="emailId" placeholder="example@gmail.com">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Alternate Mobile</label>
+                            <input type="tel" class="form-control profile-field" name="altMobile" placeholder="Optional">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Identification Mark 1 (Mole/Cut)</label>
+                            <input type="text" class="form-control profile-field" name="identMark1">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Identification Mark 2 (Optional)</label>
+                            <input type="text" class="form-control profile-field" name="identMark2">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-3">Disability Details (PWD)</h5>
+                    <div class="row">
+                        <div class="col-md-3 mb-3 field-container">
+                            <label class="form-label">Are you PwD?</label>
+                            <select class="form-select profile-field" name="isPwd">
+                                <option value="">Select...</option>
+                                <option>No</option><option>Yes</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-3 mb-3 field-container">
+                            <label class="form-label">Disability Type</label>
+                            <select class="form-select profile-field" name="disabilityType">
+                                <option value="">Select...</option>
+                                <option>VI (Visually Impaired)</option><option>HI (Hearing Impaired)</option><option>OH (Orthopedically Handicapped)</option><option>MD (Multiple Disability)</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-3 mb-3 field-container">
+                            <label class="form-label">Disability %</label>
+                            <input type="text" class="form-control profile-field" name="disabilityPercent">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-3 mb-3 field-container">
+                            <label class="form-label">Certificate No</label>
+                            <input type="text" class="form-control profile-field" name="pwdCertNo">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADDRESS SECTION -->
+            <div class="tab-pane fade" id="address">
+                <div class="card p-4">
+                    <h4 class="section-title">2. Address Details</h4>
+                    
+                    <h5 class="text-primary">Permanent Address</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Address Line 1 (House No/Street)</label>
+                            <input type="text" class="form-control profile-field" name="permAddr1">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Address Line 2 (Village/Locality)</label>
+                            <input type="text" class="form-control profile-field" name="permAddr2">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Post Office</label>
+                            <input type="text" class="form-control profile-field" name="permPO">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Police Station</label>
+                            <input type="text" class="form-control profile-field" name="permPS">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Pin Code</label>
+                            <input type="text" class="form-control profile-field" name="permPin">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">District</label>
+                            <input type="text" class="form-control profile-field" name="permDistrict">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">State</label>
+                            <select class="form-select profile-field" name="permState">
+                                <option value="">-- Select State --</option>
+                                <option>Andhra Pradesh</option><option>Arunachal Pradesh</option>
+                                <option>Assam</option><option>Bihar</option>
+                                <option>Chhattisgarh</option><option>Goa</option>
+                                <option>Gujarat</option><option>Haryana</option>
+                                <option>Himachal Pradesh</option><option>Jharkhand</option>
+                                <option>Karnataka</option><option>Kerala</option>
+                                <option>Madhya Pradesh</option><option>Maharashtra</option>
+                                <option>Manipur</option><option>Meghalaya</option>
+                                <option>Mizoram</option><option>Nagaland</option>
+                                <option>Odisha</option><option>Punjab</option>
+                                <option>Rajasthan</option><option>Sikkim</option>
+                                <option>Tamil Nadu</option><option>Telangana</option>
+                                <option>Tripura</option><option>Uttar Pradesh</option>
+                                <option>Uttarakhand</option><option>West Bengal</option>
+                                <option>Andaman and Nicobar Islands</option>
+                                <option>Chandigarh</option>
+                                <option>Dadra and Nagar Haveli and Daman and Diu</option>
+                                <option>Delhi</option><option>Jammu and Kashmir</option>
+                                <option>Ladakh</option><option>Lakshadweep</option>
+                                <option>Puducherry</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+
+                    <h5 class="text-primary">Correspondence Address</h5>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="sameAsPerm" onchange="copyAddress()">
+                        <label class="form-check-label" for="sameAsPerm">Same as Permanent Address</label>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Address Line 1</label>
+                            <input type="text" class="form-control profile-field" name="corrAddr1">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Address Line 2</label>
+                            <input type="text" class="form-control profile-field" name="corrAddr2">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Post Office</label>
+                            <input type="text" class="form-control profile-field" name="corrPO">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Police Station</label>
+                            <input type="text" class="form-control profile-field" name="corrPS">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Pin Code</label>
+                            <input type="text" class="form-control profile-field" name="corrPin">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">District</label>
+                            <input type="text" class="form-control profile-field" name="corrDistrict">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">State</label>
+                            <input type="text" class="form-control profile-field" name="corrState">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESERVATION SECTION -->
+            <div class="tab-pane fade" id="reservation">
+                <div class="card p-4">
+                    <h4 class="section-title">3. Reservation & Certificates</h4>
+                    
+                    <h5 class="text-primary mt-3">Caste Certificate Details</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Certificate Number</label>
+                            <input type="text" class="form-control profile-field" name="casteCertNo">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Date of Issue</label>
+                            <input type="date" class="form-control profile-field" name="casteIssueDate">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Issuing Authority (e.g. Tehsildar)</label>
+                            <input type="text" class="form-control profile-field" name="casteAuthority">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">District of Issue</label>
+                            <input type="text" class="form-control profile-field" name="casteIssueDistrict">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+
+                    <h5 class="text-primary">Domicile / Residence Certificate</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Certificate Number</label>
+                            <input type="text" class="form-control profile-field" name="domicileCertNo">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Date of Issue</label>
+                            <input type="date" class="form-control profile-field" name="domicileIssueDate">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Issuing Authority</label>
+                            <input type="text" class="form-control profile-field" name="domicileAuthority">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+
+                    <h5 class="text-primary">EWS / Income Certificate</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Certificate Number</label>
+                            <input type="text" class="form-control profile-field" name="incomeCertNo">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Date of Issue</label>
+                            <input type="date" class="form-control profile-field" name="incomeIssueDate">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Annual Family Income</label>
+                            <input type="text" class="form-control profile-field" name="annualIncome">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EDUCATION SECTION -->
+            <div class="tab-pane fade" id="education">
+                <div class="card p-4">
+                    <h4 class="section-title">4. Educational Details</h4>
+                    
+                    <!-- 10th -->
+                    <div class="bg-light p-3 rounded mb-3">
+                        <h5 class="text-primary fw-bold">10th / Matriculation</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Board Name</label>
+                                <input type="text" class="form-control profile-field" name="tenthBoard">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-2 mb-3 field-container">
+                                <label class="form-label">Passing Year</label>
+                                <input type="number" class="form-control profile-field" name="tenthYear">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Roll Number</label>
+                                <input type="text" class="form-control profile-field" name="tenthRoll">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Certificate No.</label>
+                                <input type="text" class="form-control profile-field" name="tenthCertNo">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Total Marks</label>
+                                <input type="number" class="form-control profile-field" name="tenthTotal">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Obtained Marks</label>
+                                <input type="number" class="form-control profile-field" name="tenthObtained">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Percentage / CGPA</label>
+                                <input type="text" class="form-control profile-field" name="tenthPercent">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Division</label>
+                                <select class="form-select profile-field" name="tenthDivision">
+                                    <option value="">Select...</option>
+                                    <option>1st</option><option>2nd</option><option>3rd</option>
+                                </select>
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 12th -->
+                    <div class="bg-light p-3 rounded mb-3">
+                        <h5 class="text-primary fw-bold">12th / Intermediate</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Board Name</label>
+                                <input type="text" class="form-control profile-field" name="twelfthBoard">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-2 mb-3 field-container">
+                                <label class="form-label">Stream</label>
+                                <select class="form-select profile-field" name="twelfthStream">
+                                    <option value="">Select...</option>
+                                    <option>Science (PCM)</option><option>Science (PCB)</option><option>Commerce</option><option>Arts</option>
+                                </select>
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Passing Year</label>
+                                <input type="number" class="form-control profile-field" name="twelfthYear">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Roll Number</label>
+                                <input type="text" class="form-control profile-field" name="twelfthRoll">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Total Marks</label>
+                                <input type="number" class="form-control profile-field" name="twelfthTotal">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Obtained Marks</label>
+                                <input type="number" class="form-control profile-field" name="twelfthObtained">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Percentage</label>
+                                <input type="text" class="form-control profile-field" name="twelfthPercent">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-3 mb-3 field-container">
+                                <label class="form-label">Certificate No.</label>
+                                <input type="text" class="form-control profile-field" name="twelfthCertNo">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Diploma -->
+                    <div class="bg-light p-3 rounded mb-3">
+                        <h5 class="text-primary fw-bold">Diploma (If applicable)</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">University / Board</label>
+                                <input type="text" class="form-control profile-field" name="diplomaBoard">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Trade / Branch</label>
+                                <input type="text" class="form-control profile-field" name="diplomaTrade">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Passing Year</label>
+                                <input type="number" class="form-control profile-field" name="diplomaYear">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Roll Number</label>
+                                <input type="text" class="form-control profile-field" name="diplomaRoll">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Percentage</label>
+                                <input type="text" class="form-control profile-field" name="diplomaPercent">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Graduation -->
+                    <div class="bg-light p-3 rounded mb-3">
+                        <h5 class="text-primary fw-bold">Graduation (Degree)</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">University Name</label>
+                                <input type="text" class="form-control profile-field" name="gradUniv">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Degree Name (e.g. BA, BSc, BTech)</label>
+                                <input type="text" class="form-control profile-field" name="gradDegree">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Passing Year</label>
+                                <input type="number" class="form-control profile-field" name="gradYear">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Roll Number</label>
+                                <input type="text" class="form-control profile-field" name="gradRoll">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Percentage / CGPA</label>
+                                <input type="text" class="form-control profile-field" name="gradPercent">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Date of Issue (Degree)</label>
+                                <input type="date" class="form-control profile-field" name="gradIssueDate">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post Graduation -->
+                    <div class="bg-light p-3 rounded mb-3">
+                        <h5 class="text-primary fw-bold">Post Graduation (PG)</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">University Name</label>
+                                <input type="text" class="form-control profile-field" name="pgUniv">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Degree Name (e.g. MA, MSc, MBA)</label>
+                                <input type="text" class="form-control profile-field" name="pgDegree">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Passing Year</label>
+                                <input type="number" class="form-control profile-field" name="pgYear">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-6 mb-3 field-container">
+                                <label class="form-label">Roll Number</label>
+                                <input type="text" class="form-control profile-field" name="pgRoll">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                            <div class="col-md-6 mb-3 field-container">
+                                <label class="form-label">Percentage</label>
+                                <input type="text" class="form-control profile-field" name="pgPercent">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOCUMENTS SECTION -->
+            <div class="tab-pane fade" id="documents">
+                <div class="card p-4">
+                    <h4 class="section-title">5. Identity Documents</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Aadhaar Number</label>
+                            <input type="text" class="form-control profile-field" name="aadhaarNumber" placeholder="XXXX XXXX XXXX">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">PAN Number</label>
+                            <input type="text" class="form-control profile-field" name="panNumber" placeholder="ABCDE1234F">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Voter ID</label>
+                            <input type="text" class="form-control profile-field" name="voterId">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Driving License</label>
+                            <input type="text" class="form-control profile-field" name="dlNumber">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Passport Number</label>
+                            <input type="text" class="form-control profile-field" name="passportNumber">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BANK & OTHER SECTION -->
+            <div class="tab-pane fade" id="bank">
+                <div class="card p-4">
+                    <h4 class="section-title">6. Bank & Other Details</h4>
+                    
+                    <h5 class="text-primary mt-3">Bank Details (For Fee Refunds)</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Bank Name</label>
+                            <input type="text" class="form-control profile-field" name="bankName">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Branch Name</label>
+                            <input type="text" class="form-control profile-field" name="bankBranch">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Account Number</label>
+                            <input type="text" class="form-control profile-field" name="bankAcc">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">IFSC Code</label>
+                            <input type="text" class="form-control profile-field" name="bankIFSC">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+
+                    <h5 class="text-primary">Legal & Employment</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Any Criminal Cases?</label>
+                            <select class="form-select profile-field" name="criminalCase">
+                                <option value="">Select...</option>
+                                <option>No</option><option>Yes</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Debarred from Exams?</label>
+                            <select class="form-select profile-field" name="debarred">
+                                <option value="">Select...</option>
+                                <option>No</option><option>Yes</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Presently Employed?</label>
+                            <select class="form-select profile-field" name="employed">
+                                <option value="">Select...</option>
+                                <option>No</option><option>Yes</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Employment Exchange Reg No.</label>
+                            <input type="text" class="form-control profile-field" name="empExchangeNo">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- SCHEMES TAB -->
+            <div class="tab-pane fade" id="schemes">
+                <div class="card p-4">
+                    <h4 class="section-title">7. Government Schemes</h4>
+
+                    <!-- E-SHRAM -->
+                    <h5 class="text-primary mt-2">🔨 E-Shram Card (Unorganised Worker)</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Occupation / Type of Work</label>
+                            <select class="form-select profile-field" name="occupation">
+                                <option value="">Select Occupation</option>
+                                <option>Construction Worker</option>
+                                <option>Agricultural Labourer</option>
+                                <option>Domestic Worker</option>
+                                <option>Street Vendor</option>
+                                <option>Rickshaw / Auto Driver</option>
+                                <option>Tailor / Weaver</option>
+                                <option>Carpenter / Mason</option>
+                                <option>Electrician / Plumber</option>
+                                <option>Migrant Worker</option>
+                                <option>Fisherman</option>
+                                <option>Beedi Worker</option>
+                                <option>Other</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Nature of Work</label>
+                            <select class="form-select profile-field" name="natureOfWork">
+                                <option value="">Select</option>
+                                <option>Skilled</option>
+                                <option>Semi-Skilled</option>
+                                <option>Unskilled</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Monthly Income (₹)</label>
+                            <input type="number" class="form-control profile-field" name="monthlyIncome" placeholder="e.g. 8000">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Daily Wage (₹)</label>
+                            <input type="number" class="form-control profile-field" name="dailyWage" placeholder="e.g. 350">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Years of Experience</label>
+                            <input type="number" class="form-control profile-field" name="workExperience" placeholder="e.g. 5">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">E-Shram Card Number (if already registered)</label>
+                            <input type="text" class="form-control profile-field" name="eshramNumber" placeholder="UAN / E-Shram number">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Nominee Name (for E-Shram)</label>
+                            <input type="text" class="form-control profile-field" name="nomineeName" placeholder="Nominee full name">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Nominee Relation</label>
+                            <select class="form-select profile-field" name="nomineeRelation">
+                                <option value="">Select</option>
+                                <option>Spouse</option><option>Father</option><option>Mother</option>
+                                <option>Son</option><option>Daughter</option><option>Brother</option><option>Sister</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Nominee DOB</label>
+                            <input type="date" class="form-control profile-field" name="nomineeDob">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Nominee Aadhaar</label>
+                            <input type="text" class="form-control profile-field" name="nomineeAadhaar" maxlength="12" placeholder="12-digit Aadhaar">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+
+                    <!-- PM KISAN / FARMER -->
+                    <h5 class="text-success mt-2">🌾 PM Kisan / Farmer Details</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Khasra Number / खसरा नंबर</label>
+                            <input type="text" class="form-control profile-field" name="khasraNumber" placeholder="Land plot khasra no.">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Khatauni Number / खतौनी नंबर</label>
+                            <input type="text" class="form-control profile-field" name="khatauniNumber" placeholder="Land record khatauni no.">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Land Area (Acres) / भूमि क्षेत्र</label>
+                            <input type="text" class="form-control profile-field" name="landArea" placeholder="e.g. 2.5">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Land Type / भूमि प्रकार</label>
+                            <select class="form-select profile-field" name="landType">
+                                <option value="">Select</option>
+                                <option>Irrigated / सिंचित</option>
+                                <option>Unirrigated / असिंचित</option>
+                                <option>Both / दोनों</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Survey Number / सर्वे नंबर</label>
+                            <input type="text" class="form-control profile-field" name="surveyNumber" placeholder="Survey / Plot number">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Tehsil / Taluka / तहसील</label>
+                            <input type="text" class="form-control profile-field" name="tehsil" placeholder="Tehsil / Taluka name">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Gram Sabha / Village / ग्राम सभा</label>
+                            <input type="text" class="form-control profile-field" name="gramSabha" placeholder="Village / Gram Sabha name">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">PM Kisan Registration No. (if registered)</label>
+                            <input type="text" class="form-control profile-field" name="pmKisanRegNo" placeholder="PM Kisan registration number">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+
+                    <!-- RATION CARD / AYUSHMAN -->
+                    <h5 class="text-danger mt-2">🏥 Ration Card & Ayushman Bharat</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Ration Card Number / राशन कार्ड नंबर</label>
+                            <input type="text" class="form-control profile-field" name="rationCardNumber" placeholder="Ration card number">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Ration Card Type / राशन कार्ड प्रकार</label>
+                            <select class="form-select profile-field" name="rationCardType">
+                                <option value="">Select Type</option>
+                                <option>APL (Above Poverty Line)</option>
+                                <option>BPL (Below Poverty Line)</option>
+                                <option>AAY (Antyodaya Anna Yojana)</option>
+                                <option>PHH (Priority Household)</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Number of Family Members</label>
+                            <input type="number" class="form-control profile-field" name="familyMemberCount" placeholder="e.g. 4" min="1">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Ayushman Card Number (ABHA)</label>
+                            <input type="text" class="form-control profile-field" name="ayushmanCardNumber" placeholder="14-digit ABHA number">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">SECC / NFSA ID</label>
+                            <input type="text" class="form-control profile-field" name="seccId" placeholder="SECC/NFSA ID">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+
+                    <!-- OTHER SCHEMES -->
+                    <h5 class="text-warning mt-2">📋 Other Scheme Details</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Jan Dhan Account Number</label>
+                            <input type="text" class="form-control profile-field" name="janDhanAcc" placeholder="Jan Dhan account no.">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">MNREGA Job Card Number</label>
+                            <input type="text" class="form-control profile-field" name="mnregaJobCard" placeholder="Job card number">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Pension Type (if applicable)</label>
+                            <select class="form-select profile-field" name="pensionType">
+                                <option value="">Select</option>
+                                <option>Old Age Pension</option>
+                                <option>Widow Pension</option>
+                                <option>Disability Pension</option>
+                                <option>None</option>
+                            </select>
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Pension Registration Number</label>
+                            <input type="text" class="form-control profile-field" name="pensionRegNo" placeholder="Pension reg. number">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORM HISTORY TAB -->
+            <div class="tab-pane fade" id="formlog">
+                <div class="card p-4">
+                    <h4 class="section-title">8. Applied Forms History</h4>
+                    <p class="text-muted mb-3" style="font-size:.85rem">Every form filled via the extension is automatically logged here — portal, date, fields filled, and cost charged.</p>
+                    <div id="formlog-loading" class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">Loading form history...</p></div>
+                    <div id="formlog-empty" style="display:none" class="text-center py-4">
+                        <div style="font-size:2.5rem">📋</div>
+                        <p class="text-muted mt-2">No forms filled yet for this customer.<br>Load the customer in the extension and fill a form to start tracking.</p>
+                    </div>
+                    <div id="formlog-list"></div>
+                    <div id="formlog-summary" style="display:none;margin-top:16px;padding:14px;background:#f0fdf4;border-radius:8px;border:1px solid #bbf7d0">
+                        <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.85rem">
+                            <span>📝 Total Forms: <strong id="log-total-forms">0</strong></span>
+                            <span>🔢 Total Fields: <strong id="log-total-fields">0</strong></span>
+                            <span>💰 Total Spent: <strong id="log-total-cost">₹0.00</strong></span>
+                            <span>🕐 Last Filled: <strong id="log-last-date">—</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+let currentDocId = null;
+
+// Auto-split Full Name into First / Middle / Last
+const fullNameInput  = document.getElementById('fullNameInput');
+const firstNameInput = document.getElementById('firstNameInput');
+const middleNameInput= document.getElementById('middleNameInput');
+const lastNameInput  = document.getElementById('lastNameInput');
+
+if (fullNameInput) {
+    fullNameInput.addEventListener('input', () => {
+        const parts = fullNameInput.value.trim().split(/\s+/).filter(Boolean);
+        if (parts.length === 1) {
+            firstNameInput.value  = parts[0];
+            middleNameInput.value = '';
+            lastNameInput.value   = '';
+        } else if (parts.length === 2) {
+            firstNameInput.value  = parts[0];
+            middleNameInput.value = '';
+            lastNameInput.value   = parts[1];
+        } else if (parts.length >= 3) {
+            firstNameInput.value  = parts[0];
+            lastNameInput.value   = parts[parts.length - 1];
+            middleNameInput.value = parts.slice(1, -1).join(' ');
+        }
+        [firstNameInput, middleNameInput, lastNameInput].forEach(f => {
+            updateFieldStatus(f);
+        });
+        updateOverallProgress();
+    });
+}
+
+// Track field changes and update status
+document.querySelectorAll('.profile-field').forEach(field => {
+    field.addEventListener('input', () => {
+        updateFieldStatus(field);
+        updateOverallProgress();
+    });
+});
+
+function updateFieldStatus(field) {
+    if (!field || typeof field.closest !== 'function') return;
+    const container = field.closest('.field-container');
+    if (!container) return;
+    const icon = container.querySelector('.status-icon');
+    if (!icon) return;
+    
+    if (field.value.trim() !== "") {
+        field.classList.add('field-filled');
+        icon.classList.remove('fa-circle', 'text-muted-custom');
+        icon.classList.add('fa-check-circle', 'text-success-custom');
+    } else {
+        field.classList.remove('field-filled');
+        icon.classList.remove('fa-check-circle', 'text-success-custom');
+        icon.classList.add('fa-circle', 'text-muted-custom');
+    }
+}
+
+function updateOverallProgress() {
+    const fields = document.querySelectorAll('.profile-field');
+    const filled = Array.from(fields).filter(f => f.value.trim() !== "").length;
+    const total = fields.length;
+    const percent = Math.round((filled / total) * 100);
+
+    document.getElementById('progressBar').style.width = percent + '%';
+    document.getElementById('completionText').textContent = percent + '%';
+    document.getElementById('filledCount').textContent = filled;
+    document.getElementById('remainingCount').textContent = total - filled;
+}
+
+function copyAddress() {
+    const isChecked = document.getElementById('sameAsPerm').checked;
+    if (isChecked) {
+        document.getElementsByName('corrAddr1')[0].value = document.getElementsByName('permAddr1')[0].value;
+        document.getElementsByName('corrAddr2')[0].value = document.getElementsByName('permAddr2')[0].value;
+        document.getElementsByName('corrPO')[0].value = document.getElementsByName('permPO')[0].value;
+        document.getElementsByName('corrPS')[0].value = document.getElementsByName('permPS')[0].value;
+        document.getElementsByName('corrPin')[0].value = document.getElementsByName('permPin')[0].value;
+        document.getElementsByName('corrDistrict')[0].value = document.getElementsByName('permDistrict')[0].value;
+        document.getElementsByName('corrState')[0].value = document.getElementsByName('permState')[0].value;
+    }
+    // Update visual status for all fields
+    document.querySelectorAll('.profile-field').forEach(f => updateFieldStatus(f));
+    updateOverallProgress();
+}
+
+async function saveMasterProfile() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const statusEl = document.getElementById('autoSaveStatus');
+    statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    const formData = new FormData(document.getElementById('masterProfileForm'));
+    const data = Object.fromEntries(formData.entries());
+    
+    const fields = document.querySelectorAll('.profile-field');
+    const filled = Array.from(fields).filter(f => f.value.trim() !== "").length;
+    
+    data.userId = user.uid;
+    data.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+    data.profileCompletionPercent = Math.round((filled / fields.length) * 100);
+
+    try {
+        if (currentDocId) {
+            await db.collection('customers').doc(currentDocId).update(data);
+        } else {
+            data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            data.customerId = `CUS-${Date.now()}`;
+            const docRef = await db.collection('customers').add(data);
+            currentDocId = docRef.id;
+        }
+        
+        statusEl.innerHTML = '<i class="fas fa-check text-success"></i> All Saved!';
+        setTimeout(() => { statusEl.innerHTML = '<i class="fas fa-sync"></i> Ready'; }, 3000);
+        
+    } catch (error) {
+        statusEl.innerHTML = '<i class="fas fa-times text-danger"></i> Error';
+        console.error(error);
+    }
+}
+
+auth.onAuthStateChanged(async (user) => {
+    if (user) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('id');
+
+        if (editId) {
+            const doc = await db.collection('customers').doc(editId).get();
+            if (doc.exists) {
+                fillFormData(doc.data());
+                currentDocId = doc.id;
+                // customerId field (CUS-XXXX) — needed for formLogs query
+                const cusId = doc.data().customerId || editId;
+                document.querySelector('a[href="#formlog"]').addEventListener('shown.bs.tab', () => {
+                    loadFormHistory(cusId);
+                });
+            }
+        } else {
+            updateOverallProgress();
+        }
+    } else {
+        window.location.href = 'login.html';
+    }
+});
+
+async function loadFormHistory(customerId) {
+    const loading = document.getElementById('formlog-loading');
+    const empty   = document.getElementById('formlog-empty');
+    const list    = document.getElementById('formlog-list');
+    const summary = document.getElementById('formlog-summary');
+
+    loading.style.display = 'block';
+    empty.style.display   = 'none';
+    list.innerHTML        = '';
+    summary.style.display = 'none';
+
+    try {
+        // No orderBy — sort in JS so no composite index needed
+        const snap = await db.collection('formLogs')
+            .where('customerId', '==', customerId)
+            .limit(100)
+            .get();
+
+        loading.style.display = 'none';
+
+        if (snap.empty) { empty.style.display = 'block'; return; }
+
+        // Sort newest first in JS (no composite index needed)
+        const allDocs = [];
+        snap.forEach(doc => allDocs.push(doc.data()));
+        allDocs.sort((a, b) => {
+            const ta = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp || 0);
+            const tb = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp || 0);
+            return tb - ta;
+        });
+
+        let totalForms=0, totalFields=0, totalCost=0, lastDate='—';
+        const rows = [];
+
+        allDocs.forEach(d => {
+            totalForms++;
+            totalFields += d.fieldsCount || 0;
+            totalCost   += d.cost || 0;
+            const ts = d.timestamp?.toDate ? d.timestamp.toDate() : (d.timestamp ? new Date(d.timestamp) : new Date());
+            if (totalForms === 1) lastDate = ts.toLocaleString('en-IN');
+
+            const portalName = d.portalName || new URL(d.pageUrl||'http://unknown').hostname;
+            rows.push(`
+              <div style="border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;margin-bottom:10px;background:#fff">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+                  <div>
+                    <div style="font-weight:700;font-size:.9rem;color:#1e293b">${escHtml(d.pageTitle||'Unknown Form')}</div>
+                    <div style="font-size:.78rem;color:#64748b;margin-top:2px">
+                      🌐 <a href="${escHtml(d.pageUrl||'#')}" target="_blank" style="color:#2563eb">${escHtml(portalName)}</a>
+                    </div>
+                  </div>
+                  <div style="text-align:right;flex-shrink:0">
+                    <span style="background:#dcfce7;color:#15803d;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:700">
+                      ${d.fieldsCount||0} fields
+                    </span>
+                    <span style="background:#fef3c7;color:#92400e;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:700;margin-left:4px">
+                      ₹${(d.cost||0).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <div style="font-size:.75rem;color:#94a3b8;margin-top:6px">
+                  🕐 ${ts.toLocaleString('en-IN')}
+                </div>
+              </div>`);
+        });
+
+        list.innerHTML = rows.join('');
+        document.getElementById('log-total-forms').textContent  = totalForms;
+        document.getElementById('log-total-fields').textContent = totalFields;
+        document.getElementById('log-total-cost').textContent   = '₹' + totalCost.toFixed(2);
+        document.getElementById('log-last-date').textContent    = lastDate;
+        summary.style.display = 'block';
+
+    } catch(e) {
+        loading.style.display = 'none';
+        list.innerHTML = `<p class="text-danger">Error loading history: ${e.message}</p>`;
+    }
+}
+
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fillFormData(data) {
+    const form = document.getElementById('masterProfileForm');
+    Object.keys(data).forEach(key => {
+        const val = data[key];
+        // Skip Firestore metadata objects (Timestamp, nested maps, arrays)
+        if (val === null || val === undefined || typeof val === 'object') return;
+        const input = form.querySelector(`[name="${key}"]`);
+        if (input) {
+            input.value = val;
+            updateFieldStatus(input);
+        }
+    });
+    updateOverallProgress();
+}
+
+function handleLogout() {
+    auth.signOut().then(() => window.location.href = 'login.html');
+}
+</script>
+
+</body>
+</html>

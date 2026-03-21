@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "AI Form Filler – Forms & Document Tools",
+  "version": "5.0",
+  "description": "Auto-fill government job application forms with AI in one click. Detects required documents & opens free photo and PDF tools.",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://ai-workflows.cloud/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

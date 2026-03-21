@@ -1,0 +1,2240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Form Agent – Fill Government Forms in 5 Seconds | ai-workflows.cloud</title>
+  <meta name="description" content="AI Agent auto-fills SSC, UPSC, Railways, IBPS and 50+ government portals in 5 seconds. One profile, unlimited forms. ₹2/form. Free ₹100 wallet on signup."/>
+  <meta property="og:title" content="AI Form Agent – Government Form Auto-Fill"/>
+  <meta property="og:description" content="AI Agent fills 60+ fields in 5 seconds on 50+ portals. Built for CSC operators and Jan Seva Kendras."/>
+  <meta property="og:url" content="https://ai-workflows.cloud"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <style>
+    :root {
+      --bg-primary: #0a0e27;
+      --bg-secondary: #0f1538;
+      --bg-card: #141a3d;
+      --bg-card-hover: #1a2148;
+      --accent-cyan: #00d4ff;
+      --accent-magenta: #ff2d78;
+      --accent-green: #00e676;
+      --accent-amber: #ffab00;
+      --text-primary: #e8eaed;
+      --text-secondary: #8b92a5;
+      --text-heading: #ffffff;
+      --border-subtle: rgba(255,255,255,0.06);
+      --border-glow: rgba(0,212,255,0.3);
+      --glow-cyan: 0 0 20px rgba(0,212,255,0.15);
+      --glow-magenta: 0 0 20px rgba(255,45,120,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-heading);
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius: 3px; }
+
+    /* ---- Grid background ---- */
+    .grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridMove 20s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes gridMove {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(50px); }
+    }
+
+    /* ============ NAVBAR ============ */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 16px 0;
+      transition: background 0.3s, backdrop-filter 0.3s, box-shadow 0.3s;
+    }
+
+    nav.scrolled {
+      background: rgba(10,14,39,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 1px 0 var(--border-subtle);
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .nav-logo {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text-heading); }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-signin {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+
+    .btn-signin:hover { color: var(--text-heading); }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-cyan);
+      color: #0a0e27;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(0,212,255,0.4);
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--accent-cyan);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border-glow);
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-outline:hover {
+      background: rgba(0,212,255,0.08);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text-primary);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 64px; left: 0; right: 0;
+      background: rgba(10,14,39,0.97);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 24px;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 999;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      transition: color 0.2s;
+    }
+
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover { color: var(--text-heading); }
+
+    /* ============ HERO ============ */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 24px 80px;
+      overflow: hidden;
+      background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    }
+
+    .hero-glow-1 {
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+      top: -100px; left: -200px;
+      pointer-events: none;
+    }
+
+    .hero-glow-2 {
+      position: absolute;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(255,45,120,0.06) 0%, transparent 70%);
+      bottom: -100px; right: -150px;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      color: var(--accent-cyan);
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-h1 {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #ffffff 0%, rgba(0,212,255,0.9) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 520px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent-cyan);
+      color: #0a0e27;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 14px 28px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-hero:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,212,255,0.5);
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 40px;
+      background: var(--border-subtle);
+    }
+
+    /* ---- Agent demo card ---- */
+    .hero-demo { position: relative; }
+
+    .agent-card {
+      background: rgba(20,26,61,0.9);
+      border: 1px solid var(--border-glow);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--glow-cyan), 0 40px 80px rgba(0,0,0,0.5);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .agent-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      opacity: 0.6;
+    }
+
+    .agent-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .agent-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-heading);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot-live {
+      display: inline-block;
+      width: 8px; height: 8px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      animation: pulse-green 2s infinite;
+    }
+
+    @keyframes pulse-green {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,230,118,0.7); opacity: 1; }
+      50% { box-shadow: 0 0 0 6px rgba(0,230,118,0); opacity: 0.8; }
+    }
+
+    .agent-badge-card {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent-green);
+      background: rgba(0,230,118,0.08);
+      border: 1px solid rgba(0,230,118,0.2);
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+
+    .agent-steps {
+      margin-bottom: 20px;
+      min-height: 60px;
+    }
+
+    .agent-step {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      animation: stepFadeIn 0.4s ease;
+    }
+
+    .agent-step.active { display: flex; }
+
+    @keyframes stepFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent-cyan);
+    }
+
+    .step-progress {
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .step-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+      border-radius: 100px;
+      width: 0%;
+      animation: progressAnim 1.8s ease forwards;
+    }
+
+    @keyframes progressAnim {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+
+    .step-success {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent-green);
+      font-weight: 700;
+    }
+
+    /* Mock form fields */
+    .mock-fields-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .mock-field { display: flex; flex-direction: column; gap: 4px; }
+
+    .mock-field-label {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .mock-field-input {
+      height: 30px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 5px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      transition: border-color 0.4s;
+    }
+
+    .mock-field.filled .mock-field-input { border-color: rgba(0,212,255,0.35); }
+
+    .mock-field-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: linear-gradient(90deg, rgba(0,212,255,0.15), rgba(0,212,255,0.04));
+      width: 0%;
+      transition: width 0.55s ease;
+    }
+
+    .mock-field.filled .mock-field-fill { width: 100%; }
+
+    .mock-field-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-primary);
+      opacity: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      transition: opacity 0.3s 0.45s;
+    }
+
+    .mock-field.filled .mock-field-value { opacity: 1; }
+
+    /* Wallet card */
+    .wallet-float {
+      background: rgba(20,26,61,0.95);
+      border: 1px solid rgba(255,171,0,0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 16px rgba(255,171,0,0.1);
+      animation: walletPop 0.4s ease;
+    }
+
+    @keyframes walletPop {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .wallet-icon { font-size: 1.1rem; }
+
+    .wallet-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent-amber);
+    }
+
+    /* ============ SECTION COMMON ============ */
+    .section {
+      padding: 96px 24px;
+      position: relative;
+    }
+
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      display: inline-block;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-cyan);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 700;
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    .section-sub {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      line-height: 1.7;
+    }
+
+    .section-header { margin-bottom: 60px; }
+
+    .section-header.centered { text-align: center; }
+    .section-header.centered .section-sub { margin: 0 auto; }
+
+    /* ============ PORTALS BAR ============ */
+    #portals {
+      background: var(--bg-secondary);
+      padding: 40px 0;
+      overflow: hidden;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .portals-label {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .marquee-wrapper {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .marquee-wrapper::before,
+    .marquee-wrapper::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 120px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .marquee-wrapper::before {
+      left: 0;
+      background: linear-gradient(90deg, var(--bg-secondary), transparent);
+    }
+
+    .marquee-wrapper::after {
+      right: 0;
+      background: linear-gradient(-90deg, var(--bg-secondary), transparent);
+    }
+
+    .marquee-track {
+      display: flex;
+      animation: marqueeScroll 30s linear infinite;
+      width: max-content;
+    }
+
+    .marquee-track:hover { animation-play-state: paused; }
+
+    @keyframes marqueeScroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .portal-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 100px;
+      padding: 8px 20px;
+      margin: 0 8px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .portal-chip:hover {
+      border-color: var(--border-glow);
+      color: var(--accent-cyan);
+    }
+
+    /* ============ HOW IT WORKS ============ */
+    #how-it-works { background: var(--bg-primary); }
+
+    .steps-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      position: relative;
+    }
+
+    .steps-container::before {
+      content: '';
+      position: absolute;
+      top: 48px;
+      left: calc(33.33% + 16px);
+      right: calc(33.33% + 16px);
+      height: 2px;
+      background: repeating-linear-gradient(90deg, var(--border-glow) 0, var(--border-glow) 8px, transparent 8px, transparent 16px);
+      z-index: 0;
+    }
+
+    .step-card {
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 36px 28px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      transition: background 0.3s, box-shadow 0.3s, border-color 0.3s, transform 0.3s;
+    }
+
+    .step-card:hover {
+      background: rgba(255,255,255,0.05);
+      box-shadow: var(--glow-cyan);
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+    }
+
+    .step-number {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(0,212,255,0.05));
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      margin: 0 auto 20px;
+    }
+
+    .step-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .step-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .step-card p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ============ FEATURES ============ */
+    #features { background: var(--bg-secondary); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s, box-shadow 0.3s, border-color 0.3s, transform 0.3s;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover {
+      background: rgba(255,255,255,0.05);
+      box-shadow: var(--glow-cyan);
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+    }
+
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon-wrap {
+      width: 48px; height: 48px;
+      background: rgba(0,212,255,0.1);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+      border: 1px solid rgba(0,212,255,0.15);
+    }
+
+    .feature-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--accent-amber);
+      background: rgba(255,171,0,0.1);
+      border: 1px solid rgba(255,171,0,0.2);
+      padding: 2px 8px;
+      border-radius: 100px;
+      margin-bottom: 12px;
+    }
+
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ============ LIVE AGENT DEMO ============ */
+    #demo { background: var(--bg-primary); }
+
+    .flow-diagram {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 48px 40px;
+      margin-bottom: 48px;
+      overflow-x: auto;
+    }
+
+    .flow-nodes {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 700px;
+    }
+
+    .flow-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .flow-node-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-glow);
+      border-radius: 10px;
+      padding: 14px 18px;
+      text-align: center;
+    }
+
+    .flow-node-icon { font-size: 1.4rem; margin-bottom: 6px; }
+
+    .flow-node-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-heading);
+      white-space: nowrap;
+    }
+
+    .flow-node-sub {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .flow-connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+
+    .flow-line {
+      position: relative;
+      height: 3px;
+      width: 56px;
+      background: rgba(0,212,255,0.1);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .flow-dot {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      animation: flowMove 2s linear infinite;
+      box-shadow: 0 0 5px var(--accent-cyan);
+    }
+
+    .flow-dot:nth-child(2) { animation-delay: -0.67s; }
+    .flow-dot:nth-child(3) { animation-delay: -1.33s; }
+
+    @keyframes flowMove {
+      0% { left: -7px; opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { left: 100%; opacity: 0; }
+    }
+
+    .flow-connector-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--accent-cyan);
+      opacity: 0.7;
+    }
+
+    .flow-points {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .flow-point {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+    }
+
+    .flow-point:hover {
+      background: rgba(255,255,255,0.05);
+      box-shadow: var(--glow-cyan);
+      transform: translateY(-2px);
+    }
+
+    .flow-point-icon { font-size: 1.8rem; flex-shrink: 0; }
+
+    .flow-point h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .flow-point p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* ============ PRICING ============ */
+    #pricing { background: var(--bg-secondary); }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .pricing-card {
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 32px 24px;
+      position: relative;
+      transition: background 0.3s, box-shadow 0.3s, border-color 0.3s, transform 0.3s;
+    }
+
+    .pricing-card:hover {
+      background: rgba(255,255,255,0.05);
+      box-shadow: var(--glow-cyan);
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+    }
+
+    .pricing-card.popular {
+      border-color: rgba(255,171,0,0.4);
+      box-shadow: 0 0 30px rgba(255,171,0,0.1);
+    }
+
+    .pricing-card.popular:hover { box-shadow: 0 0 40px rgba(255,171,0,0.2); }
+
+    .pricing-card.premium {
+      border-color: rgba(255,45,120,0.4);
+      background: linear-gradient(135deg, rgba(255,45,120,0.05), rgba(20,26,61,0.9));
+      box-shadow: var(--glow-magenta);
+    }
+
+    .pricing-card.premium:hover { box-shadow: 0 0 40px rgba(255,45,120,0.25); }
+
+    .pricing-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .pricing-badge.amber { background: var(--accent-amber); color: #0a0e27; }
+    .pricing-badge.magenta { background: var(--accent-magenta); color: #fff; }
+
+    .pricing-plan-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .pricing-amount {
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .pricing-currency {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      line-height: 1;
+      padding-bottom: 4px;
+    }
+
+    .pricing-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      line-height: 1;
+    }
+
+    .pricing-period {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding-bottom: 6px;
+    }
+
+    .pricing-fills {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent-cyan);
+      margin-bottom: 20px;
+    }
+
+    .pricing-divider {
+      height: 1px;
+      background: var(--border-subtle);
+      margin: 20px 0;
+    }
+
+    .pricing-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .pricing-features li i {
+      color: var(--accent-green);
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .btn-pricing {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: rgba(0,212,255,0.1);
+      color: var(--accent-cyan);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,212,255,0.2);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-pricing:hover {
+      background: rgba(0,212,255,0.15);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .btn-pricing.premium {
+      background: var(--accent-magenta);
+      color: #fff;
+      border-color: var(--accent-magenta);
+    }
+
+    .btn-pricing.premium:hover {
+      opacity: 0.9;
+      box-shadow: var(--glow-magenta);
+    }
+
+    .pricing-promo {
+      text-align: center;
+      background: rgba(0,230,118,0.06);
+      border: 1px solid rgba(0,230,118,0.2);
+      border-radius: 12px;
+      padding: 16px 24px;
+      font-size: 0.95rem;
+      color: var(--accent-green);
+      font-weight: 500;
+    }
+
+    /* ============ TESTIMONIALS ============ */
+    #testimonials { background: var(--bg-primary); }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .testimonial-card {
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 28px;
+      transition: background 0.3s, box-shadow 0.3s, border-color 0.3s, transform 0.3s;
+    }
+
+    .testimonial-card:hover {
+      background: rgba(255,255,255,0.05);
+      box-shadow: var(--glow-cyan);
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+    }
+
+    .stars { display: flex; gap: 3px; margin-bottom: 16px; }
+    .stars i { color: var(--accent-amber); font-size: 0.9rem; }
+
+    .testimonial-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .author-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .author-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-heading);
+    }
+
+    .author-role { font-size: 0.78rem; color: var(--text-secondary); }
+
+    /* ============ FAQ ============ */
+    #faq { background: var(--bg-secondary); }
+
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+
+    .faq-item.open { border-color: var(--border-glow); }
+
+    .faq-question {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-align: left;
+      gap: 16px;
+    }
+
+    .faq-question span {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-heading);
+    }
+
+    .faq-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+
+    .faq-icon i {
+      color: var(--accent-cyan);
+      font-size: 0.8rem;
+      transition: transform 0.3s;
+    }
+
+    .faq-item.open .faq-icon { background: rgba(0,212,255,0.2); }
+    .faq-item.open .faq-icon i { transform: rotate(45deg); }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+
+    .faq-item.open .faq-answer { max-height: 300px; }
+
+    .faq-answer-inner {
+      padding: 0 24px 20px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ============ BOTTOM CTA ============ */
+    #cta {
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+      padding: 96px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #cta::before {
+      content: '';
+      position: absolute;
+      width: 800px; height: 400px;
+      background: radial-gradient(ellipse, rgba(0,212,255,0.06) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .cta-inner {
+      max-width: 640px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-inner h2 {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .cta-inner p {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      margin-bottom: 36px;
+    }
+
+    .cta-btns {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* ============ FOOTER ============ */
+    footer {
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border-subtle);
+      padding: 64px 24px 32px;
+    }
+
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+
+    .footer-logo {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-heading);
+    }
+
+    .footer-brand p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-top: 12px;
+      max-width: 260px;
+    }
+
+    .footer-col h4 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--accent-cyan); }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-bottom p { font-size: 0.8rem; color: var(--text-secondary); }
+    .footer-bottom a { color: var(--accent-cyan); }
+
+    /* ============ SCROLL REVEAL ============ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+    .reveal-delay-6 { transition-delay: 0.6s; }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 1100px) {
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-demo { display: none; }
+      .steps-container { grid-template-columns: 1fr; }
+      .steps-container::before { display: none; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .flow-points { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links, .nav-right { display: none; }
+      .hamburger { display: flex; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto 32px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; gap: 32px; }
+      .section { padding: 64px 24px; }
+      .stats-row { gap: 16px; }
+      .stat-divider { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-ctas { flex-direction: column; align-items: flex-start; }
+      .cta-btns { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">🤖 AI Form Agent</a>
+    <ul class="nav-links">
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://ai-workflows.cloud/login.html" class="btn-signin">Sign in</a>
+      <a href="https://chromewebstore.google.com/detail/ai-form-filler-%E2%80%93-forms-do/ilpbinejiboadnbijkmhbdfliipcbkkn" target="_blank" rel="noopener" class="btn-primary">
+        <i class="bi bi-browser-chrome"></i> Add to Chrome — Free
+      </a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#how-it-works">How it works</a>
+  <a href="#features">Features</a>
+  <a href="#pricing">Pricing</a>
+  <a href="#faq">FAQ</a>
+  <a href="https://ai-workflows.cloud/login.html">Sign in</a>
+  <a href="https://chromewebstore.google.com/detail/ai-form-filler-%E2%80%93-forms-do/ilpbinejiboadnbijkmhbdfliipcbkkn" target="_blank" rel="noopener" style="color:var(--accent-cyan);">Add to Chrome — Free</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="grid-bg"></div>
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-badge">
+        🧠 Powered by AI Agent Technology — Updates Instantly
+      </div>
+      <h1 class="hero-h1">Your AI Agent fills government forms while you watch</h1>
+      <p class="hero-sub">Install once. The AI Agent scans any form, maps your data, and fills 60+ fields in 5 seconds. It learns new portals from the server — no extension updates needed.</p>
+      <div class="hero-ctas">
+        <a href="https://chromewebstore.google.com/detail/ai-form-filler-%E2%80%93-forms-do/ilpbinejiboadnbijkmhbdfliipcbkkn" target="_blank" rel="noopener" class="btn-hero">
+          <i class="bi bi-browser-chrome"></i> Add to Chrome — Free
+        </a>
+        <a href="https://ai-workflows.cloud/login.html" class="btn-outline">
+          <i class="bi bi-person-circle"></i> Sign in
+        </a>
+      </div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-value">5s</span>
+          <span class="stat-label">per form</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">60+</span>
+          <span class="stat-label">fields filled</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">50+</span>
+          <span class="stat-label">portals</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value">₹2</span>
+          <span class="stat-label">per form</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agent Demo Card -->
+    <div class="hero-demo">
+      <div class="agent-card">
+        <div class="agent-header">
+          <div class="agent-title">
+            <span class="dot-live"></span>
+            Agent Connected
+          </div>
+          <div class="agent-badge-card">v2.1.4 · LIVE</div>
+        </div>
+
+        <div class="agent-steps">
+          <div class="agent-step active" id="step0">
+            <span class="step-label">⟳ Scanning form...</span>
+            <div class="step-progress"><div class="step-progress-bar"></div></div>
+          </div>
+          <div class="agent-step" id="step1">
+            <span class="step-label">🔍 Analyzing 12 fields...</span>
+            <div class="step-progress"><div class="step-progress-bar"></div></div>
+          </div>
+          <div class="agent-step" id="step2">
+            <span class="step-label">🗂 Mapping profile data...</span>
+            <div class="step-progress"><div class="step-progress-bar"></div></div>
+          </div>
+          <div class="agent-step" id="step3">
+            <span class="step-label">✍️ Filling form...</span>
+            <div class="step-progress"><div class="step-progress-bar"></div></div>
+          </div>
+          <div class="agent-step" id="step4">
+            <span class="step-success">✅ 12/12 fields filled in 4.2s</span>
+          </div>
+        </div>
+
+        <div class="mock-fields-grid" id="mockFields">
+          <div class="mock-field" id="f0">
+            <div class="mock-field-label">Full Name</div>
+            <div class="mock-field-input">
+              <div class="mock-field-fill"></div>
+              <span class="mock-field-value">Rajesh Kumar</span>
+            </div>
+          </div>
+          <div class="mock-field" id="f1">
+            <div class="mock-field-label">Date of Birth</div>
+            <div class="mock-field-input">
+              <div class="mock-field-fill"></div>
+              <span class="mock-field-value">15/08/1995</span>
+            </div>
+          </div>
+          <div class="mock-field" id="f2">
+            <div class="mock-field-label">Father's Name</div>
+            <div class="mock-field-input">
+              <div class="mock-field-fill"></div>
+              <span class="mock-field-value">Suresh Kumar</span>
+            </div>
+          </div>
+          <div class="mock-field" id="f3">
+            <div class="mock-field-label">Category</div>
+            <div class="mock-field-input">
+              <div class="mock-field-fill"></div>
+              <span class="mock-field-value">OBC</span>
+            </div>
+          </div>
+          <div class="mock-field" id="f4">
+            <div class="mock-field-label">Mobile Number</div>
+            <div class="mock-field-input">
+              <div class="mock-field-fill"></div>
+              <span class="mock-field-value">9876543210</span>
+            </div>
+          </div>
+          <div class="mock-field" id="f5">
+            <div class="mock-field-label">Aadhaar No.</div>
+            <div class="mock-field-input">
+              <div class="mock-field-fill"></div>
+              <span class="mock-field-value">XXXX XXXX 4521</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="wallet-float" id="walletCard" style="display:none;">
+          <span class="wallet-icon">💳</span>
+          <span class="wallet-text">₹2 deducted · Wallet: ₹98</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTALS BAR -->
+<div id="portals">
+  <p class="portals-label">Works on all major government portals</p>
+  <div class="marquee-wrapper">
+    <div class="marquee-track">
+      <span class="portal-chip"><i class="bi bi-mortarboard-fill"></i> SSC</span>
+      <span class="portal-chip"><i class="bi bi-bank"></i> UPSC</span>
+      <span class="portal-chip"><i class="bi bi-train-front-fill"></i> Indian Railways</span>
+      <span class="portal-chip"><i class="bi bi-building"></i> IBPS / SBI</span>
+      <span class="portal-chip"><i class="bi bi-file-earmark-text"></i> NRA CET</span>
+      <span class="portal-chip"><i class="bi bi-geo-alt-fill"></i> State PSC</span>
+      <span class="portal-chip"><i class="bi bi-shield-fill"></i> Defence</span>
+      <span class="portal-chip"><i class="bi bi-heart-pulse-fill"></i> NEET / JEE</span>
+      <span class="portal-chip"><i class="bi bi-train-lightrail-front"></i> RRB / RRC</span>
+      <span class="portal-chip"><i class="bi bi-building-fill"></i> LIC / GIC</span>
+      <span class="portal-chip"><i class="bi bi-bank2"></i> NABARD</span>
+      <span class="portal-chip" style="color:var(--accent-cyan);border-color:rgba(0,212,255,0.2)"><i class="bi bi-arrow-right-circle-fill"></i> 50+ more</span>
+      <!-- duplicate for seamless loop -->
+      <span class="portal-chip"><i class="bi bi-mortarboard-fill"></i> SSC</span>
+      <span class="portal-chip"><i class="bi bi-bank"></i> UPSC</span>
+      <span class="portal-chip"><i class="bi bi-train-front-fill"></i> Indian Railways</span>
+      <span class="portal-chip"><i class="bi bi-building"></i> IBPS / SBI</span>
+      <span class="portal-chip"><i class="bi bi-file-earmark-text"></i> NRA CET</span>
+      <span class="portal-chip"><i class="bi bi-geo-alt-fill"></i> State PSC</span>
+      <span class="portal-chip"><i class="bi bi-shield-fill"></i> Defence</span>
+      <span class="portal-chip"><i class="bi bi-heart-pulse-fill"></i> NEET / JEE</span>
+      <span class="portal-chip"><i class="bi bi-train-lightrail-front"></i> RRB / RRC</span>
+      <span class="portal-chip"><i class="bi bi-building-fill"></i> LIC / GIC</span>
+      <span class="portal-chip"><i class="bi bi-bank2"></i> NABARD</span>
+      <span class="portal-chip" style="color:var(--accent-cyan);border-color:rgba(0,212,255,0.2)"><i class="bi bi-arrow-right-circle-fill"></i> 50+ more</span>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how-it-works">
+  <div class="section-inner">
+    <div class="section-header centered reveal">
+      <span class="section-label">Simple Process</span>
+      <h2 class="section-title">How the AI Agent fills your forms</h2>
+    </div>
+    <div class="steps-container">
+      <div class="step-card reveal reveal-delay-1">
+        <div class="step-number">1</div>
+        <span class="step-icon">🔌</span>
+        <h3>Install the AI Agent</h3>
+        <p>Add to Chrome in one click. Installs in 10 seconds. No configuration needed — the agent connects to the cloud automatically.</p>
+      </div>
+      <div class="step-card reveal reveal-delay-2">
+        <div class="step-number">2</div>
+        <span class="step-icon">👤</span>
+        <h3>Create a Customer Profile</h3>
+        <p>Enter applicant details once. Saved securely in the cloud. Create unlimited profiles for all your clients — access from any device.</p>
+      </div>
+      <div class="step-card reveal reveal-delay-3">
+        <div class="step-number">3</div>
+        <span class="step-icon">⚡</span>
+        <h3>Agent Scans &amp; Fills Automatically</h3>
+        <p>Open any government portal. The AI Agent detects the form, analyzes every field intelligently, and fills everything in just 5 seconds.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="section-inner">
+    <div class="section-header reveal">
+      <span class="section-label">Features</span>
+      <h2 class="section-title">Everything your form-filling business needs</h2>
+      <p class="section-sub">Built for Jan Seva Kendras, CSC operators, and anyone who fills government forms professionally.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon-wrap">🤖</div>
+        <div class="feature-badge">Server-side AI</div>
+        <h3>AI Agent Auto-Fill</h3>
+        <p>Server-side AI understands both Hindi and English field labels. Maps data intelligently across any form layout — no manual field matching.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon-wrap">⚡</div>
+        <div class="feature-badge">Zero downtime</div>
+        <h3>Instant Updates, No Waiting</h3>
+        <p>We update the AI on our server. Your extension gets the latest intelligence instantly — zero downtime, zero user action required.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon-wrap">👥</div>
+        <h3>Unlimited Customer Profiles</h3>
+        <p>Store all your clients in the cloud. One-click profile selection before filling. Sync across all your computers and devices.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon-wrap">🌐</div>
+        <h3>Works on 50+ Portals</h3>
+        <p>SSC, UPSC, Railways, IBPS, SBI, Defence, NRA CET, State PSC, and 40+ more. New portals added every week automatically.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon-wrap">💰</div>
+        <h3>Pay Per Fill</h3>
+        <p>Just ₹2 per form. No monthly subscription. No hidden fees. New users get ₹100 free wallet — that's 50 forms on us.</p>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon-wrap">🔒</div>
+        <h3>Secure &amp; Synced</h3>
+        <p>Customer data encrypted in the cloud. API keys never stored in the browser. Enterprise-grade security for your clients' sensitive data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE AGENT DEMO -->
+<section class="section" id="demo">
+  <div class="section-inner">
+    <div class="section-header centered reveal">
+      <span class="section-label">Architecture</span>
+      <h2 class="section-title">See the AI Agent in action</h2>
+      <p class="section-sub">A lightweight extension bridges your browser to a powerful cloud AI — giving you the best of both worlds.</p>
+    </div>
+
+    <div class="flow-diagram reveal">
+      <div class="flow-nodes">
+        <div class="flow-node">
+          <div class="flow-node-box">
+            <div class="flow-node-icon">📄</div>
+            <div class="flow-node-label">Government Form</div>
+            <div class="flow-node-sub">SSC / UPSC / Railways</div>
+          </div>
+        </div>
+        <div class="flow-connector">
+          <div class="flow-line">
+            <div class="flow-dot"></div>
+            <div class="flow-dot"></div>
+            <div class="flow-dot"></div>
+          </div>
+          <div class="flow-connector-label">DOM scan</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-node-box" style="border-color:rgba(0,212,255,0.5)">
+            <div class="flow-node-icon">🔌</div>
+            <div class="flow-node-label">Extension Bridge</div>
+            <div class="flow-node-sub">50KB · Chrome</div>
+          </div>
+        </div>
+        <div class="flow-connector">
+          <div class="flow-line">
+            <div class="flow-dot"></div>
+            <div class="flow-dot"></div>
+            <div class="flow-dot"></div>
+          </div>
+          <div class="flow-connector-label">WebSocket</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-node-box" style="border-color:rgba(255,45,120,0.5)">
+            <div class="flow-node-icon">🧠</div>
+            <div class="flow-node-label">AI Server</div>
+            <div class="flow-node-sub">ai-workflows.cloud</div>
+          </div>
+        </div>
+        <div class="flow-connector">
+          <div class="flow-line">
+            <div class="flow-dot"></div>
+            <div class="flow-dot"></div>
+            <div class="flow-dot"></div>
+          </div>
+          <div class="flow-connector-label">Inference</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-node-box" style="border-color:rgba(255,171,0,0.5)">
+            <div class="flow-node-icon">✨</div>
+            <div class="flow-node-label">GPT-4o</div>
+            <div class="flow-node-sub">Field mapping</div>
+          </div>
+        </div>
+        <div class="flow-connector">
+          <div class="flow-line">
+            <div class="flow-dot"></div>
+            <div class="flow-dot"></div>
+            <div class="flow-dot"></div>
+          </div>
+          <div class="flow-connector-label">Instructions</div>
+        </div>
+        <div class="flow-node">
+          <div class="flow-node-box" style="border-color:rgba(0,230,118,0.5)">
+            <div class="flow-node-icon">✅</div>
+            <div class="flow-node-label">Form Filled</div>
+            <div class="flow-node-sub">In 5 seconds</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-points">
+      <div class="flow-point reveal reveal-delay-1">
+        <div class="flow-point-icon">🧠</div>
+        <div>
+          <h4>AI brain on server — always improving</h4>
+          <p>The intelligence lives in the cloud. Every update makes the AI smarter for every user instantly.</p>
+        </div>
+      </div>
+      <div class="flow-point reveal reveal-delay-2">
+        <div class="flow-point-icon">⚡</div>
+        <div>
+          <h4>Extension is lightweight — just 50KB</h4>
+          <p>The Chrome extension is a thin bridge. No bloat, no slowdown, no permission overreach.</p>
+        </div>
+      </div>
+      <div class="flow-point reveal reveal-delay-3">
+        <div class="flow-point-icon">🔄</div>
+        <div>
+          <h4>New portals added weekly — no update needed</h4>
+          <p>Server learns new portals. Your extension works on them next day. No Chrome Store update needed.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="section-inner">
+    <div class="section-header centered reveal">
+      <span class="section-label">Pricing</span>
+      <h2 class="section-title">Simple, transparent pricing</h2>
+      <p class="section-sub">Pay only for what you use. New users get ₹100 free wallet on signup.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="pricing-card reveal reveal-delay-1">
+        <div class="pricing-plan-name">Starter</div>
+        <div class="pricing-amount">
+          <span class="pricing-currency">₹</span>
+          <span class="pricing-value">50</span>
+        </div>
+        <div class="pricing-fills">~25 form fills</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li><i class="bi bi-check-circle-fill"></i> ₹2 per form fill</li>
+          <li><i class="bi bi-check-circle-fill"></i> All 50+ portals</li>
+          <li><i class="bi bi-check-circle-fill"></i> Cloud profiles</li>
+          <li><i class="bi bi-check-circle-fill"></i> No expiry</li>
+        </ul>
+        <a href="https://ai-workflows.cloud/login.html" class="btn-pricing">Get Started</a>
+      </div>
+
+      <div class="pricing-card popular reveal reveal-delay-2">
+        <div class="pricing-badge amber">Most Popular</div>
+        <div class="pricing-plan-name">Standard</div>
+        <div class="pricing-amount">
+          <span class="pricing-currency">₹</span>
+          <span class="pricing-value">100</span>
+        </div>
+        <div class="pricing-fills">~50 form fills</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li><i class="bi bi-check-circle-fill"></i> ₹2 per form fill</li>
+          <li><i class="bi bi-check-circle-fill"></i> All 50+ portals</li>
+          <li><i class="bi bi-check-circle-fill"></i> Unlimited profiles</li>
+          <li><i class="bi bi-check-circle-fill"></i> Priority support</li>
+        </ul>
+        <a href="https://ai-workflows.cloud/login.html" class="btn-pricing">Buy Now</a>
+      </div>
+
+      <div class="pricing-card reveal reveal-delay-3">
+        <div class="pricing-plan-name">Bulk</div>
+        <div class="pricing-amount">
+          <span class="pricing-currency">₹</span>
+          <span class="pricing-value">500</span>
+        </div>
+        <div class="pricing-fills">~250 form fills</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li><i class="bi bi-check-circle-fill"></i> ₹2 per form fill</li>
+          <li><i class="bi bi-check-circle-fill"></i> All 50+ portals</li>
+          <li><i class="bi bi-check-circle-fill"></i> Unlimited profiles</li>
+          <li><i class="bi bi-check-circle-fill"></i> Dedicated support</li>
+        </ul>
+        <a href="https://ai-workflows.cloud/login.html" class="btn-pricing">Buy Now</a>
+      </div>
+
+      <div class="pricing-card premium reveal reveal-delay-4">
+        <div class="pricing-badge magenta">Pro License</div>
+        <div class="pricing-plan-name">Cyber Cafe License</div>
+        <div class="pricing-amount">
+          <span class="pricing-currency">₹</span>
+          <span class="pricing-value">999</span>
+          <span class="pricing-period">/month</span>
+        </div>
+        <div class="pricing-fills" style="color:var(--accent-magenta)">Unlimited fills</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li><i class="bi bi-check-circle-fill" style="color:var(--accent-magenta)"></i> Unlimited form fills</li>
+          <li><i class="bi bi-check-circle-fill" style="color:var(--accent-magenta)"></i> Multiple computers</li>
+          <li><i class="bi bi-check-circle-fill" style="color:var(--accent-magenta)"></i> Unlimited profiles</li>
+          <li><i class="bi bi-check-circle-fill" style="color:var(--accent-magenta)"></i> WhatsApp support</li>
+        </ul>
+        <a href="https://ai-workflows.cloud/login.html" class="btn-pricing premium">Get License</a>
+      </div>
+    </div>
+
+    <div class="pricing-promo reveal">
+      🎁 New users get <strong>₹100 free wallet</strong> on signup — that's 50 forms completely free!
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section" id="testimonials">
+  <div class="section-inner">
+    <div class="section-header centered reveal">
+      <span class="section-label">Testimonials</span>
+      <h2 class="section-title">Trusted by CSC operators across India</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal reveal-delay-1">
+        <div class="stars">
+          <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+        </div>
+        <p class="testimonial-text">"Pehle 20-25 minute lagte the. Ab AI Agent 5 second mein sab kar deta hai. Din mein 30 forms? Koi baat nahi!"</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">RG</div>
+          <div>
+            <div class="author-name">Rajesh Gupta</div>
+            <div class="author-role">CSC Operator · Lucknow</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-2">
+        <div class="stars">
+          <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+        </div>
+        <p class="testimonial-text">"Roz 30-40 forms bharte hain. AI Agent ne meri zindagi aasaan kar di. Ek baar profile daalo, bas."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:linear-gradient(135deg,var(--accent-magenta),var(--accent-amber))">PS</div>
+          <div>
+            <div class="author-name">Pradeep Sharma</div>
+            <div class="author-role">Delhi CSC · Jan Seva Kendra</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal reveal-delay-3">
+        <div class="stars">
+          <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+        </div>
+        <p class="testimonial-text">"Railway aur SSC dono pe perfectly kaam karta hai. Agent har hafte naye portals seekh leta hai, koi update nahi chahiye."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:linear-gradient(135deg,var(--accent-green),var(--accent-cyan))">SD</div>
+          <div>
+            <div class="author-name">Sunita Devi</div>
+            <div class="author-role">CSC Operator · Gorakhpur</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="section-inner">
+    <div class="section-header centered reveal">
+      <span class="section-label">FAQ</span>
+      <h2 class="section-title">Frequently asked questions</h2>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>How does the AI Agent know which field to fill?</span>
+          <div class="faq-icon"><i class="bi bi-plus"></i></div>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">The AI Agent sends the form's HTML structure to our cloud server. GPT-4o analyzes each field's label (in Hindi or English), context, and type — then maps the correct data from your profile. It understands field intent, not just keywords, so it works even on forms it hasn't seen before.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>What is the AI Agent? How is it different from a normal extension?</span>
+          <div class="faq-icon"><i class="bi bi-plus"></i></div>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">A normal autofill extension uses pre-programmed rules for specific portals — you need to update it every time a portal changes. Our AI Agent uses a cloud-based AI (GPT-4o) that understands forms the same way a human does. It can handle new portals, renamed fields, and layout changes without any extension update.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Is my customer data safe?</span>
+          <div class="faq-icon"><i class="bi bi-plus"></i></div>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Yes. Customer profile data is encrypted and stored in our cloud database. Your API key is never stored in the browser extension — it's authenticated through our server. We do not share or sell any data. You control your profiles and can delete them anytime from the dashboard.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Does it work on all government forms?</span>
+          <div class="faq-icon"><i class="bi bi-plus"></i></div>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">It works on 50+ major government portals including SSC, UPSC, Indian Railways, IBPS, SBI, NRA CET, State PSC, Defence, NEET/JEE, and many more. We add new portals every week. If a portal is not supported, you can request it and we typically add it within 2–3 days.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>What happens when my wallet runs out?</span>
+          <div class="faq-icon"><i class="bi bi-plus"></i></div>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">The extension will show a low balance warning when your wallet reaches ₹10. When balance hits ₹0, form filling will pause until you recharge. You can top up anytime from the dashboard at ai-workflows.cloud/recharge.html — wallet balance never expires.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Can I use it on multiple computers?</span>
+          <div class="faq-icon"><i class="bi bi-plus"></i></div>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Yes! Your account, profiles, and wallet are cloud-based. Just install the Chrome extension on any computer and sign in with your account. The Cyber Cafe License is specifically designed for shops with multiple computers — one subscription covers all machines.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>What is the ₹2 per form launch offer?</span>
+          <div class="faq-icon"><i class="bi bi-plus"></i></div>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">₹2 per form is our introductory launch pricing. Each time the AI Agent successfully fills a form, ₹2 is deducted from your wallet. This includes AI processing, server costs, and all portal support. New users also get ₹100 free wallet (50 free fills) on signup.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-question">
+          <span>Do I need to update the extension for new portals?</span>
+          <div class="faq-icon"><i class="bi bi-plus"></i></div>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">No! This is one of the biggest advantages of our AI Agent architecture. When we add support for a new portal, the update happens on our server. Your extension automatically benefits the next time you visit that portal — no Chrome Store update, no browser restart required.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM CTA -->
+<section id="cta">
+  <div class="cta-inner">
+    <h2 class="reveal">Start filling forms with AI Agent today</h2>
+    <p class="reveal">Join thousands of CSC operators. Get ₹100 free wallet on signup.</p>
+    <div class="cta-btns reveal">
+      <a href="https://chromewebstore.google.com/detail/ai-form-filler-%E2%80%93-forms-do/ilpbinejiboadnbijkmhbdfliipcbkkn" target="_blank" rel="noopener" class="btn-hero">
+        <i class="bi bi-browser-chrome"></i> Add to Chrome — Free
+      </a>
+      <a href="https://ai-workflows.cloud/login.html" class="btn-outline">
+        <i class="bi bi-grid-1x2-fill"></i> Sign in to Dashboard
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">🤖 AI Form Agent</div>
+        <p>AI-powered form filling agent for India's government portals. Built for Jan Seva Kendras and CSC operators.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul class="footer-links">
+          <li><a href="#how-it-works">How it works</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="https://ai-workflows.cloud/download-extension.html">Download</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <ul class="footer-links">
+          <li><a href="https://ai-workflows.cloud/login.html">Sign in</a></li>
+          <li><a href="https://ai-workflows.cloud/dashboard.html">Dashboard</a></li>
+          <li><a href="https://ai-workflows.cloud/recharge.html">Add money</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul class="footer-links">
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="https://ai-workflows.cloud/privacy.html">Privacy Policy</a></li>
+          <li><a href="https://wa.me/919296914511" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a></li>
+          <li><a href="mailto:support@ai-workflows.cloud"><i class="bi bi-envelope"></i> Email</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 AI Form Agent · <a href="https://ai-workflows.cloud">ai-workflows.cloud</a></p>
+      <p>Made with love for India's form fillers</p>
+    </div>
+  </div>
+</footer>
+
+<!-- JAVASCRIPT -->
+<script>
+(function() {
+  // Navbar scroll
+  var navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 40) navbar.classList.add('scrolled');
+    else navbar.classList.remove('scrolled');
+  }, { passive: true });
+
+  // Hamburger
+  var hamburger = document.getElementById('hamburger');
+  var mobileMenu = document.getElementById('mobileMenu');
+
+  hamburger.addEventListener('click', function() {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+
+  mobileMenu.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+    });
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+    anchor.addEventListener('click', function(e) {
+      var targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+      var target = document.querySelector(targetId);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // Scroll reveal
+  var revealObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(function(el) {
+    revealObserver.observe(el);
+  });
+
+  // Agent demo animation
+  var steps = document.querySelectorAll('.agent-step');
+  var mockFields = document.querySelectorAll('.mock-field');
+  var walletCard = document.getElementById('walletCard');
+  var demoTimeout = null;
+
+  function restartProgressBar(step) {
+    var bar = step.querySelector('.step-progress-bar');
+    if (!bar) return;
+    bar.style.animation = 'none';
+    void bar.offsetWidth;
+    bar.style.animation = 'progressAnim 1.8s ease forwards';
+  }
+
+  function showStep(index) {
+    steps.forEach(function(s) { s.classList.remove('active'); });
+    if (steps[index]) {
+      steps[index].classList.add('active');
+      restartProgressBar(steps[index]);
+    }
+  }
+
+  function resetDemo() {
+    mockFields.forEach(function(f) { f.classList.remove('filled'); });
+    walletCard.style.display = 'none';
+    if (demoTimeout) { clearTimeout(demoTimeout); demoTimeout = null; }
+    showStep(0);
+  }
+
+  function runDemo() {
+    resetDemo();
+
+    var timings = [
+      { delay: 0,    fn: function() { showStep(0); } },
+      { delay: 2000, fn: function() { showStep(1); } },
+      { delay: 4000, fn: function() { showStep(2); } },
+      { delay: 6000, fn: function() { showStep(3); } },
+      { delay: 8000, fn: function() { showStep(4); } },
+      { delay: 8600, fn: function() { walletCard.style.display = 'flex'; } },
+    ];
+
+    // Fill fields one by one starting at 6400ms
+    var fieldStart = 6400;
+    var fieldDelay = 380;
+    mockFields.forEach(function(f, i) {
+      timings.push({
+        delay: fieldStart + i * fieldDelay,
+        fn: (function(field) {
+          return function() { field.classList.add('filled'); };
+        })(f)
+      });
+    });
+
+    timings.forEach(function(t) {
+      setTimeout(t.fn, t.delay);
+    });
+
+    // Loop
+    demoTimeout = setTimeout(runDemo, 14000);
+  }
+
+  setTimeout(runDemo, 1000);
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-question').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var item = btn.closest('.faq-item');
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+})();
+</script>
+</body>
+</html>

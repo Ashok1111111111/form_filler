@@ -1,0 +1,20 @@
+# Environment / secrets
+.env
+
+# Composer
+vendor/
+composer.phar
+
+# Node / tests
+tests/node_modules/
+node_modules/
+
+# Cache
+cache/
+
+# ZIP builds
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db

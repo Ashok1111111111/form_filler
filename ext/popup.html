@@ -1,0 +1,175 @@
+<!-- Updated popup.html - WITH CREDIT DISPLAY -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Form Filler</title>
+    <style>
+        body {
+            width: 380px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            margin: 0;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        h4 {
+            color: white;
+            margin: 0 0 15px 0;
+            text-align: center;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .badge-ai {
+            background: #00bcd4;
+            color: white;
+        }
+        .badge-cache {
+            background: #4caf50;
+            color: white;
+        }
+        .form-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background-color: #00bcd4;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #00acc1;
+        }
+        .btn-success {
+            background-color: #4caf50;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #43a047;
+        }
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 12px;
+            padding: 8px;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .data-preview {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            display: none;
+        }
+        .data-preview strong {
+            color: #ffeb3b;
+        }
+        #statusMessages {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.2);
+            font-size: 0.85em;
+            display: none;
+        }
+        .text-success { color: #8bc34a !important; }
+        .text-danger { color: #f44336 !important; }
+        .text-info { color: #03a9f4 !important; }
+        .cache-info {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-top: 10px;
+        }
+        .doc-section { margin-top:12px; border-top:1px solid rgba(255,255,255,0.15); padding-top:12px; display:none; }
+        .doc-section-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:rgba(255,255,255,.6); margin-bottom:8px; }
+        .doc-item { background:rgba(255,255,255,.12); border-radius:8px; padding:9px 10px; margin-bottom:7px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+        .doc-item-label { font-size:12px; font-weight:600; color:white; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .doc-item-meta { font-size:10px; color:rgba(255,255,255,.55); white-space:nowrap; }
+        .btn-tool { background:#f5724f; color:white; border:none; border-radius:6px; padding:5px 9px; font-size:11px; font-weight:700; cursor:pointer; flex-shrink:0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h4>
+            AI Form Filler
+            <span class="badge badge-ai">AI</span>
+            <span class="badge badge-cache">CACHE</span>
+        </h4>
+        <div style="text-align:center; font-size:10px; color:rgba(255,255,255,0.5); margin:-10px 0 10px; letter-spacing:.5px;">v4.6 — Forms & Document Tools</div>
+
+        <!-- LOGIN / WALLET STATUS -->
+        <div id="walletBar" style="background:rgba(0,0,0,.25);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;display:flex;align-items:center;justify-content:space-between;">
+            <span id="walletUser" style="color:rgba(255,255,255,.6);">Checking login...</span>
+            <span id="walletAmt" style="font-weight:800;color:#8bc34a;"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="customerId" class="form-label">Customer ID</label>
+            <input type="text" class="form-control" id="customerId" placeholder="e.g., CUS-1707123456" required>
+            <small style="color: rgba(255,255,255,0.7); font-size: 11px;">Find in My Customers</small>
+        </div>
+        
+        <button class="btn btn-primary" id="loadDataBtn">Load Customer Data</button>
+        
+        <div id="dataPreview" class="data-preview">
+            <p><strong>Name:</strong> <span id="previewName"></span></p>
+            <p><strong>Email:</strong> <span id="previewEmail"></span></p>
+            <p class="mb-0"><strong>Mobile:</strong> <span id="previewMobile"></span></p>
+        </div>
+
+        <button class="btn btn-success" id="fillFormBtn" disabled>Fill Form with AI 🤖</button>
+        
+        <button class="btn btn-secondary" id="clearCacheBtn">Clear Cache</button>
+
+        <div id="statusMessages"></div>
+
+        <div id="docSection" class="doc-section">
+            <div class="doc-section-title">📄 Documents Required</div>
+            <div id="docList"></div>
+        </div>
+
+        <div class="cache-info">
+            💾 Forms cached after first fill<br>
+            ⚡ Next fill = Instant & FREE!
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

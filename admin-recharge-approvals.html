@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin — Recharge Approvals</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+<style>
+:root{--accent:#5b4ff5;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--bg:#f6f6fa;--card:#fff;--ink:#0d0d14;--ink-muted:#6b6b80;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#1a1535,#2d2060);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.hdr-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;display:flex;align-items:center;gap:10px;}
+.admin-badge{background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.4);color:#fca5a5;border-radius:20px;padding:3px 12px;font-size:.72rem;font-weight:700;}
+.hdr-right{display:flex;align-items:center;gap:12px;}
+.back-btn{color:rgba(255,255,255,.7);text-decoration:none;font-size:.85rem;display:flex;align-items:center;gap:6px;}
+.back-btn:hover{color:#fff;}
+.logout-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:6px 14px;font-size:.82rem;cursor:pointer;}
+
+/* STATS BAR */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px 24px;background:var(--card);border-bottom:1px solid #eee;}
+.stat-box{text-align:center;}
+.stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;line-height:1;}
+.stat-lbl{font-size:.72rem;color:var(--ink-muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px;}
+.stat-num.pending-c{color:var(--yellow);}
+.stat-num.approved-c{color:var(--green);}
+.stat-num.rejected-c{color:var(--red);}
+.stat-num.total-c{color:var(--accent);}
+
+/* MAIN */
+.main{padding:24px;max-width:1100px;margin:0 auto;}
+.section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.badge{border-radius:20px;padding:3px 10px;font-size:.7rem;font-weight:700;}
+.badge-pending{background:rgba(245,158,11,.12);color:#92400e;border:1px solid rgba(245,158,11,.3);}
+.badge-approved{background:rgba(34,197,94,.1);color:#166534;border:1px solid rgba(34,197,94,.25);}
+.badge-rejected{background:rgba(239,68,68,.1);color:#991b1b;border:1px solid rgba(239,68,68,.2);}
+
+/* PENDING CARDS */
+.pending-list{display:flex;flex-direction:column;gap:12px;margin-bottom:30px;}
+.txn-card{background:var(--card);border:1px solid #e8e8f0;border-radius:14px;padding:16px 18px;}
+.txn-card.is-pending{border-left:4px solid var(--yellow);}
+.txn-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.txn-user{font-weight:700;font-size:.95rem;}
+.txn-email{font-size:.78rem;color:var(--ink-muted);}
+.txn-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
+.meta-pill{background:#f4f4fb;border-radius:8px;padding:4px 10px;font-size:.76rem;color:var(--ink-muted);display:flex;align-items:center;gap:5px;}
+.meta-pill strong{color:var(--ink);}
+.txn-id{font-family:monospace;font-size:.8rem;background:#f0f0fb;border-radius:6px;padding:4px 10px;color:var(--accent);margin-top:8px;display:inline-block;}
+.txn-actions{display:flex;gap:8px;margin-top:12px;align-items:center;}
+.btn-approve{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:9px;padding:8px 18px;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;}
+.btn-approve:hover{opacity:.88;}
+.btn-reject{background:#fff;color:var(--red);border:1.5px solid var(--red);border-radius:9px;padding:8px 18px;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;}
+.btn-reject:hover{background:#fff5f5;}
+.btn-approve:disabled,.btn-reject:disabled{opacity:.5;cursor:not-allowed;}
+.admin-note-inp{flex:1;min-width:180px;padding:8px 12px;border:1.5px solid #e0e0f0;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.82rem;outline:none;}
+.admin-note-inp:focus{border-color:var(--accent);}
+.time-ago{font-size:.72rem;color:var(--ink-muted);}
+
+/* HISTORY TABLE */
+.tbl-wrap{background:var(--card);border-radius:14px;border:1px solid #e8e8f0;overflow:hidden;}
+.tbl-head{padding:14px 18px;background:#f8f8fc;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;}
+.tbl-head h3{font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;}
+table{width:100%;border-collapse:collapse;}
+th{background:#f8f8fc;padding:10px 14px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-muted);border-bottom:1px solid #eee;}
+td{padding:11px 14px;font-size:.82rem;border-bottom:1px solid #f4f4fb;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fafafa;}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px;color:var(--ink-muted);}
+.empty .ico{font-size:2.5rem;margin-bottom:8px;}
+
+/* TOAST */
+.toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:#fff;border-radius:10px;padding:12px 16px;box-shadow:0 4px 20px rgba(0,0,0,.12);font-size:.84rem;display:flex;align-items:center;gap:10px;animation:slideIn .3s ease;border-left:4px solid #ccc;max-width:320px;}
+.toast.success{border-left-color:var(--green);}
+.toast.error{border-left-color:var(--red);}
+.toast.warn{border-left-color:var(--yellow);}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+
+/* MIGRATION PANEL */
+.migration-panel{background:#fff;border:1.5px solid rgba(91,79,245,.25);border-radius:14px;padding:18px 20px;margin-bottom:24px;}
+.migration-panel h3{font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.migration-panel p{font-size:.82rem;color:var(--ink-muted);margin-bottom:14px;}
+.btn-migrate{background:linear-gradient(135deg,#5b4ff5,#7c3aed);color:#fff;border:none;border-radius:9px;padding:9px 20px;font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.2s;}
+.btn-migrate:hover{opacity:.88;}
+.btn-migrate:disabled{opacity:.5;cursor:not-allowed;}
+#migrateLog{font-family:monospace;font-size:.75rem;background:#f4f4fb;border-radius:8px;padding:12px;margin-top:12px;max-height:200px;overflow-y:auto;display:none;white-space:pre-wrap;line-height:1.6;}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border:none;border-radius:9px;padding:9px 20px;font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.2s;}
+.btn-danger:hover{opacity:.88;}
+.btn-danger:disabled{opacity:.5;cursor:not-allowed;}
+
+/* LOADING */
+#loading{position:fixed;inset:0;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;z-index:1000;font-size:.9rem;gap:10px;}
+
+@media(max-width:600px){
+  .stats-bar{grid-template-columns:1fr 1fr;}
+  .txn-top{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<div id="loading"><div style="width:32px;height:32px;border:3px solid #e0e0f0;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite"></div> Loading...</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-brand">
+    🤖 AI Form Filler
+    <span class="admin-badge">🔐 ADMIN</span>
+  </div>
+  <div class="hdr-right">
+    <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i> Dashboard</a>
+    <button class="logout-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-box"><div class="stat-num pending-c" id="statPending">--</div><div class="stat-lbl">⏳ Pending</div></div>
+  <div class="stat-box"><div class="stat-num approved-c" id="statApproved">--</div><div class="stat-lbl">✅ Approved</div></div>
+  <div class="stat-box"><div class="stat-num rejected-c" id="statRejected">--</div><div class="stat-lbl">❌ Rejected</div></div>
+  <div class="stat-box"><div class="stat-num total-c" id="statTotal">--</div><div class="stat-lbl">💰 Total ₹</div></div>
+</div>
+
+<div class="main">
+  <!-- WALLET MIGRATION PANEL -->
+  <div class="migration-panel">
+    <h3>🔄 Migrate Users to Wallet System</h3>
+    <p>Sets <code>walletBalance</code> for all users who don't have it yet. Users with old credits get <strong>credits × ₹4</strong>; users with 0 credits get <strong>₹100 free</strong>. Safe to run multiple times — already-migrated users are skipped.</p>
+    <button class="btn-migrate" id="migrateBtn" onclick="migrateAllUsers()">
+      <i class="bi bi-arrow-repeat"></i> Run Migration
+    </button>
+    <div id="migrateLog"></div>
+  </div>
+
+  <!-- DANGER ZONE -->
+  <div class="migration-panel" style="border-color:rgba(239,68,68,.3);margin-bottom:24px;">
+    <h3 style="color:var(--red);">⚠️ Danger Zone</h3>
+    <p>Permanently deletes all transactions and resets all user wallet balances to ₹100. <strong>Cannot be undone.</strong></p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn-danger" id="clearTxnBtn" onclick="clearAllTransactions()">
+        <i class="bi bi-trash3-fill"></i> Delete All Transactions
+      </button>
+      <button class="btn-danger" id="deleteUsersBtn" onclick="deleteAllFirestoreUsers()">
+        <i class="bi bi-person-x-fill"></i> Delete All Users (Firestore)
+      </button>
+      <button class="btn-danger" id="resetWalletBtn" onclick="resetAllWallets()" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
+        <i class="bi bi-wallet2"></i> Reset All Wallets to ₹100
+      </button>
+    </div>
+    <p style="font-size:.75rem;color:var(--red);margin-top:10px;margin-bottom:0;">⚠️ To also delete Firebase Auth login credentials, go to <strong>Firebase Console → Authentication → Users → Select All → Delete</strong></p>
+    <div id="dangerLog" style="font-family:monospace;font-size:.75rem;background:#fff5f5;border-radius:8px;padding:12px;margin-top:12px;max-height:160px;overflow-y:auto;display:none;white-space:pre-wrap;line-height:1.6;"></div>
+  </div>
+
+  <!-- PENDING -->
+  <div class="section-title">⏳ Pending Approvals <span class="badge badge-pending" id="pendingCount">0</span></div>
+  <div class="pending-list" id="pendingList">
+    <div class="empty"><div class="ico">🎉</div>No pending requests</div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="section-title" style="margin-top:8px;">📋 All Transactions</div>
+  <div class="tbl-wrap">
+    <div class="tbl-head">
+      <h3>Transaction History</h3>
+      <span style="font-size:.78rem;color:var(--ink-muted)" id="histCount"></span>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>User</th><th>Package</th><th>Amount</th><th>TXN ID</th><th>Status</th><th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="histBody">
+          <tr><td colspan="6" class="empty">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+// ── ADMIN EMAIL — change this to YOUR email ────────────────────────────
+const ADMIN_EMAIL = 'ashokkumar1112.ch@gmail.com';
+
+firebase.initializeApp({
+  apiKey:'AIzaSyCGnA0-2QiSQ2Dg8n3xhzBxjvVKcXKf9P0',
+  authDomain:'form-filling-service-5a261.firebaseapp.com',
+  projectId:'form-filling-service-5a261',
+  storageBucket:'form-filling-service-5a261.firebasestorage.app',
+  messagingSenderId:'417118407948',
+  appId:'1:417118407948:web:4daf44a54875a1b0f6cd29'
+});
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+let currentAdmin = null;
+let allTxns = [];
+
+// ── AUTH CHECK ────────────────────────────────────────────────────────
+auth.onAuthStateChanged(async user => {
+  if (!user) { window.location.href = 'login.html'; return; }
+  if (user.email !== ADMIN_EMAIL) {
+    alert('⛔ Access denied. Admin only.');
+    window.location.href = 'dashboard.html';
+    return;
+  }
+  currentAdmin = user;
+  document.getElementById('loading').style.display = 'none';
+  loadAll();
+  // Live listener for new pending requests (catch both old 'pending' and new 'pending_verification')
+  db.collection('transactions')
+    .where('status','in',['pending_verification','pending'])
+    .onSnapshot(() => loadAll());
+});
+
+document.getElementById('logoutBtn').onclick = () => auth.signOut().then(() => window.location.href = 'login.html');
+
+// ── LOAD ALL TRANSACTIONS ─────────────────────────────────────────────
+async function loadAll() {
+  try {
+    const snap = await db.collection('transactions')
+      .orderBy('timestamp','desc')
+      .limit(200)
+      .get();
+
+    allTxns = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // Stats
+    const pending  = allTxns.filter(t => t.status === 'pending_verification' || t.status === 'pending');
+    const approved = allTxns.filter(t => t.status === 'approved');
+    const rejected = allTxns.filter(t => t.status === 'rejected');
+    const totalRs  = approved.reduce((s, t) => s + (t.amount || 0), 0);
+
+    document.getElementById('statPending').textContent  = pending.length;
+    document.getElementById('statApproved').textContent = approved.length;
+    document.getElementById('statRejected').textContent = rejected.length;
+    document.getElementById('statTotal').textContent    = '₹' + totalRs;
+    document.getElementById('pendingCount').textContent = pending.length;
+
+    renderPending(pending);
+    renderHistory(allTxns);
+  } catch(e) {
+    console.error('Load error:', e);
+    showToast('Error loading data: ' + e.message, 'error');
+  }
+}
+
+// ── RENDER PENDING ────────────────────────────────────────────────────
+async function renderPending(list) {
+  const el = document.getElementById('pendingList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><div class="ico">🎉</div>No pending requests — all clear!</div>';
+    return;
+  }
+
+  // For old transactions missing userName, fetch user info from users collection
+  const enriched = await Promise.all(list.map(async t => {
+    if (!t.userName && t.userId) {
+      try {
+        const uSnap = await db.collection('users').doc(t.userId).get();
+        if (uSnap.exists) {
+          const ud = uSnap.data();
+          t.userName  = ud.name  || t.userId;
+          t.userEmail = ud.email || t.userEmail || '';
+          t.userPhone = ud.phone || '';
+        }
+      } catch(_) {}
+    }
+    return t;
+  }));
+
+  el.innerHTML = enriched.map(t => {
+    const tsRaw = t.timestamp;
+    const ts  = tsRaw?.toDate ? tsRaw.toDate() : tsRaw?.seconds ? new Date(tsRaw.seconds * 1000) : tsRaw ? new Date(tsRaw) : new Date();
+    const amt = t.amount || 0;
+    return `
+    <div class="txn-card is-pending" id="card-${t.id}">
+      <div class="txn-top">
+        <div>
+          <div class="txn-user">👤 ${t.userName || t.userId || 'Unknown'}</div>
+          <div class="txn-email">${t.userEmail || t.userPhone || ''}</div>
+          <div class="txn-meta">
+            <div class="meta-pill">💰 Add to Wallet: <strong>₹${amt}</strong></div>
+            <div class="meta-pill">📦 ${t.description || 'Wallet recharge'}</div>
+          </div>
+          <div class="txn-id">UPI TXN: ${t.userUpiTransactionId || 'Not provided'}</div>
+          ${t.adminNote ? `<div style="font-size:.78rem;color:var(--ink-muted);margin-top:6px;">💬 Note: ${t.adminNote}</div>` : ''}
+          <div class="time-ago" style="margin-top:6px;">🕐 ${timeAgo(ts)}</div>
+        </div>
+        <span class="badge badge-pending">⏳ Pending</span>
+      </div>
+      <div class="txn-actions">
+        <input class="admin-note-inp" id="note-${t.id}" placeholder="Admin note (optional)..."/>
+        <button class="btn-approve" id="approve-${t.id}" onclick="approveRecharge('${t.id}','${t.userId}',${t.credits||0},${amt})">
+          <i class="bi bi-check-circle-fill"></i> Approve +₹${amt} to Wallet
+        </button>
+        <button class="btn-reject" id="reject-${t.id}" onclick="rejectRecharge('${t.id}')">
+          <i class="bi bi-x-circle"></i> Reject
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── APPROVE ───────────────────────────────────────────────────────────
+async function approveRecharge(txnId, userId, credits, amount) {
+  const note    = document.getElementById('note-' + txnId)?.value.trim() || '';
+  const appBtn  = document.getElementById('approve-' + txnId);
+  const rejBtn  = document.getElementById('reject-'  + txnId);
+  appBtn.disabled = rejBtn.disabled = true;
+  appBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+
+  try {
+    const batch = db.batch();
+
+    // 1. Add rupee amount to walletBalance
+    const userRef = db.collection('users').doc(userId);
+    batch.update(userRef, {
+      walletBalance: firebase.firestore.FieldValue.increment(amount)
+    });
+
+    // 2. Update transaction status
+    const txnRef = db.collection('transactions').doc(txnId);
+    batch.update(txnRef, {
+      status:       'approved',
+      approvedBy:   currentAdmin.email,
+      approvedAt:   firebase.firestore.FieldValue.serverTimestamp(),
+      adminNote:    note
+    });
+
+    await batch.commit();
+
+    // WhatsApp: notify user that credits were added
+    try {
+      const userSnap = await db.collection('users').doc(userId).get();
+      const ud = userSnap.data() || {};
+      if (ud.phone) {
+        fetch('/whatsapp.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            action: 'credits_added',
+            phone: ud.phone,
+            name: ud.name || '',
+            added: String(credits),
+            total: String(ud.credits || credits)
+          })
+        });
+      }
+    } catch(_) {}
+
+    showToast(`✅ Approved! +₹${amount} added to user wallet.`, 'success');
+    document.getElementById('card-' + txnId)?.remove();
+    loadAll();
+
+  } catch(e) {
+    console.error('Approve error:', e);
+    showToast('Error: ' + e.message, 'error');
+    appBtn.disabled = rejBtn.disabled = false;
+    appBtn.innerHTML = `<i class="bi bi-check-circle-fill"></i> Approve +${credits} Credits`;
+  }
+}
+
+// ── REJECT ────────────────────────────────────────────────────────────
+async function rejectRecharge(txnId) {
+  if (!confirm('Reject this recharge request?')) return;
+  const note   = document.getElementById('note-' + txnId)?.value.trim() || '';
+  const appBtn = document.getElementById('approve-' + txnId);
+  const rejBtn = document.getElementById('reject-'  + txnId);
+  appBtn.disabled = rejBtn.disabled = true;
+
+  try {
+    await db.collection('transactions').doc(txnId).update({
+      status:     'rejected',
+      rejectedBy: currentAdmin.email,
+      rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      adminNote:  note
+    });
+    showToast('❌ Request rejected.', 'warn');
+    document.getElementById('card-' + txnId)?.remove();
+    loadAll();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+    appBtn.disabled = rejBtn.disabled = false;
+  }
+}
+
+// ── RENDER HISTORY ────────────────────────────────────────────────────
+// Cache user lookups so we don't re-fetch the same userId multiple times
+const _userCache = {};
+async function getUserInfo(userId) {
+  if (!userId) return {};
+  if (_userCache[userId]) return _userCache[userId];
+  try {
+    const s = await db.collection('users').doc(userId).get();
+    const d = s.exists ? s.data() : {};
+    _userCache[userId] = { name: d.name || userId, email: d.email || '' };
+  } catch(_) { _userCache[userId] = { name: userId, email: '' }; }
+  return _userCache[userId];
+}
+
+async function renderHistory(list) {
+  const tbody = document.getElementById('histBody');
+  document.getElementById('histCount').textContent = list.length + ' transactions';
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">No transactions yet</td></tr>';
+    return;
+  }
+
+  // Enrich missing names in parallel
+  const enriched = await Promise.all(list.map(async t => {
+    if (!t.userName && t.userId) {
+      const info = await getUserInfo(t.userId);
+      t.userName  = t.userName  || info.name;
+      t.userEmail = t.userEmail || info.email;
+    }
+    return t;
+  }));
+
+  tbody.innerHTML = enriched.map(t => {
+    const tsRaw2 = t.timestamp;
+    const ts    = tsRaw2?.toDate ? tsRaw2.toDate() : tsRaw2?.seconds ? new Date(tsRaw2.seconds * 1000) : tsRaw2 ? new Date(tsRaw2) : null;
+    const badge = t.status === 'approved' ? 'badge-approved' : t.status === 'rejected' ? 'badge-rejected' : 'badge-pending';
+    const label = t.status === 'approved' ? '✅ Approved' : t.status === 'rejected' ? '❌ Rejected' : '⏳ Pending';
+    return `<tr>
+      <td><strong>${t.userName||t.userId||'?'}</strong><br><span style="font-size:.72rem;color:var(--ink-muted)">${t.userEmail||''}</span></td>
+      <td>${t.description||'-'}</td>
+      <td style="font-weight:700;color:var(--accent)">₹${t.amount||'-'}</td>
+      <td><span style="font-family:monospace;font-size:.75rem">${t.userUpiTransactionId||'-'}</span></td>
+      <td><span class="badge ${badge}">${label}</span></td>
+      <td style="font-size:.75rem;color:var(--ink-muted)">${ts ? ts.toLocaleString('en-IN') : '-'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+function timeAgo(date) {
+  const diff = Math.floor((Date.now() - date) / 1000);
+  if (diff < 60)    return diff + 's ago';
+  if (diff < 3600)  return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+// ── BULK WALLET MIGRATION ────────────────────────────────────────────
+async function migrateAllUsers() {
+  const btn = document.getElementById('migrateBtn');
+  const log = document.getElementById('migrateLog');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Migrating...';
+  log.style.display = 'block';
+  log.textContent = 'Fetching all users...\n';
+
+  const RUPEES_PER_CREDIT = 4;
+  const FREE_BALANCE      = 100.0;
+
+  let updated = 0, skipped = 0, failed = 0;
+
+  try {
+    const snap = await db.collection('users').get();
+    log.textContent += `Found ${snap.size} users.\n\n`;
+
+    for (const docSnap of snap.docs) {
+      const uid  = docSnap.id;
+      const data = docSnap.data();
+
+      if (data.walletBalance !== undefined && data.walletBalance !== null) {
+        skipped++;
+        log.textContent += `⏭️  SKIP  ${uid} — already ₹${data.walletBalance}\n`;
+        log.scrollTop = log.scrollHeight;
+        continue;
+      }
+
+      const oldCredits    = parseInt(data.credits ?? 0, 10);
+      const walletBalance = oldCredits > 0
+        ? Math.round(oldCredits * RUPEES_PER_CREDIT * 100) / 100
+        : FREE_BALANCE;
+
+      try {
+        await db.collection('users').doc(uid).update({ walletBalance });
+        updated++;
+        log.textContent += `✅ ${uid} (${data.name || 'unknown'}) — ${oldCredits} credits → ₹${walletBalance}\n`;
+      } catch(e) {
+        failed++;
+        log.textContent += `❌ FAILED ${uid}: ${e.message}\n`;
+      }
+      log.scrollTop = log.scrollHeight;
+    }
+
+    log.textContent += `\n── Done ──\nUpdated: ${updated}  |  Skipped: ${skipped}  |  Failed: ${failed}\n`;
+    showToast(`Migration complete — ${updated} updated, ${skipped} skipped`, 'success', 6000);
+  } catch(e) {
+    log.textContent += `\nERROR: ${e.message}\n`;
+    showToast('Migration failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Run Migration';
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+// ── DELETE ALL TRANSACTIONS ──────────────────────────────────────────
+async function clearAllTransactions() {
+  if (!confirm('⚠️ DELETE ALL TRANSACTIONS?\n\nThis will permanently remove every transaction record. Type "DELETE" to confirm.')) return;
+  const input = prompt('Type DELETE to confirm:');
+  if (input !== 'DELETE') { showToast('Cancelled.', 'warn'); return; }
+
+  const btn = document.getElementById('clearTxnBtn');
+  const log = document.getElementById('dangerLog');
+  btn.disabled = true;
+  log.style.display = 'block';
+  log.textContent = 'Deleting all transactions...\n';
+
+  try {
+    const snap = await db.collection('transactions').get();
+    log.textContent += `Found ${snap.size} transactions.\n`;
+
+    // Firestore batch max 500
+    let batch = db.batch();
+    let count = 0;
+    let deleted = 0;
+    for (const doc of snap.docs) {
+      batch.delete(doc.ref);
+      count++;
+      if (count === 500) {
+        await batch.commit();
+        deleted += count;
+        log.textContent += `Deleted ${deleted}...\n`;
+        batch = db.batch();
+        count = 0;
+      }
+    }
+    if (count > 0) { await batch.commit(); deleted += count; }
+
+    log.textContent += `\n✅ Done — ${deleted} transactions deleted.\n`;
+    showToast(`All ${deleted} transactions deleted.`, 'success', 6000);
+    loadAll();
+  } catch(e) {
+    log.textContent += `\nERROR: ${e.message}\n`;
+    showToast('Failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+// ── DELETE ALL FIRESTORE USERS ───────────────────────────────────────
+async function deleteAllFirestoreUsers() {
+  if (!confirm('⚠️ DELETE ALL USER DATA?\n\nThis removes all user documents from Firestore (profiles, wallets). Firebase Auth logins must be deleted separately in Firebase Console. Type "DELETEUSERS" to confirm.')) return;
+  const input = prompt('Type DELETEUSERS to confirm:');
+  if (input !== 'DELETEUSERS') { showToast('Cancelled.', 'warn'); return; }
+
+  const btn = document.getElementById('deleteUsersBtn');
+  const log = document.getElementById('dangerLog');
+  btn.disabled = true;
+  log.style.display = 'block';
+  log.textContent = 'Deleting all user documents...\n';
+
+  try {
+    const snap = await db.collection('users').get();
+    log.textContent += `Found ${snap.size} users.\n`;
+
+    let batch = db.batch();
+    let count = 0, deleted = 0;
+    for (const doc of snap.docs) {
+      batch.delete(doc.ref);
+      count++;
+      if (count === 500) {
+        await batch.commit();
+        deleted += count;
+        log.textContent += `Deleted ${deleted}...\n`;
+        batch = db.batch();
+        count = 0;
+      }
+    }
+    if (count > 0) { await batch.commit(); deleted += count; }
+
+    log.textContent += `\n✅ Done — ${deleted} user documents deleted.\n`;
+    log.textContent += `\n⚠️ Go to Firebase Console → Authentication → Users to delete login credentials.\n`;
+    showToast(`${deleted} user documents deleted. Delete Auth users in Firebase Console.`, 'warn', 8000);
+  } catch(e) {
+    log.textContent += `\nERROR: ${e.message}\n`;
+    showToast('Failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+// ── RESET ALL WALLETS TO ₹100 ────────────────────────────────────────
+async function resetAllWallets() {
+  if (!confirm('⚠️ RESET ALL USER WALLETS TO ₹100?\n\nEvery user\'s walletBalance will be set to ₹100. Type "RESET" to confirm.')) return;
+  const input = prompt('Type RESET to confirm:');
+  if (input !== 'RESET') { showToast('Cancelled.', 'warn'); return; }
+
+  const btn = document.getElementById('resetWalletBtn');
+  const log = document.getElementById('dangerLog');
+  btn.disabled = true;
+  log.style.display = 'block';
+  log.textContent = 'Resetting all user wallets to ₹100...\n';
+
+  try {
+    const snap = await db.collection('users').get();
+    log.textContent += `Found ${snap.size} users.\n`;
+
+    let batch = db.batch();
+    let count = 0, updated = 0;
+    for (const doc of snap.docs) {
+      batch.update(doc.ref, { walletBalance: 100.0, totalFormsFilledCount: 0 });
+      count++;
+      if (count === 500) {
+        await batch.commit();
+        updated += count;
+        log.textContent += `Reset ${updated}...\n`;
+        batch = db.batch();
+        count = 0;
+      }
+    }
+    if (count > 0) { await batch.commit(); updated += count; }
+
+    log.textContent += `\n✅ Done — ${updated} users reset to ₹100.\n`;
+    showToast(`${updated} users reset to ₹100 wallet.`, 'success', 6000);
+  } catch(e) {
+    log.textContent += `\nERROR: ${e.message}\n`;
+    showToast('Failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+function showToast(msg, type='success', dur=4000) {
+  const tc = document.getElementById('toastContainer');
+  const t  = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = {success:'✅', error:'❌', warn:'⚠️'};
+  t.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  tc.appendChild(t);
+  setTimeout(() => t.remove(), dur);
+}
+</script>
+</body>
+</html>

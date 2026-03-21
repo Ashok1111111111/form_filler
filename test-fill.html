@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Form Filler — Full Government Form Test</title>
+<style>
+:root{--blue:#2563eb;--green:#16a34a;--red:#dc2626;--bg:#f1f5f9;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+
+.topbar{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 3px 12px rgba(0,0,0,.25)}
+.topbar h1{font-size:.95rem;font-weight:700}
+.score-wrap{display:flex;align-items:center;gap:12px}
+.score-ring{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;border:3px solid rgba(255,255,255,.4);background:rgba(255,255,255,.1);transition:border-color .3s,color .3s}
+.score-label{font-size:.78rem;opacity:.85}
+
+.statbar{background:#0f172a;color:#cbd5e1;padding:9px 20px;display:flex;gap:24px;font-size:.78rem;flex-wrap:wrap;align-items:center}
+.statbar strong{color:#fff}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.g{background:#4ade80}.r{background:#f87171}.y{background:#fbbf24}.b{background:#60a5fa}
+
+.wrap{max-width:1000px;margin:20px auto;padding:0 14px;display:flex;flex-direction:column;gap:16px}
+
+.card{background:var(--card);border-radius:10px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card-head{padding:11px 18px;font-weight:700;font-size:.88rem;display:flex;align-items:center;gap:8px;color:#fff}
+.s1{background:#1e40af} .s2{background:#0369a1} .s3{background:#065f46} .s4{background:#7e22ce}
+.s5{background:#9f1239} .s6{background:#92400e} .s7{background:#1e3a8a} .s8{background:#134e4a}
+.card-body{padding:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+
+.fw{display:flex;flex-direction:column;gap:3px;position:relative}
+.fw label{font-size:.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.fw input,.fw select,.fw textarea{
+  width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:7px;
+  font-size:.88rem;color:var(--text);background:#fff;outline:none;transition:border-color .2s,background .4s
+}
+.fw textarea{resize:vertical;min-height:60px}
+.fw select{cursor:pointer}
+.fw input:focus,.fw select:focus{border-color:var(--blue)}
+
+/* Badges */
+.tag{position:absolute;right:6px;top:24px;font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:20px;pointer-events:none}
+.tag-confirm{background:#fef3c7;color:#92400e}
+.tag-filled{background:#dcfce7;color:#15803d;display:none}
+.tag-empty{background:#fee2e2;color:#b91c1c;display:none}
+
+/* live green flash when filled by extension */
+.fw.just-filled input,.fw.just-filled select,.fw.just-filled textarea{border-color:#16a34a;background:#f0fdf4}
+
+/* summary table */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.row-item{display:flex;justify-content:space-between;padding:5px 10px;border-radius:6px;font-size:.82rem}
+.row-filled{background:#f0fdf4;color:#166534}
+.row-empty{background:#fef2f2;color:#991b1b}
+.big-pct{font-size:3.5rem;font-weight:900;text-align:center;margin:8px 0;letter-spacing:-2px}
+
+.note{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;font-size:.82rem;color:#78350f;line-height:1.7}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <h1>🤖 AI Form Filler — Full Production Test Form (All 85 Fields)</h1>
+  <div class="score-wrap">
+    <div class="score-ring" id="score-ring">—%</div>
+    <div class="score-label" id="score-label">Load customer &<br>click Fill Form</div>
+  </div>
+</div>
+
+<!-- STAT BAR -->
+<div class="statbar">
+  <span><span class="dot g"></span> Filled: <strong id="c-filled">0</strong></span>
+  <span><span class="dot r"></span> Empty: <strong id="c-empty">0</strong></span>
+  <span><span class="dot y"></span> Confirm: <strong id="c-confirm">0</strong></span>
+  <span><span class="dot b"></span> Total: <strong id="c-total">0</strong></span>
+  <span style="margin-left:auto;opacity:.6">↑ Extension fills this form — watch fields turn green live</span>
+</div>
+
+<div class="wrap">
+<div class="note">
+  <strong>📋 Instructions:</strong>
+  1. Open extension popup → Enter Customer ID (e.g. CUS-XXXXXXX) → Load Data → Fill Form<br>
+  2. Every field that matches your customer profile turns <strong style="color:#16a34a">green</strong><br>
+  3. Red = missing data in profile &nbsp;|&nbsp; Orange badge = confirm/repeat field &nbsp;|&nbsp; Check console (F12) for field-by-field log
+</div>
+
+<form id="tf" autocomplete="off">
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 1 — PERSONAL DETAILS
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s1">👤 Section 1 — Personal Details</div>
+  <div class="card-body">
+
+    <div class="fw"><label for="firstName">First Name / प्रथम नाम *</label>
+      <input id="firstName" name="firstName" placeholder="First name only"></div>
+
+    <div class="fw"><label for="middleName">Middle Name / मध्य नाम</label>
+      <input id="middleName" name="middleName" placeholder="Middle name (if any)"></div>
+
+    <div class="fw"><label for="lastName">Last Name / Surname / उपनाम *</label>
+      <input id="lastName" name="lastName" placeholder="Surname / Last name"></div>
+
+    <div class="fw"><label for="fullName">Full Name / पूरा नाम *</label>
+      <input id="fullName" name="fullName" placeholder="Full name as per Aadhaar"></div>
+
+    <div class="fw"><label for="fatherName">Father's Name / पिता का नाम *</label>
+      <input id="fatherName" name="fatherName" placeholder="Father's full name"></div>
+
+    <div class="fw"><label for="motherName">Mother's Name / माता का नाम *</label>
+      <input id="motherName" name="motherName" placeholder="Mother's full name"></div>
+
+    <div class="fw"><label for="husbandName">Husband / Guardian Name</label>
+      <input id="husbandName" name="husbandName" placeholder="Husband / Guardian"></div>
+
+    <div class="fw"><label for="dob">Date of Birth / जन्म तिथि *</label>
+      <input type="date" id="dob" name="dob"></div>
+
+    <div class="fw"><label for="gender">Gender / लिंग *</label>
+      <select id="gender" name="gender">
+        <option value="">-- Select --</option>
+        <option>Male</option><option>Female</option><option>Transgender</option>
+      </select></div>
+
+    <div class="fw"><label>Gender (Radio Style)</label>
+      <div style="display:flex;gap:16px;padding:9px 0">
+        <label style="text-transform:none;font-size:.88rem;display:flex;align-items:center;gap:5px;color:var(--text);font-weight:400">
+          <input type="radio" name="genderRadio" value="Male"> Male</label>
+        <label style="text-transform:none;font-size:.88rem;display:flex;align-items:center;gap:5px;color:var(--text);font-weight:400">
+          <input type="radio" name="genderRadio" value="Female"> Female</label>
+        <label style="text-transform:none;font-size:.88rem;display:flex;align-items:center;gap:5px;color:var(--text);font-weight:400">
+          <input type="radio" name="genderRadio" value="Transgender"> TG</label>
+      </div></div>
+
+    <div class="fw"><label for="category">Category / वर्ग *</label>
+      <select id="category" name="category">
+        <option value="">-- Select --</option>
+        <option>General</option><option>OBC</option><option>OBC-NCL</option>
+        <option>SC</option><option>ST</option><option>EWS</option>
+      </select></div>
+
+    <div class="fw"><label for="religion">Religion / धर्म</label>
+      <select id="religion" name="religion">
+        <option value="">-- Select --</option>
+        <option>Hindu</option><option>Muslim</option><option>Christian</option>
+        <option>Sikh</option><option>Buddhist</option><option>Jain</option><option>Other</option>
+      </select></div>
+
+    <div class="fw"><label for="nationality">Nationality / राष्ट्रीयता</label>
+      <select id="nationality" name="nationality">
+        <option value="">-- Select --</option>
+        <option>Indian</option><option>Other</option>
+      </select></div>
+
+    <div class="fw"><label for="maritalStatus">Marital Status / वैवाहिक स्थिति</label>
+      <select id="maritalStatus" name="maritalStatus">
+        <option value="">-- Select --</option>
+        <option>Single</option><option>Married</option>
+        <option>Divorced</option><option>Widowed</option>
+      </select></div>
+
+    <div class="fw"><label for="annualIncome">Annual Income / वार्षिक आय (₹)</label>
+      <input id="annualIncome" name="annualIncome" placeholder="e.g. 250000"></div>
+
+    <div class="fw"><label for="identMark1">Identification Mark 1 / पहचान चिह्न</label>
+      <input id="identMark1" name="identMark1" placeholder="e.g. Mole on left cheek"></div>
+
+    <div class="fw"><label for="identMark2">Identification Mark 2</label>
+      <input id="identMark2" name="identMark2" placeholder="e.g. Scar on right hand"></div>
+
+    <div class="fw"><label for="employed">Currently Employed / कार्यरत</label>
+      <select id="employed" name="employed">
+        <option value="">-- Select --</option>
+        <option>No</option><option>Yes</option>
+      </select></div>
+
+    <div class="fw"><label for="empExchangeNo">Employment Exchange No.</label>
+      <input id="empExchangeNo" name="empExchangeNo" placeholder="Emp exchange number"></div>
+
+    <div class="fw"><label for="criminalCase">Criminal Case / अपराधिक मामला</label>
+      <select id="criminalCase" name="criminalCase">
+        <option value="">-- Select --</option>
+        <option>No</option><option>Yes</option>
+      </select></div>
+
+    <div class="fw"><label for="debarred">Debarred from Exam</label>
+      <select id="debarred" name="debarred">
+        <option value="">-- Select --</option>
+        <option>No</option><option>Yes</option>
+      </select></div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 2 — CONTACT
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s2">📞 Section 2 — Contact Details</div>
+  <div class="card-body">
+
+    <div class="fw"><label for="emailId">Email Address / ईमेल *</label>
+      <input type="email" id="emailId" name="emailId" placeholder="your@email.com"></div>
+
+    <div class="fw"><label for="confirmEmail">Confirm Email / ईमेल पुनः दर्ज करें *</label>
+      <input type="email" id="confirmEmail" name="confirmEmail" placeholder="Re-enter email">
+      <span class="tag tag-confirm">CONFIRM</span></div>
+
+    <div class="fw"><label for="mobileNumber">Mobile Number / मोबाइल *</label>
+      <input type="tel" id="mobileNumber" name="mobileNumber" maxlength="10" placeholder="10-digit mobile"></div>
+
+    <div class="fw"><label for="confirmMobile">Confirm Mobile / मोबाइल पुनः दर्ज करें *</label>
+      <input type="tel" id="confirmMobile" name="confirmMobile" maxlength="10" placeholder="Re-enter mobile">
+      <span class="tag tag-confirm">CONFIRM</span></div>
+
+    <div class="fw"><label for="altMobile">Alternate Mobile / वैकल्पिक मोबाइल</label>
+      <input type="tel" id="altMobile" name="altMobile" maxlength="10" placeholder="Alternate number"></div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 3 — PERMANENT ADDRESS
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s3">🏠 Section 3 — Permanent Address / स्थायी पता</div>
+  <div class="card-body">
+
+    <div class="fw" style="grid-column:1/-1"><label for="permAddr1">House No. / Street / Village / पता *</label>
+      <textarea id="permAddr1" name="permAddr1" placeholder="House No., Street, Village/Colony"></textarea></div>
+
+    <div class="fw"><label for="permAddr2">Address Line 2 / Area / Colony</label>
+      <input id="permAddr2" name="permAddr2" placeholder="Area / Colony / Ward"></div>
+
+    <div class="fw"><label for="permPO">Post Office / डाकघर</label>
+      <input id="permPO" name="permPO" placeholder="Post Office name"></div>
+
+    <div class="fw"><label for="permPS">Police Station / थाना</label>
+      <input id="permPS" name="permPS" placeholder="Police Station name"></div>
+
+    <div class="fw"><label for="permDistrict">District / City / जिला *</label>
+      <input id="permDistrict" name="permDistrict" placeholder="District / City"></div>
+
+    <div class="fw"><label for="permState">State / राज्य *</label>
+      <select id="permState" name="permState">
+        <option value="">-- Select State --</option>
+        <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
+        <option>Bihar</option><option>Chhattisgarh</option><option>Goa</option>
+        <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
+        <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+        <option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
+        <option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option>
+        <option>Odisha</option><option>Punjab</option><option>Rajasthan</option>
+        <option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option>
+        <option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+        <option>West Bengal</option><option>Andaman and Nicobar Islands</option>
+        <option>Chandigarh</option><option>Delhi</option>
+        <option>Jammu and Kashmir</option><option>Ladakh</option>
+        <option>Lakshadweep</option><option>Puducherry</option>
+      </select></div>
+
+    <div class="fw"><label for="permPin">PIN Code / पिनकोड *</label>
+      <input id="permPin" name="permPin" maxlength="6" placeholder="6-digit PIN"></div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 4 — CORRESPONDENCE ADDRESS
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s3" style="background:#047857">📮 Section 4 — Correspondence Address / वर्तमान पता</div>
+  <div class="card-body">
+
+    <div class="fw" style="grid-column:1/-1"><label for="corrAddr1">Correspondence Address / वर्तमान पता *</label>
+      <textarea id="corrAddr1" name="corrAddr1" placeholder="House No., Street, Village/Colony"></textarea>
+      <span class="tag tag-confirm">CONFIRM</span></div>
+
+    <div class="fw"><label for="corrAddr2">Address Line 2</label>
+      <input id="corrAddr2" name="corrAddr2" placeholder="Area / Colony">
+      <span class="tag tag-confirm">CONFIRM</span></div>
+
+    <div class="fw"><label for="corrPO">Post Office</label>
+      <input id="corrPO" name="corrPO" placeholder="Post Office">
+      <span class="tag tag-confirm">CONFIRM</span></div>
+
+    <div class="fw"><label for="corrPS">Police Station</label>
+      <input id="corrPS" name="corrPS" placeholder="Police Station">
+      <span class="tag tag-confirm">CONFIRM</span></div>
+
+    <div class="fw"><label for="corrDistrict">District / City</label>
+      <input id="corrDistrict" name="corrDistrict" placeholder="District / City">
+      <span class="tag tag-confirm">CONFIRM</span></div>
+
+    <div class="fw"><label for="corrState">State</label>
+      <select id="corrState" name="corrState">
+        <option value="">-- Select State --</option>
+        <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
+        <option>Bihar</option><option>Chhattisgarh</option><option>Goa</option>
+        <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
+        <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+        <option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
+        <option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option>
+        <option>Odisha</option><option>Punjab</option><option>Rajasthan</option>
+        <option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option>
+        <option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+        <option>West Bengal</option><option>Andaman and Nicobar Islands</option>
+        <option>Chandigarh</option><option>Delhi</option>
+        <option>Jammu and Kashmir</option><option>Ladakh</option>
+        <option>Lakshadweep</option><option>Puducherry</option>
+      </select>
+      <span class="tag tag-confirm">CONFIRM</span></div>
+
+    <div class="fw"><label for="corrPin">PIN Code</label>
+      <input id="corrPin" name="corrPin" maxlength="6" placeholder="6-digit PIN">
+      <span class="tag tag-confirm">CONFIRM</span></div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 5 — IDENTITY DOCUMENTS
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s4">🪪 Section 5 — Identity Documents</div>
+  <div class="card-body">
+
+    <div class="fw"><label for="aadhaarNumber">Aadhaar Number / आधार *</label>
+      <input id="aadhaarNumber" name="aadhaarNumber" maxlength="12" placeholder="12-digit Aadhaar"></div>
+
+    <div class="fw"><label for="panNumber">PAN Number / पैन</label>
+      <input id="panNumber" name="panNumber" maxlength="10" placeholder="ABCDE1234F"></div>
+
+    <div class="fw"><label for="voterId">Voter ID / EPIC</label>
+      <input id="voterId" name="voterId" placeholder="Voter ID number"></div>
+
+    <div class="fw"><label for="passportNumber">Passport Number</label>
+      <input id="passportNumber" name="passportNumber" placeholder="Passport number"></div>
+
+    <div class="fw"><label for="dlNumber">Driving Licence No.</label>
+      <input id="dlNumber" name="dlNumber" placeholder="DL number"></div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 6 — BANK DETAILS
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s5">🏦 Section 6 — Bank Details</div>
+  <div class="card-body">
+
+    <div class="fw"><label for="bankAcc">Account Number / खाता संख्या</label>
+      <input id="bankAcc" name="bankAcc" placeholder="Bank account number"></div>
+
+    <div class="fw"><label for="bankIFSC">IFSC Code</label>
+      <input id="bankIFSC" name="bankIFSC" maxlength="11" placeholder="e.g. SBIN0001234"></div>
+
+    <div class="fw"><label for="bankName">Bank Name / बैंक का नाम</label>
+      <input id="bankName" name="bankName" placeholder="e.g. State Bank of India"></div>
+
+    <div class="fw"><label for="bankBranch">Branch Name / शाखा</label>
+      <input id="bankBranch" name="bankBranch" placeholder="Branch name"></div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 7 — DISABILITY / CERTIFICATES
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s6">📋 Section 7 — Certificates & Disability</div>
+  <div class="card-body">
+
+    <div class="fw"><label for="isPwd">Person with Disability (PWD)</label>
+      <select id="isPwd" name="isPwd">
+        <option value="">-- Select --</option><option>No</option><option>Yes</option>
+      </select></div>
+
+    <div class="fw"><label for="disabilityType">Disability Type</label>
+      <input id="disabilityType" name="disabilityType" placeholder="e.g. Locomotor, Visual"></div>
+
+    <div class="fw"><label for="disabilityPercent">Disability Percentage</label>
+      <input id="disabilityPercent" name="disabilityPercent" placeholder="e.g. 40"></div>
+
+    <div class="fw"><label for="pwdCertNo">PWD Certificate No.</label>
+      <input id="pwdCertNo" name="pwdCertNo" placeholder="Certificate number"></div>
+
+    <div class="fw"><label for="domicileCertNo">Domicile Certificate No.</label>
+      <input id="domicileCertNo" name="domicileCertNo" placeholder="Domicile cert no."></div>
+
+    <div class="fw"><label for="domicileIssueDate">Domicile Issue Date</label>
+      <input type="date" id="domicileIssueDate" name="domicileIssueDate"></div>
+
+    <div class="fw"><label for="domicileAuthority">Domicile Issuing Authority</label>
+      <input id="domicileAuthority" name="domicileAuthority" placeholder="Issuing authority"></div>
+
+    <div class="fw"><label for="casteCertNo">Caste Certificate No.</label>
+      <input id="casteCertNo" name="casteCertNo" placeholder="Caste cert no."></div>
+
+    <div class="fw"><label for="casteIssueDate">Caste Cert Issue Date</label>
+      <input type="date" id="casteIssueDate" name="casteIssueDate"></div>
+
+    <div class="fw"><label for="casteAuthority">Caste Issuing Authority</label>
+      <input id="casteAuthority" name="casteAuthority" placeholder="Issuing authority"></div>
+
+    <div class="fw"><label for="casteIssueDistrict">Caste Cert Issue District</label>
+      <input id="casteIssueDistrict" name="casteIssueDistrict" placeholder="District"></div>
+
+    <div class="fw"><label for="incomeCertNo">Income Certificate No.</label>
+      <input id="incomeCertNo" name="incomeCertNo" placeholder="Income cert no."></div>
+
+    <div class="fw"><label for="incomeIssueDate">Income Cert Issue Date</label>
+      <input type="date" id="incomeIssueDate" name="incomeIssueDate"></div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 8 — 10TH / MATRICULATION
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s7">🎓 Section 8 — 10th / Matriculation</div>
+  <div class="card-body">
+
+    <div class="fw"><label for="tenthBoard">10th Board / मैट्रिक बोर्ड</label>
+      <input id="tenthBoard" name="tenthBoard" placeholder="e.g. CBSE / UP Board"></div>
+
+    <div class="fw"><label for="tenthYear">10th Passing Year</label>
+      <input type="number" id="tenthYear" name="tenthYear" min="1990" max="2030" placeholder="e.g. 2018"></div>
+
+    <div class="fw"><label for="tenthPercent">10th Percentage / %</label>
+      <input id="tenthPercent" name="tenthPercent" placeholder="e.g. 85.5"></div>
+
+    <div class="fw"><label for="tenthObtained">Marks Obtained (10th)</label>
+      <input type="number" id="tenthObtained" name="tenthObtained" placeholder="e.g. 420"></div>
+
+    <div class="fw"><label for="tenthTotal">Total Marks (10th)</label>
+      <input type="number" id="tenthTotal" name="tenthTotal" placeholder="e.g. 500"></div>
+
+    <div class="fw"><label for="tenthRoll">Roll Number (10th)</label>
+      <input id="tenthRoll" name="tenthRoll" placeholder="Roll number"></div>
+
+    <div class="fw"><label for="tenthCertNo">Certificate No. (10th)</label>
+      <input id="tenthCertNo" name="tenthCertNo" placeholder="Certificate number"></div>
+
+    <div class="fw"><label for="tenthDivision">Division / Grade</label>
+      <select id="tenthDivision" name="tenthDivision">
+        <option value="">-- Select --</option>
+        <option>First Division</option><option>Second Division</option>
+        <option>Third Division</option><option>Distinction</option>
+        <option>Pass</option>
+      </select></div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 9 — 12TH / INTERMEDIATE
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s7" style="background:#1e3a8a">🎓 Section 9 — 12th / Intermediate</div>
+  <div class="card-body">
+
+    <div class="fw"><label for="twelfthBoard">12th Board / इंटर बोर्ड</label>
+      <input id="twelfthBoard" name="twelfthBoard" placeholder="e.g. CBSE / UP Board"></div>
+
+    <div class="fw"><label for="twelfthYear">12th Passing Year</label>
+      <input type="number" id="twelfthYear" name="twelfthYear" min="1990" max="2030" placeholder="e.g. 2020"></div>
+
+    <div class="fw"><label for="twelfthPercent">12th Percentage / %</label>
+      <input id="twelfthPercent" name="twelfthPercent" placeholder="e.g. 78.4"></div>
+
+    <div class="fw"><label for="twelfthObtained">Marks Obtained (12th)</label>
+      <input type="number" id="twelfthObtained" name="twelfthObtained" placeholder="e.g. 392"></div>
+
+    <div class="fw"><label for="twelfthTotal">Total Marks (12th)</label>
+      <input type="number" id="twelfthTotal" name="twelfthTotal" placeholder="e.g. 500"></div>
+
+    <div class="fw"><label for="twelfthRoll">Roll Number (12th)</label>
+      <input id="twelfthRoll" name="twelfthRoll" placeholder="Roll number"></div>
+
+    <div class="fw"><label for="twelfthCertNo">Certificate No. (12th)</label>
+      <input id="twelfthCertNo" name="twelfthCertNo" placeholder="Certificate number"></div>
+
+    <div class="fw"><label for="twelfthStream">Stream / विषय</label>
+      <select id="twelfthStream" name="twelfthStream">
+        <option value="">-- Select --</option>
+        <option>Science</option><option>Commerce</option>
+        <option>Arts</option><option>Agriculture</option><option>Vocational</option>
+      </select></div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 10 — DIPLOMA
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s8">🏫 Section 10 — Diploma / Polytechnic</div>
+  <div class="card-body">
+
+    <div class="fw"><label for="diplomaBoard">Diploma Board</label>
+      <input id="diplomaBoard" name="diplomaBoard" placeholder="e.g. BTEUP"></div>
+
+    <div class="fw"><label for="diplomaYear">Diploma Passing Year</label>
+      <input type="number" id="diplomaYear" name="diplomaYear" min="1990" max="2030" placeholder="e.g. 2021"></div>
+
+    <div class="fw"><label for="diplomaPercent">Diploma Percentage</label>
+      <input id="diplomaPercent" name="diplomaPercent" placeholder="e.g. 72.0"></div>
+
+    <div class="fw"><label for="diplomaTrade">Trade / Branch / Stream</label>
+      <input id="diplomaTrade" name="diplomaTrade" placeholder="e.g. Mechanical, Civil"></div>
+
+    <div class="fw"><label for="diplomaRoll">Diploma Roll No.</label>
+      <input id="diplomaRoll" name="diplomaRoll" placeholder="Roll number"></div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 11 — GRADUATION
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s7" style="background:#065f46">🎓 Section 11 — Graduation / स्नातक</div>
+  <div class="card-body">
+
+    <div class="fw"><label for="gradDegree">Degree / स्नातक उपाधि</label>
+      <input id="gradDegree" name="gradDegree" placeholder="e.g. B.A., B.Sc., B.Com"></div>
+
+    <div class="fw"><label for="gradUniv">University / विश्वविद्यालय</label>
+      <input id="gradUniv" name="gradUniv" placeholder="University name"></div>
+
+    <div class="fw"><label for="gradYear">Passing Year</label>
+      <input type="number" id="gradYear" name="gradYear" min="1990" max="2030" placeholder="e.g. 2023"></div>
+
+    <div class="fw"><label for="gradPercent">Percentage / %</label>
+      <input id="gradPercent" name="gradPercent" placeholder="e.g. 68.5"></div>
+
+    <div class="fw"><label for="gradRoll">Roll / Enrolment No.</label>
+      <input id="gradRoll" name="gradRoll" placeholder="Roll number"></div>
+
+    <div class="fw"><label for="gradIssueDate">Degree Issue Date</label>
+      <input type="date" id="gradIssueDate" name="gradIssueDate"></div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 12 — POST GRADUATION
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head s4" style="background:#581c87">🎓 Section 12 — Post Graduation / स्नातकोत्तर</div>
+  <div class="card-body">
+
+    <div class="fw"><label for="pgDegree">PG Degree</label>
+      <input id="pgDegree" name="pgDegree" placeholder="e.g. M.A., M.Sc., MBA"></div>
+
+    <div class="fw"><label for="pgUniv">University</label>
+      <input id="pgUniv" name="pgUniv" placeholder="University name"></div>
+
+    <div class="fw"><label for="pgYear">Passing Year</label>
+      <input type="number" id="pgYear" name="pgYear" min="1990" max="2030" placeholder="e.g. 2025"></div>
+
+    <div class="fw"><label for="pgPercent">Percentage / %</label>
+      <input id="pgPercent" name="pgPercent" placeholder="e.g. 72.0"></div>
+
+    <div class="fw"><label for="pgRoll">Roll / Enrolment No.</label>
+      <input id="pgRoll" name="pgRoll" placeholder="Roll number"></div>
+
+  </div>
+</div>
+
+</form>
+
+<!-- RESULT PANEL -->
+<div class="card" id="result-panel" style="display:none">
+  <div class="card-head" style="background:#1e293b">📊 Fill Result Summary</div>
+  <div style="padding:20px">
+    <div class="big-pct" id="big-pct">—%</div>
+    <div class="summary-grid" id="summary-grid"></div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// All fillable field names matching customer profile keys
+const ALL_FIELDS = [
+  // Personal
+  'firstName','middleName','lastName','fullName',
+  'fatherName','motherName','husbandName',
+  'dob','gender','genderRadio',
+  'category','religion','nationality','maritalStatus',
+  'annualIncome','identMark1','identMark2',
+  'employed','empExchangeNo','criminalCase','debarred',
+  // Contact
+  'emailId','confirmEmail','mobileNumber','confirmMobile','altMobile',
+  // Permanent address
+  'permAddr1','permAddr2','permPO','permPS','permDistrict','permState','permPin',
+  // Correspondence
+  'corrAddr1','corrAddr2','corrPO','corrPS','corrDistrict','corrState','corrPin',
+  // ID docs
+  'aadhaarNumber','panNumber','voterId','passportNumber','dlNumber',
+  // Bank
+  'bankAcc','bankIFSC','bankName','bankBranch',
+  // Disability/certs
+  'isPwd','disabilityType','disabilityPercent','pwdCertNo',
+  'domicileCertNo','domicileIssueDate','domicileAuthority',
+  'casteCertNo','casteIssueDate','casteAuthority','casteIssueDistrict',
+  'incomeCertNo','incomeIssueDate',
+  // 10th
+  'tenthBoard','tenthYear','tenthPercent','tenthObtained','tenthTotal',
+  'tenthRoll','tenthCertNo','tenthDivision',
+  // 12th
+  'twelfthBoard','twelfthYear','twelfthPercent','twelfthObtained','twelfthTotal',
+  'twelfthRoll','twelfthCertNo','twelfthStream',
+  // Diploma
+  'diplomaBoard','diplomaYear','diplomaPercent','diplomaTrade','diplomaRoll',
+  // Graduation
+  'gradDegree','gradUniv','gradYear','gradPercent','gradRoll','gradIssueDate',
+  // PG
+  'pgDegree','pgUniv','pgYear','pgPercent','pgRoll',
+];
+
+const CONFIRM_SET = new Set([
+  'confirmEmail','confirmMobile',
+  'corrAddr1','corrAddr2','corrPO','corrPS','corrDistrict','corrState','corrPin'
+]);
+
+function getVal(name) {
+  const el = document.querySelector(`[name="${name}"]`);
+  if (!el) return '';
+  if (el.type === 'radio') {
+    const c = document.querySelector(`input[name="${el.name}"]:checked`);
+    return c ? c.value : '';
+  }
+  return (el.value || '').trim();
+}
+
+function updateScore() {
+  let filled=0, empty=0, confirmFilled=0, confirmEmpty=0;
+  const emptyNames=[], filledNames=[];
+
+  ALL_FIELDS.forEach(name => {
+    const val = getVal(name);
+    if (CONFIRM_SET.has(name)) {
+      val ? confirmFilled++ : confirmEmpty++;
+      return;
+    }
+    if (val) { filled++; filledNames.push(name); }
+    else { empty++; emptyNames.push(name); }
+  });
+
+  const total = filled + empty;
+  const pct = total ? Math.round(filled/total*100) : 0;
+
+  document.getElementById('c-filled').textContent = filled;
+  document.getElementById('c-empty').textContent = empty;
+  document.getElementById('c-confirm').textContent = confirmFilled + '/' + (confirmFilled+confirmEmpty);
+  document.getElementById('c-total').textContent = total;
+
+  const ring = document.getElementById('score-ring');
+  ring.textContent = pct + '%';
+  ring.style.borderColor = pct>=80?'#4ade80':pct>=50?'#fbbf24':'#f87171';
+  ring.style.color = pct>=80?'#4ade80':pct>=50?'#fbbf24':'#f87171';
+
+  const lbl = document.getElementById('score-label');
+  lbl.textContent = `${filled}/${total} fields filled`;
+
+  // show result panel
+  if (filled > 0) {
+    document.getElementById('result-panel').style.display = 'block';
+    const bpct = document.getElementById('big-pct');
+    bpct.textContent = pct + '%';
+    bpct.style.color = pct>=80?'#16a34a':pct>=50?'#d97706':'#dc2626';
+
+    const grid = document.getElementById('summary-grid');
+    grid.innerHTML =
+      filledNames.map(n=>`<div class="row-item row-filled">✅ ${n}</div>`).join('') +
+      emptyNames.map(n=>`<div class="row-item row-empty">❌ ${n}</div>`).join('');
+  }
+
+  // Highlight .fw wrappers
+  ALL_FIELDS.forEach(name => {
+    const el = document.querySelector(`[name="${name}"]`);
+    if (!el) return;
+    const wrap = el.closest('.fw');
+    if (!wrap) return;
+    const val = getVal(name);
+    if (val) wrap.classList.add('just-filled');
+    else wrap.classList.remove('just-filled');
+  });
+}
+
+setInterval(updateScore, 400);
+updateScore();
+</script>
+</body>
+</html>

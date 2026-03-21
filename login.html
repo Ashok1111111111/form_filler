@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – AI Form Filler</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root{--accent:#5b4ff5;--accent2:#f5724f;--glow:rgba(91,79,245,.22);}
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;background:#f6f6fa;}
+        .left{width:44%;background:linear-gradient(160deg,#1a1535,#0d0d14);display:flex;flex-direction:column;justify-content:center;padding:3rem;position:relative;overflow:hidden;color:#fff;}
+        .left::before{content:'';position:absolute;top:-120px;right:-120px;width:450px;height:450px;background:radial-gradient(circle,rgba(91,79,245,.28),transparent 70%);}
+        .left::after{content:'';position:absolute;bottom:-80px;left:-80px;width:320px;height:320px;background:radial-gradient(circle,rgba(245,114,79,.18),transparent 70%);}
+        .z1{position:relative;z-index:1;}
+        .brand{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;margin-bottom:4px;}
+        .brand span{color:#8b7fff;}
+        .tagline{font-size:.95rem;color:rgba(255,255,255,.5);margin-bottom:2.5rem;}
+        .fi{display:flex;align-items:center;gap:14px;margin-bottom:1.1rem;font-size:.88rem;color:rgba(255,255,255,.8);}
+        .fi-icon{width:38px;height:38px;background:rgba(139,127,255,.18);border:1px solid rgba(139,127,255,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+        .pill{display:inline-flex;align-items:center;gap:10px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);border-radius:50px;padding:10px 18px;font-size:.85rem;font-weight:600;color:#4ade80;margin-top:2rem;}
+        .pill .dot{width:8px;height:8px;background:#4ade80;border-radius:50%;animation:blink 1.8s infinite;}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+        .right{flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;}
+        .box{width:100%;max-width:400px;}
+        .box h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.85rem;margin-bottom:4px;color:#0d0d14;}
+        .sub{font-size:.9rem;color:#6b6b80;margin-bottom:1.8rem;}
+        #regPanel,#fpPanel{display:none;}
+        .f-label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#4a4a5a;margin-bottom:6px;display:block;}
+        .f-input{width:100%;padding:.78rem 1rem;border:1.5px solid #e0e0f0;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.95rem;outline:none;transition:all .2s;background:#fff;margin-bottom:1rem;}
+        .f-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,79,245,.1);}
+        .pw-wrap{position:relative;margin-bottom:1rem;}
+        .pw-wrap .f-input{margin-bottom:0;padding-right:2.8rem;}
+        .eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:#aaa;padding:4px;}
+        .eye-btn:hover{color:#555;}
+        .pw-bar{height:4px;border-radius:4px;margin-top:6px;margin-bottom:1rem;transition:all .3s;background:#f0f0f8;}
+        .pw-bar.weak{background:#ef4444;width:33%;}
+        .pw-bar.medium{background:#f59e0b;width:66%;}
+        .pw-bar.strong{background:#22c55e;width:100%;}
+        .pw-bar.empty{width:0;}
+        .btn-main{width:100%;padding:.88rem;background:var(--accent);color:#fff;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;transition:all .3s;margin-top:.3rem;box-shadow:0 6px 20px var(--glow);}
+        .btn-main:hover{transform:translateY(-2px);box-shadow:0 10px 28px var(--glow);}
+        .btn-main:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+        .btn-ghost{width:100%;padding:.75rem;background:transparent;color:var(--accent);border:1.5px solid var(--accent);border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s;margin-top:.5rem;}
+        .btn-ghost:hover{background:rgba(91,79,245,.06);}
+        .toggle-row{text-align:center;margin-top:1.2rem;font-size:.88rem;color:#6b6b80;}
+        .lnk{color:var(--accent);font-weight:700;background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;font-size:inherit;}
+        .forgot-row{text-align:right;margin-top:-.5rem;margin-bottom:.9rem;}
+        .forgot-row .lnk{font-size:.82rem;font-weight:600;text-decoration:none;}
+        .forgot-row .lnk:hover{text-decoration:underline;}
+        .alert{border-radius:10px;padding:.75rem 1rem;font-size:.84rem;margin-bottom:1rem;display:none;line-height:1.5;white-space:pre-line;}
+        .alert-err{background:#fff1f0;border:1px solid #ffccc7;color:#a61d24;}
+        .alert-ok{background:#f6ffed;border:1px solid #b7eb8f;color:#237804;}
+        .alert-info{background:#e6f4ff;border:1px solid #91caff;color:#003eb3;}
+        @media(max-width:768px){body{flex-direction:column;}.left{width:100%;padding:2rem;min-height:auto;}.fi{display:none;}}
+    </style>
+</head>
+<body>
+
+<div class="left">
+    <div class="z1">
+        <div class="brand">AI<span>Form</span>Filler</div>
+        <div class="tagline">Auto-fill government forms with AI</div>
+        <div class="fi"><div class="fi-icon">⚡</div> Fill 60–80 fields in under 5 seconds</div>
+        <div class="fi"><div class="fi-icon">🤖</div> GPT-4 powered — 95% accuracy</div>
+        <div class="fi"><div class="fi-icon">🇮🇳</div> Hindi + English forms supported</div>
+        <div class="fi"><div class="fi-icon">👥</div> Manage 100s of customers easily</div>
+        <div class="fi"><div class="fi-icon">🔐</div> Secure Firebase cloud storage</div>
+        <div class="pill"><span class="dot"></span> 🎁 Get ₹100 FREE wallet balance on signup!</div>
+    </div>
+</div>
+
+<div class="right">
+<div class="box">
+
+    <!-- LOGIN -->
+    <div id="loginPanel">
+        <h2>Welcome back 👋</h2>
+        <div class="sub">Sign in to your AI Form Filler account</div>
+        <div class="alert alert-err" id="loginErr"></div>
+        <label class="f-label">Email Address</label>
+        <input type="email" class="f-input" id="loginEmail" placeholder="you@example.com" autocomplete="email"/>
+        <label class="f-label">Password</label>
+        <div class="pw-wrap">
+            <input type="password" class="f-input" id="loginPass" placeholder="••••••••" autocomplete="current-password"/>
+            <button class="eye-btn" id="eyeLogin" type="button">👁️</button>
+        </div>
+        <div class="forgot-row"><button class="lnk" id="toFP">Forgot password?</button></div>
+        <button class="btn-main" id="loginBtn">Sign In →</button>
+        <div class="toggle-row">New here? <button class="lnk" id="toReg">Create free account</button></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="regPanel">
+        <h2>Create account 🚀</h2>
+        <div class="sub">Sign up and get <strong style="color:var(--accent)">50 free credits</strong> instantly!</div>
+        <div class="alert alert-err" id="regErr"></div>
+        <div class="alert alert-ok"  id="regOk"></div>
+        <label class="f-label">Full Name</label>
+        <input type="text" class="f-input" id="regName" placeholder="Ramesh Kumar Singh" autocomplete="name"/>
+        <label class="f-label">Email Address</label>
+        <input type="email" class="f-input" id="regEmail" placeholder="you@example.com" autocomplete="email"/>
+        <label class="f-label">Password</label>
+        <div class="pw-wrap">
+            <input type="password" class="f-input" id="regPass" placeholder="Min 6 characters" autocomplete="new-password"/>
+            <button class="eye-btn" id="eyeReg" type="button">👁️</button>
+        </div>
+        <div class="pw-bar empty" id="pwBar"></div>
+        <label class="f-label">WhatsApp Number</label>
+        <input type="tel" class="f-input" id="regPhone" placeholder="WhatsApp Number 10 digits" autocomplete="tel" maxlength="10"/>
+        <button class="btn-main" id="regBtn">Create Account &amp; Get ₹100 Free 🎁</button>
+        <div class="toggle-row">Already registered? <button class="lnk" id="toLogin">Sign in here</button></div>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div id="fpPanel">
+        <h2>Reset Password 🔑</h2>
+        <div class="sub">We'll send a reset link to your email</div>
+        <div class="alert alert-info" id="fpInfo" style="display:block;">📧 A reset email will be sent by Firebase. Check inbox and spam/junk folder.</div>
+        <div class="alert alert-err" id="fpErr"></div>
+        <div class="alert alert-ok"  id="fpOk"></div>
+        <label class="f-label">Email Address</label>
+        <input type="email" class="f-input" id="fpEmail" placeholder="you@example.com" autocomplete="email"/>
+        <button class="btn-main" id="fpBtn">Send Reset Link 📧</button>
+        <button class="btn-ghost" id="fpBack">← Back to Sign In</button>
+    </div>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+const EJ_SERVICE='service_ku3opjg', EJ_TEMPLATE='template_jptlive', EJ_KEY='MF6snaiF27-HdtR-j';
+emailjs.init({publicKey:EJ_KEY});
+
+async function sendWelcomeEmail(name,email){
+    try{
+        const r=await emailjs.send(EJ_SERVICE,EJ_TEMPLATE,{to_name:name,to_email:email,from_name:'AI Form Filler',reply_to:email,credits:'₹100 wallet balance',wallet_amount:'₹100',login_link:window.location.origin+'/dashboard.html',support_wa:'https://wa.me/919296914511',app_name:'AI Form Filler'});
+        console.log('✅ Welcome email sent:',r.status);
+    }catch(e){
+        console.error('❌ Email failed:',e.status,e.text);
+        const b=document.getElementById('regOk');
+        if(b) b.textContent='🎉 Account created! ₹100 free wallet balance added. (Email delivery issue)';
+    }
+}
+
+firebase.initializeApp({apiKey:'AIzaSyCGnA0-2QiSQ2Dg8n3xhzBxjvVKcXKf9P0',authDomain:'form-filling-service-5a261.firebaseapp.com',projectId:'form-filling-service-5a261',storageBucket:'form-filling-service-5a261.firebasestorage.app',messagingSenderId:'417118407948',appId:'1:417118407948:web:4daf44a54875a1b0f6cd29'});
+const auth=firebase.auth(), db=firebase.firestore();
+let isRegistering=false;
+
+auth.onAuthStateChanged(user=>{
+    if(isRegistering) return;
+    if(user){
+        // Notify extension about logged-in user (content.js will pick this up)
+        try{ window.postMessage({type:'AIFF_SET_USER',userId:user.uid,name:user.displayName||''},'*'); }catch(_){}
+        window.location.href='dashboard.html';
+    }
+});
+
+function showPanel(id){
+    ['loginPanel','regPanel','fpPanel'].forEach(p=>{
+        document.getElementById(p).style.display=(p===id?'block':'none');
+    });
+    clearAll();
+    // Reset fpInfo visibility when switching to forgot panel
+    if(id==='fpPanel') document.getElementById('fpInfo').style.display='block';
+}
+
+function clearAll(){
+    ['loginErr','regErr','regOk','fpErr','fpOk'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el){el.style.display='none';el.textContent='';}
+    });
+}
+function showErr(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block';}
+function showOk(id,msg){const el=document.getElementById(id);el.textContent=msg;el.style.display='block';}
+
+function friendly(code){
+    return({'auth/user-not-found':'❌ No account found. Please register first.','auth/wrong-password':'❌ Wrong password. Try again or use Forgot Password.','auth/invalid-credential':'❌ Wrong email or password. Please check and try again.','auth/invalid-email':'❌ Please enter a valid email address.','auth/email-already-in-use':'❌ Email already registered. Please sign in.','auth/weak-password':'❌ Password must be at least 6 characters.','auth/too-many-requests':'⚠️ Too many attempts. Wait a few minutes and try again.','auth/network-request-failed':'⚠️ Network error. Check your internet connection.','auth/user-disabled':'❌ Account disabled. Contact support.'})[code]||'❌ Something went wrong. Please try again.';
+}
+
+// Eye toggle
+function toggleEye(inp,btn){
+    document.getElementById(btn).addEventListener('click',()=>{
+        const el=document.getElementById(inp);
+        const hide=el.type==='password';
+        el.type=hide?'text':'password';
+        document.getElementById(btn).textContent=hide?'🙈':'👁️';
+    });
+}
+toggleEye('loginPass','eyeLogin');
+toggleEye('regPass','eyeReg');
+
+// Password strength
+document.getElementById('regPass').addEventListener('input',function(){
+    const b=document.getElementById('pwBar'),v=this.value;
+    if(!v){b.className='pw-bar empty';return;}
+    b.className='pw-bar '+(v.length<6?'weak':v.length<10?'medium':'strong');
+});
+
+// Panel switches
+document.getElementById('toReg').onclick   =()=>showPanel('regPanel');
+document.getElementById('toLogin').onclick =()=>showPanel('loginPanel');
+document.getElementById('toFP').onclick    =()=>showPanel('fpPanel');
+document.getElementById('fpBack').onclick  =()=>showPanel('loginPanel');
+
+// LOGIN
+document.getElementById('loginBtn').onclick=async()=>{
+    clearAll();
+    const email=document.getElementById('loginEmail').value.trim();
+    const pass=document.getElementById('loginPass').value;
+    if(!email||!pass){showErr('loginErr','❌ Please fill in all fields.');return;}
+    const btn=document.getElementById('loginBtn');
+    btn.disabled=true;btn.textContent='Signing in...';
+    try{
+        await auth.signInWithEmailAndPassword(email,pass);
+    }catch(e){
+        showErr('loginErr',friendly(e.code));
+        btn.disabled=false;btn.textContent='Sign In →';
+    }
+};
+
+// REGISTER
+document.getElementById('regBtn').onclick=async()=>{
+    clearAll();
+    const name=document.getElementById('regName').value.trim();
+    const email=document.getElementById('regEmail').value.trim();
+    const pass=document.getElementById('regPass').value;
+    const phone=document.getElementById('regPhone').value.trim().replace(/\D/g,'');
+    if(!name||!email||!pass){showErr('regErr','❌ Please fill in all fields.');return;}
+    if(pass.length<6){showErr('regErr','❌ Password must be at least 6 characters.');return;}
+    const btn=document.getElementById('regBtn');
+    btn.disabled=true;btn.textContent='Creating your account...';
+    isRegistering=true;
+    try{
+        const cred=await auth.createUserWithEmailAndPassword(email,pass);
+        await cred.user.updateProfile({displayName:name});
+        await db.collection('users').doc(cred.user.uid).set({name,email,walletBalance:100.0,credits:0,totalSpent:0,totalFormsFilledCount:0,phone:phone?'91'+phone:'',registeredAt:firebase.firestore.FieldValue.serverTimestamp(),createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+        localStorage.setItem('userId',cred.user.uid);
+        localStorage.setItem('userName',name);
+        try{const tok=await cred.user.getIdToken();localStorage.setItem('fbIdToken',tok);}catch(_){}
+        await sendWelcomeEmail(name,email);
+        if(phone){fetch('/whatsapp.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'welcome',phone:'91'+phone,name,credits:'₹100'})});}
+        showOk('regOk','🎉 Account created! ₹100 free wallet balance added. Redirecting...');
+        setTimeout(()=>{isRegistering=false;window.location.href='dashboard.html';},2000);
+    }catch(e){
+        isRegistering=false;
+        showErr('regErr',friendly(e.code));
+        btn.disabled=false;btn.innerHTML='Create Account &amp; Get ₹100 Free 🎁';
+    }
+};
+
+// FORGOT PASSWORD
+document.getElementById('fpBtn').onclick=async()=>{
+    clearAll();
+    const email=document.getElementById('fpEmail').value.trim();
+    if(!email){showErr('fpErr','❌ Please enter your email address.');return;}
+    const btn=document.getElementById('fpBtn');
+    btn.disabled=true;btn.textContent='Sending...';
+    try{
+        await auth.sendPasswordResetEmail(email);
+        document.getElementById('fpInfo').style.display='none';
+        showOk('fpOk','✅ Reset link sent to '+email+'!\n\nCheck your inbox and spam/junk folder.\nLink expires in 1 hour — click it to set a new password.');
+        document.getElementById('fpEmail').value='';
+        btn.textContent='Sent ✅';
+        setTimeout(()=>{btn.disabled=false;btn.textContent='Send Reset Link 📧';},5000);
+    }catch(e){
+        if(e.code==='auth/user-not-found'){
+            document.getElementById('fpInfo').style.display='none';
+            showOk('fpOk','✅ If an account exists for '+email+', a reset link has been sent.');
+        }else{
+            showErr('fpErr',friendly(e.code));
+        }
+        btn.disabled=false;btn.textContent='Send Reset Link 📧';
+    }
+};
+
+// Enter key
+document.addEventListener('keydown',e=>{
+    if(e.key!=='Enter')return;
+    const map={loginPanel:'loginBtn',regPanel:'regBtn',fpPanel:'fpBtn'};
+    for(const[p,b]of Object.entries(map)){
+        if(document.getElementById(p).style.display!=='none'){document.getElementById(b).click();break;}
+    }
+});
+</script>
+</body>
+</html>

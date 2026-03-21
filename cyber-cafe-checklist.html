@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Cafe — Complete Service Checklist</title>
+<style>
+:root{--blue:#2563eb;--green:#16a34a;--red:#dc2626;--orange:#d97706;--purple:#7c3aed;--bg:#f1f5f9;--card:#fff;--border:#e2e8f0;--text:#1e293b;--muted:#64748b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text)}
+.topbar{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;padding:16px 24px;position:sticky;top:0;z-index:100;box-shadow:0 3px 12px rgba(0,0,0,.3)}
+.topbar h1{font-size:1.05rem;font-weight:800;margin-bottom:2px}
+.topbar p{font-size:.78rem;opacity:.7}
+.stats-bar{background:#0f172a;color:#94a3b8;padding:10px 24px;display:flex;gap:28px;font-size:.8rem;border-bottom:1px solid #1e293b}
+.stats-bar strong{color:#fff}
+.wrap{max-width:1100px;margin:24px auto;padding:0 16px;display:flex;flex-direction:column;gap:20px}
+
+/* CATEGORY CARD */
+.cat{background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.cat-head{padding:13px 20px;display:flex;align-items:center;justify-content:space-between;color:#fff;cursor:pointer;user-select:none}
+.cat-head h2{font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.cat-progress{font-size:.75rem;background:rgba(255,255,255,.15);border-radius:20px;padding:3px 12px;white-space:nowrap}
+
+/* ITEM TABLE */
+.item-table{width:100%;border-collapse:collapse}
+.item-table tr{border-bottom:1px solid var(--border)}
+.item-table tr:last-child{border-bottom:none}
+.item-table td{padding:11px 18px;font-size:.85rem;vertical-align:top}
+.item-table td:first-child{width:36px;text-align:center;font-size:1.1rem}
+.item-table td:nth-child(2){font-weight:600;width:220px;color:var(--text)}
+.item-table td:nth-child(3){color:var(--muted);font-size:.82rem}
+.item-table td:last-child{width:160px;text-align:right}
+.item-table tr:hover{background:#f8fafc}
+
+/* STATUS BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;white-space:nowrap}
+.done{background:#dcfce7;color:#15803d}
+.partial{background:#fef3c7;color:#92400e}
+.missing{background:#fee2e2;color:#b91c1c}
+.soon{background:#ede9fe;color:#6d28d9}
+
+/* CATEGORY COLOR BANDS */
+.c1{background:linear-gradient(90deg,#1e40af,#2563eb)}
+.c2{background:linear-gradient(90deg,#065f46,#059669)}
+.c3{background:linear-gradient(90deg,#7e22ce,#9333ea)}
+.c4{background:linear-gradient(90deg,#9f1239,#e11d48)}
+.c5{background:linear-gradient(90deg,#92400e,#d97706)}
+.c6{background:linear-gradient(90deg,#0369a1,#0ea5e9)}
+.c7{background:linear-gradient(90deg,#1e293b,#334155)}
+.c8{background:linear-gradient(90deg,#166534,#16a34a)}
+
+/* LEGEND */
+.legend{display:flex;gap:16px;flex-wrap:wrap;background:var(--card);padding:14px 20px;border-radius:10px;border:1px solid var(--border);font-size:.8rem}
+.legend-item{display:flex;align-items:center;gap:6px}
+
+/* COLLAPSIBLE */
+.cat-body{display:block}
+.cat-body.collapsed{display:none}
+
+/* PRIORITY QUEUE */
+.priority-box{background:var(--card);border-radius:12px;border:2px solid #f59e0b;overflow:hidden}
+.priority-head{background:#f59e0b;color:#fff;padding:12px 20px;font-weight:700;font-size:.9rem}
+.priority-list{padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.priority-item{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border-radius:8px;background:#fffbeb;border:1px solid #fde68a}
+.priority-item .num{background:#f59e0b;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;flex-shrink:0;margin-top:1px}
+.priority-item h4{font-size:.85rem;font-weight:700;margin-bottom:2px}
+.priority-item p{font-size:.78rem;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>🖥️ Cyber Cafe — Complete Service Checklist</h1>
+  <p>Every service a cyber cafe offers for govt job applicants — what ClawBot covers vs what's missing</p>
+</div>
+
+<div class="stats-bar">
+  <span>✅ Done: <strong id="s-done">0</strong></span>
+  <span>🟡 Partial: <strong id="s-partial">0</strong></span>
+  <span>❌ Missing: <strong id="s-missing">0</strong></span>
+  <span>🔜 Planned: <strong id="s-soon">0</strong></span>
+  <span>📊 Coverage: <strong id="s-pct">0%</strong></span>
+</div>
+
+<div class="wrap">
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><span class="badge done">✅ Done</span> Fully working in ClawBot</div>
+  <div class="legend-item"><span class="badge partial">🟡 Partial</span> Works but incomplete</div>
+  <div class="legend-item"><span class="badge missing">❌ Missing</span> Not built yet</div>
+  <div class="legend-item"><span class="badge soon">🔜 Planned</span> Can add next</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  1. FORM FILLING
+══════════════════════════════════════════ -->
+<div class="cat">
+  <div class="cat-head c1" onclick="toggle(this)">
+    <h2>📝 1. Government Form Filling (Core Service)</h2>
+    <span class="cat-progress" id="prog-1">Loading...</span>
+  </div>
+  <div class="cat-body">
+    <table class="item-table">
+      <tr><td>✅</td><td>Personal details (Name, DOB, Gender)</td><td>First/Middle/Last name split, full name, DOB with format conversion</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Father / Mother / Husband name</td><td>All parent name variants in English + Hindi labels</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Category / Caste / Religion</td><td>OBC, SC, ST, EWS, General + religion dropdown</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Contact — Email & Mobile</td><td>Primary + alternate mobile, email with confirm/re-enter detection</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Permanent address (full)</td><td>House no, street, PO, PS, district, state, PIN</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Correspondence address</td><td>Auto-fills same as permanent address</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>State dropdown (all 36)</td><td>Aliases: UP → Uttar Pradesh, WB, MH, Hindi names, abbreviations</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Identity docs (Aadhaar, PAN, Voter)</td><td>Aadhaar, PAN, Voter ID, Passport, Driving Licence</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>10th / Matriculation details</td><td>Board, year, %, marks obtained, total, roll, cert no, division</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>12th / Intermediate details</td><td>Board, year, %, stream, roll, cert, marks</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Diploma details</td><td>Board, year, %, trade/branch, roll no</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Graduation / UG details</td><td>Degree, university, year, %, roll, issue date</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Post Graduation / PG details</td><td>Degree, university, year, %, roll</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Bank account details</td><td>Account no, IFSC, bank name, branch</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Caste / Domicile / Income cert</td><td>Cert no, issue date, issuing authority, district</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>PWD / Disability details</td><td>Type, %, cert no</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Confirm / Re-enter fields</td><td>Detects confirm email, confirm mobile, re-enter patterns</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Dropdown filling (dynamic)</td><td>2-pass fill: instant + 600ms retry for AJAX-loaded dropdowns</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Radio button filling</td><td>Match by value, label, or first character</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>🟡</td><td>Checkbox fields</td><td>Terms & Conditions, declarations — not auto-checked yet</td><td><span class="badge partial">Partial</span></td></tr>
+      <tr><td>❌</td><td>OTP fields</td><td>Mobile/email OTP — cannot be automated (security by design)</td><td><span class="badge missing">Manual</span></td></tr>
+      <tr><td>❌</td><td>CAPTCHA fields</td><td>Cannot be automated (by design)</td><td><span class="badge missing">Manual</span></td></tr>
+      <tr><td>🔜</td><td>Exam centre preference</td><td>Preferred exam city — add to profile + rule mapping</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Post preference / Job preference</td><td>Preferred post code — add to profile</td><td><span class="badge soon">Planned</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  2. DOCUMENT PREPARATION
+══════════════════════════════════════════ -->
+<div class="cat">
+  <div class="cat-head c2" onclick="toggle(this)">
+    <h2>📷 2. Document Preparation</h2>
+    <span class="cat-progress" id="prog-2">Loading...</span>
+  </div>
+  <div class="cat-body">
+    <table class="item-table">
+      <tr><td>✅</td><td>Photo resize (passport size)</td><td>Preset sizes for SSC, UPSC, IBPS, RRB, SBI, NTA, BPSC portals</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Photo compression (KB limit)</td><td>Compress to 10KB, 20KB, 50KB, 100KB as required</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Signature image prep</td><td>Resize + compress to portal spec, white background</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Thumbprint image prep</td><td>Resize + compress thumb/fingerprint image</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>PDF compression</td><td>Compress PDF 30%–100% quality, download result</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>PDF → Images conversion</td><td>All pages, first page, or custom range; 72–300 DPI</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Images → PDF merge</td><td>Combine multiple photos into one PDF</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Auto-detect doc requirements</td><td>Extension scans page, shows what docs are needed + opens right tool</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>🟡</td><td>JPEG / PNG format conversion</td><td>Tools page handles it but no dedicated convert button in extension popup</td><td><span class="badge partial">Partial</span></td></tr>
+      <tr><td>🔜</td><td>Document scanning (webcam)</td><td>Use webcam to scan and crop documents — browser API possible</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>❌</td><td>Physical scanner integration</td><td>Cannot connect to hardware scanner from browser</td><td><span class="badge missing">Not possible</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  3. PORTAL SUPPORT
+══════════════════════════════════════════ -->
+<div class="cat">
+  <div class="cat-head c3" onclick="toggle(this)">
+    <h2>🌐 3. Government Portal Support</h2>
+    <span class="cat-progress" id="prog-3">Loading...</span>
+  </div>
+  <div class="cat-body">
+    <table class="item-table">
+      <tr><td>✅</td><td>SSC (ssc.gov.in)</td><td>Form fill + photo/signature size presets</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>UPSC (upsconline.nic.in)</td><td>Form fill + document presets</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>RRB / Railways</td><td>Form fill + document presets</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>IBPS (ibps.in)</td><td>Form fill + document presets</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>SBI / Bank PO</td><td>Form fill + document presets</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>NTA / JEE / NEET</td><td>Form fill + document presets</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>BPSC (Bihar PSC)</td><td>Form fill + document presets</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>State PSC (generic)</td><td>Form fill works on all portals via AI + local rules</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>NPS / EPFO</td><td>Form fill support</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>🔜</td><td>UPPSC, MPPSC, RPSC (State PSCs)</td><td>Add specific presets for state PSC photo sizes</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Army / Defence (joinindianarmy.nic.in)</td><td>Add preset + chest measurement, height, weight fields</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Sarkari Result portals</td><td>Works via AI but no specific preset</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>❌</td><td>State police portals</td><td>Highly varied, needs per-state testing</td><td><span class="badge missing">Testing needed</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  4. GOVERNMENT SCHEMES / DIGITAL SERVICES
+══════════════════════════════════════════ -->
+<div class="cat">
+  <div class="cat-head c4" onclick="toggle(this)">
+    <h2>🏛️ 4. Government Schemes & Digital Services</h2>
+    <span class="cat-progress" id="prog-4">Loading...</span>
+  </div>
+  <div class="cat-body">
+    <table class="item-table">
+      <tr><td>🟡</td><td>E-Shram Card registration</td><td>Form fill works via AI, no specific preset yet</td><td><span class="badge partial">Partial</span></td></tr>
+      <tr><td>🟡</td><td>PM Kisan registration</td><td>Form fill works, needs farmer-specific fields (Khasra, Khatauni)</td><td><span class="badge partial">Partial</span></td></tr>
+      <tr><td>🟡</td><td>Ayushman Bharat card</td><td>AI fills form but no profile fields for ration card / family data</td><td><span class="badge partial">Partial</span></td></tr>
+      <tr><td>🔜</td><td>Aadhaar address update</td><td>Need Aadhaar fields in profile, UIDAI portal support</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>PAN Card application (NSDL/UTIITSL)</td><td>Add PAN form fields — AO code, declaration fields</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Voter ID registration (NVSP)</td><td>Add Voter ID application fields</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Scholarship applications (NSP)</td><td>National Scholarship Portal — add income, bank, marks fields</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>College admission forms</td><td>DU, state university forms — works via AI</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>❌</td><td>Passport application (Seva Kendra)</td><td>Complex multi-step form, needs specific field mapping</td><td><span class="badge missing">Not built</span></td></tr>
+      <tr><td>❌</td><td>Driving Licence (Sarathi)</td><td>Multi-step, RTO-specific</td><td><span class="badge missing">Not built</span></td></tr>
+      <tr><td>❌</td><td>Ration Card application</td><td>State-specific, no profile fields</td><td><span class="badge missing">Not built</span></td></tr>
+      <tr><td>❌</td><td>Birth / Death certificate</td><td>State municipality portals vary widely</td><td><span class="badge missing">Not built</span></td></tr>
+      <tr><td>❌</td><td>Income Tax Return (ITR)</td><td>Not in scope for cyber cafe form fill</td><td><span class="badge missing">Out of scope</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  5. AFTER FORM SUBMISSION
+══════════════════════════════════════════ -->
+<div class="cat">
+  <div class="cat-head c5" onclick="toggle(this)">
+    <h2>📬 5. Post-Submission Services</h2>
+    <span class="cat-progress" id="prog-5">Loading...</span>
+  </div>
+  <div class="cat-body">
+    <table class="item-table">
+      <tr><td>❌</td><td>Admit card download</td><td>Customer needs to download their admit card — no tracking yet</td><td><span class="badge missing">Not built</span></td></tr>
+      <tr><td>❌</td><td>Application status tracking</td><td>No tracker for which forms a customer applied to</td><td><span class="badge missing">Not built</span></td></tr>
+      <tr><td>❌</td><td>Result checking</td><td>No result checker — would need portal-by-portal scraping</td><td><span class="badge missing">Not built</span></td></tr>
+      <tr><td>❌</td><td>Application form print</td><td>No "print this application" button after fill</td><td><span class="badge missing">Not built</span></td></tr>
+      <tr><td>🔜</td><td>Fee payment confirmation</td><td>Could add fee receipt download reminder in extension</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Customer applied forms log</td><td>Record which customer applied to which form on which date</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>WhatsApp reminder for admit card</td><td>Send WhatsApp when admit card date approaches</td><td><span class="badge soon">Planned</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  6. CUSTOMER MANAGEMENT
+══════════════════════════════════════════ -->
+<div class="cat">
+  <div class="cat-head c6" onclick="toggle(this)">
+    <h2>👥 6. Customer Profile Management</h2>
+    <span class="cat-progress" id="prog-6">Loading...</span>
+  </div>
+  <div class="cat-body">
+    <table class="item-table">
+      <tr><td>✅</td><td>Create customer profile</td><td>85+ fields: personal, address, education, documents, bank</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Customer ID system</td><td>Auto-generated CUS-TIMESTAMP, used to load in extension</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>View all customers</td><td>List with search, customer card, edit link</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Edit existing profile</td><td>Full edit of all fields, auto-save</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Progress tracking per profile</td><td>% complete indicator per customer profile</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>🟡</td><td>Customer search</td><td>Basic search exists, no filter by date/category/status</td><td><span class="badge partial">Partial</span></td></tr>
+      <tr><td>🔜</td><td>Customer photo storage</td><td>Store scanned photo in profile for quick reuse</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Applied forms history per customer</td><td>Track which portals each customer applied to + date</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Customer expiry / renewal alert</td><td>Alert when customer's documents (Aadhaar, caste cert) are expiring</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Bulk customer export (CSV/Excel)</td><td>Export customer list for offline backup</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>❌</td><td>Multiple operators per cafe</td><td>One cafe account can have multiple staff logins</td><td><span class="badge missing">Not built</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  7. BILLING & PAYMENTS
+══════════════════════════════════════════ -->
+<div class="cat">
+  <div class="cat-head c7" onclick="toggle(this)">
+    <h2>💰 7. Billing & Payments</h2>
+    <span class="cat-progress" id="prog-7">Loading...</span>
+  </div>
+  <div class="cat-body">
+    <table class="item-table">
+      <tr><td>✅</td><td>Wallet system (₹)</td><td>Prepaid wallet balance, shown in dashboard + extension</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>2 paise per field filled</td><td>₹0.02/field × fields filled, deducted after fill</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Recharge request system</td><td>Screenshot upload → admin approves → wallet credited</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Admin approval panel</td><td>View pending recharges, approve/reject, see history</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Transaction history</td><td>All top-ups and deductions logged in Firestore</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Low balance warning</td><td>Red warning in dashboard + extension when balance &lt; ₹10</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>✅</td><td>Block fill on zero balance</td><td>Extension shows error and opens recharge page if wallet empty</td><td><span class="badge done">Done</span></td></tr>
+      <tr><td>🟡</td><td>UPI payment proof upload</td><td>Screenshot upload exists but no UPI QR generation</td><td><span class="badge partial">Partial</span></td></tr>
+      <tr><td>🔜</td><td>Auto UPI payment (Razorpay)</td><td>Direct payment via Razorpay/PhonePe — instant wallet credit</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Invoice / receipt generation</td><td>Print receipt for customer: "Form filled on [date] — ₹X charged"</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Monthly billing report</td><td>Admin sees total revenue, fields filled, active users per month</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>❌</td><td>Per-customer billing to end-user</td><td>Cafe charges their customer separately — no customer-facing billing</td><td><span class="badge missing">Not built</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  8. PRINT SERVICES
+══════════════════════════════════════════ -->
+<div class="cat">
+  <div class="cat-head c8" onclick="toggle(this)">
+    <h2>🖨️ 8. Print Services</h2>
+    <span class="cat-progress" id="prog-8">Loading...</span>
+  </div>
+  <div class="cat-body">
+    <table class="item-table">
+      <tr><td>🟡</td><td>Print application form</td><td>User can use browser print (Ctrl+P) but no one-click print button in extension</td><td><span class="badge partial">Partial</span></td></tr>
+      <tr><td>🟡</td><td>Print admit card</td><td>User downloads + prints manually, no assist</td><td><span class="badge partial">Partial</span></td></tr>
+      <tr><td>🔜</td><td>"Print this page" button in extension</td><td>One-click print trigger from extension popup after fill</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>🔜</td><td>Print-optimised layout detection</td><td>Detect when page has print button and highlight it</td><td><span class="badge soon">Planned</span></td></tr>
+      <tr><td>❌</td><td>Print queue management</td><td>Multiple print jobs management — out of scope for browser extension</td><td><span class="badge missing">Out of scope</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  PRIORITY QUEUE
+══════════════════════════════════════════ -->
+<div class="priority-box">
+  <div class="priority-head">🚀 Next 5 Things to Build (Highest Impact for Cyber Cafe)</div>
+  <div class="priority-list">
+
+    <div class="priority-item">
+      <div class="num">1</div>
+      <div>
+        <h4>✅ Checkbox / Declaration auto-tick</h4>
+        <p>Most government forms end with "I declare that above information is correct" checkbox. Auto-tick Terms & Conditions and declaration checkboxes. <strong>Impact: Every form needs this.</strong></p>
+      </div>
+    </div>
+
+    <div class="priority-item">
+      <div class="num">2</div>
+      <div>
+        <h4>🖨️ One-click Print button in extension</h4>
+        <p>After filling form, show a "🖨️ Print this page" button in popup. Saves the operator from manually Ctrl+P. <strong>Impact: Every submission ends with a printout.</strong></p>
+      </div>
+    </div>
+
+    <div class="priority-item">
+      <div class="num">3</div>
+      <div>
+        <h4>📋 Applied forms log per customer</h4>
+        <p>Record which portals/forms each customer applied to, with date + cost. Show in customer profile. <strong>Impact: Operators can track work done, customer can re-print anytime.</strong></p>
+      </div>
+    </div>
+
+    <div class="priority-item">
+      <div class="num">4</div>
+      <div>
+        <h4>🏛️ E-Shram + PM Kisan profile fields</h4>
+        <p>Add farmer-specific fields (Khasra no, Khatauni no, land area, bank passbook) for E-Shram/PM Kisan/Ayushman forms. <strong>Impact: 50%+ of cyber cafe work is these schemes.</strong></p>
+      </div>
+    </div>
+
+    <div class="priority-item">
+      <div class="num">5</div>
+      <div>
+        <h4>💳 Auto UPI payment (Razorpay)</h4>
+        <p>Cafe owner pays directly via UPI QR — wallet credited instantly without admin approval wait. <strong>Impact: Removes friction, faster recharge = more usage.</strong></p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+const STATUS = {
+  'done': 0, 'partial': 0, 'missing': 0, 'soon': 0
+};
+
+document.querySelectorAll('.badge').forEach(b => {
+  const t = b.textContent.trim().toLowerCase();
+  if (b.classList.contains('done')) STATUS.done++;
+  else if (b.classList.contains('partial')) STATUS.partial++;
+  else if (b.classList.contains('missing')) STATUS.missing++;
+  else if (b.classList.contains('soon')) STATUS.soon++;
+});
+
+document.getElementById('s-done').textContent = STATUS.done;
+document.getElementById('s-partial').textContent = STATUS.partial;
+document.getElementById('s-missing').textContent = STATUS.missing;
+document.getElementById('s-soon').textContent = STATUS.soon;
+const total = STATUS.done + STATUS.partial + STATUS.missing + STATUS.soon;
+const pct = Math.round((STATUS.done + STATUS.partial * 0.5) / total * 100);
+document.getElementById('s-pct').textContent = pct + '%';
+
+// Section progress
+document.querySelectorAll('.cat').forEach((cat, i) => {
+  const id = 'prog-' + (i+1);
+  const done = cat.querySelectorAll('.badge.done').length;
+  const partial = cat.querySelectorAll('.badge.partial').length;
+  const total = cat.querySelectorAll('.badge').length;
+  const el = document.getElementById(id);
+  if (el) el.textContent = done + '/' + total + ' done';
+});
+
+function toggle(head) {
+  const body = head.nextElementSibling;
+  body.classList.toggle('collapsed');
+}
+</script>
+</body>
+</html>

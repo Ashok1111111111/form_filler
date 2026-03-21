@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Form Filler – Cyber Cafe Flyer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 12mm 14mm;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background decoration */
+        .page::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            background: rgba(102,126,234,0.08);
+        }
+        .page::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: -80px;
+            width: 350px; height: 350px;
+            border-radius: 50%;
+            background: rgba(255,107,53,0.06);
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 18px 22px;
+            text-align: center;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .header .tag {
+            background: #ff6b35;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .header h1 {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+        .header h1 span { color: #ffd700; }
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 6px;
+        }
+
+        /* HERO PROMISE */
+        .hero {
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            border-radius: 16px;
+            padding: 16px 20px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .hero .big {
+            font-size: 42px;
+            font-weight: 900;
+            line-height: 1;
+        }
+        .hero .big span { font-size: 22px; vertical-align: middle; }
+        .hero p {
+            font-size: 15px;
+            margin-top: 4px;
+            opacity: 0.95;
+            font-weight: 600;
+        }
+        .hero .note {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 3px;
+        }
+
+        /* HOW IT WORKS */
+        .section-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #764ba2;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(to right, #764ba2, transparent);
+            border-radius: 2px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .step {
+            background: #f8f7ff;
+            border: 2px solid #e8e4f8;
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+        }
+        .step .num {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            font-size: 15px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+        }
+        .step .icon { font-size: 22px; margin-bottom: 5px; }
+        .step .label { font-size: 11.5px; font-weight: 700; color: #333; line-height: 1.3; }
+        .step .sub { font-size: 10px; color: #888; margin-top: 3px; }
+
+        /* TIME COMPARISON */
+        .compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .compare-box {
+            border-radius: 14px;
+            padding: 14px;
+            text-align: center;
+        }
+        .compare-box.first {
+            background: #fff8f0;
+            border: 2px solid #ffd199;
+        }
+        .compare-box.second {
+            background: #f0fdf4;
+            border: 2px solid #86efac;
+        }
+        .compare-box .label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .compare-box .time {
+            font-size: 36px;
+            font-weight: 900;
+            line-height: 1;
+        }
+        .compare-box.first .time { color: #f59e0b; }
+        .compare-box.second .time { color: #16a34a; }
+        .compare-box .unit { font-size: 14px; font-weight: 600; color: #777; }
+        .compare-box .desc { font-size: 11px; color: #888; margin-top: 5px; line-height: 1.4; }
+
+        /* SERVICES */
+        .services {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .service-item {
+            background: #f8f7ff;
+            border-left: 4px solid #667eea;
+            border-radius: 0 10px 10px 0;
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .service-item .ico { font-size: 18px; }
+        .service-item .txt { font-size: 11.5px; font-weight: 600; color: #333; line-height: 1.3; }
+
+        /* PRICING */
+        .pricing {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .pricing .left .title { font-size: 13px; opacity: 0.8; }
+        .pricing .left .price {
+            font-size: 30px;
+            font-weight: 900;
+            color: #ffd700;
+            line-height: 1;
+        }
+        .pricing .left .per { font-size: 12px; opacity: 0.7; }
+        .pricing .divider { width: 1px; background: rgba(255,255,255,0.2); align-self: stretch; }
+        .pricing .right {
+            flex: 1;
+            font-size: 12px;
+            opacity: 0.85;
+            line-height: 1.8;
+        }
+        .pricing .right span { color: #ffd700; font-weight: 700; }
+
+        /* QR + FOOTER */
+        .footer {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #f8f7ff;
+            border-radius: 14px;
+            padding: 14px 18px;
+            border: 2px dashed #c4b5fd;
+        }
+        .qr-box {
+            width: 90px; height: 90px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e8e4f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: 4px;
+        }
+        .qr-box canvas, .qr-box img {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 6px;
+        }
+        .footer-text .url {
+            font-size: 16px;
+            font-weight: 900;
+            color: #667eea;
+        }
+        .footer-text .tagline {
+            font-size: 12px;
+            color: #555;
+            margin-top: 3px;
+        }
+        .footer-text .badges {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: #667eea;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .badge.orange { background: #ff6b35; }
+        .badge.green  { background: #16a34a; }
+
+        /* PRINT */
+        @media print {
+            body { background: white; padding: 0; }
+            .page { box-shadow: none; margin: 0; }
+            .print-btn { display: none; }
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 20px; right: 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(102,126,234,0.4);
+            z-index: 999;
+        }
+        .print-btn:hover { background: #764ba2; }
+    </style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">🖨️ Print Flyer</button>
+
+<div class="page">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="tag">🤖 AI Technology</div>
+        <h1>Form Fill होता है <span>2 मिनट</span> में!</h1>
+        <div class="subtitle">Government &amp; Private Forms — Auto Fill with Artificial Intelligence</div>
+    </div>
+
+    <!-- HERO PROMISE -->
+    <div class="hero">
+        <div class="big"><span>⚡</span> 2 <span>मिनट</span></div>
+        <p>पहले से Registered Customer का Form — बस 2 मिनट में भर जाता है</p>
+        <div class="note">📝 पहली बार थोड़ा time लगेगा details save करने में — उसके बाद हर बार सिर्फ 2 मिनट!</div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="section-title">कैसे काम करता है?</div>
+    <div class="steps">
+        <div class="step">
+            <div class="icon">👤</div>
+            <div class="num">1</div>
+            <div class="label">Details Save करें</div>
+            <div class="sub">सिर्फ एक बार — Name, DOB, Aadhaar सब</div>
+        </div>
+        <div class="step">
+            <div class="icon">🌐</div>
+            <div class="num">2</div>
+            <div class="label">Form वाली Website खोलें</div>
+            <div class="sub">DSSSB, SSC, UP, BPSC — कोई भी</div>
+        </div>
+        <div class="step">
+            <div class="icon">🤖</div>
+            <div class="num">3</div>
+            <div class="label">AI Fill करे</div>
+            <div class="sub">Extension button दबाओ — AI सब भर देगा</div>
+        </div>
+        <div class="step">
+            <div class="icon">✅</div>
+            <div class="num">4</div>
+            <div class="label">Submit!</div>
+            <div class="sub">Check करो और Submit — Done!</div>
+        </div>
+    </div>
+
+    <!-- TIME COMPARE -->
+    <div class="section-title">Time कितना लगता है?</div>
+    <div class="compare">
+        <div class="compare-box first">
+            <div class="label">🆕 पहली बार (1st Visit)</div>
+            <div class="time">10<span class="unit">–15</span></div>
+            <div class="unit">मिनट</div>
+            <div class="desc">Details एक बार save होती हैं — Name, Address, Aadhaar, DOB, Education, Bank सब कुछ</div>
+        </div>
+        <div class="compare-box second">
+            <div class="label">🔁 दूसरी बार से (Every Visit)</div>
+            <div class="time">2</div>
+            <div class="unit">मिनट</div>
+            <div class="desc">Customer ID डालो, AI सब automatically fill कर देगा — कोई typing नहीं!</div>
+        </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="section-title">कौन से Forms Fill होते हैं?</div>
+    <div class="services">
+        <div class="service-item"><span class="ico">📋</span><span class="txt">DSSSB Registration</span></div>
+        <div class="service-item"><span class="ico">📋</span><span class="txt">SSC CGL / CHSL / MTS</span></div>
+        <div class="service-item"><span class="ico">📋</span><span class="txt">UP Police / UPPSC</span></div>
+        <div class="service-item"><span class="ico">📋</span><span class="txt">Railway RRB / NTPC</span></div>
+        <div class="service-item"><span class="ico">📋</span><span class="txt">BPSC / State PSC</span></div>
+        <div class="service-item"><span class="ico">📋</span><span class="txt">Bank IBPS / SBI PO</span></div>
+        <div class="service-item"><span class="ico">🌾</span><span class="txt">E-Shram Card</span></div>
+        <div class="service-item"><span class="ico">🌾</span><span class="txt">PM Kisan Registration</span></div>
+        <div class="service-item"><span class="ico">🏥</span><span class="txt">Ayushman Bharat</span></div>
+        <div class="service-item"><span class="ico">🪪</span><span class="txt">Domicile / Caste Cert</span></div>
+        <div class="service-item"><span class="ico">🪪</span><span class="txt">Income Certificate</span></div>
+        <div class="service-item"><span class="ico">🏦</span><span class="txt">Jan Dhan / Bank Form</span></div>
+    </div>
+
+    <!-- PRICING -->
+    <div class="pricing">
+        <div class="left">
+            <div class="title">Charge</div>
+            <div class="price">₹2–5</div>
+            <div class="per">per field filled</div>
+        </div>
+        <div class="divider"></div>
+        <div class="right">
+            ✅ <span>Normal form (20 fields)</span> = ₹40–100 बचत<br>
+            ✅ Manual typing गलतियाँ = <span>Zero</span><br>
+            ✅ Spelling mistakes = <span>नहीं होंगी</span><br>
+            ✅ Dropdowns, checkboxes = <span>सब auto</span>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="qr-box" id="qrcode"></div>
+        <div class="footer-text">
+            <div class="url">🌐 ai-workflows.cloud</div>
+            <div class="tagline">India का पहला AI Form Filler — Cyber Cafe के लिए बनाया गया</div>
+            <div class="badges">
+                <span class="badge">✅ 100% Accurate</span>
+                <span class="badge orange">⚡ 2 Min Fill</span>
+                <span class="badge green">🔒 Data Safe</span>
+                <span class="badge">📱 All Portals</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    new QRCode(document.getElementById('qrcode'), {
+        text: 'https://ai-workflows.cloud',
+        width: 82,
+        height: 82,
+        colorDark: '#1a1a2e',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+</script>
+</body>
+</html>

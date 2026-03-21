@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Tools – AI Form Filler</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --accent: #5b4ff5; --accent-2: #f5724f;
+            --glow: rgba(91,79,245,0.18);
+            --ink: #0d0d14; --ink-muted: #6b6b80;
+            --surface: #f5f4ff; --border: rgba(91,79,245,0.1);
+            --sidebar-w: 260px;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #f6f6fa; margin: 0; color: var(--ink); }
+
+        /* ── SIDEBAR (same as dashboard) ── */
+        #sidebar { position:fixed; top:0; left:0; height:100vh; width:var(--sidebar-w); background:linear-gradient(160deg,#1a1535 0%,#0d0d14 100%); color:white; padding:0; z-index:200; display:flex; flex-direction:column; box-shadow:4px 0 30px rgba(0,0,0,.15); }
+        .sl { padding:1.8rem 1.5rem 1.2rem; border-bottom:1px solid rgba(255,255,255,.08); margin-bottom:.5rem; }
+        .sl-txt { font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem; color:white; }
+        .sl-txt span { color:#8b7fff; }
+        .sl-sub { font-size:.75rem; color:rgba(255,255,255,.4); margin-top:3px; }
+        .sn { flex:1; padding:.5rem 1rem; }
+        .ni { display:flex; align-items:center; gap:12px; padding:.75rem 1rem; border-radius:12px; text-decoration:none; color:rgba(255,255,255,.6); font-weight:500; font-size:.9rem; margin-bottom:4px; transition:all .2s; }
+        .ni i { width:20px; text-align:center; }
+        .ni:hover { background:rgba(255,255,255,.08); color:white; }
+        .ni.active { background:rgba(139,127,255,.2); color:white; border:1px solid rgba(139,127,255,.3); }
+        .ni.active i { color:#8b7fff; }
+        .sf { padding:1rem; border-top:1px solid rgba(255,255,255,.08); }
+        .uc { display:flex; align-items:center; gap:10px; padding:.75rem 1rem; background:rgba(255,255,255,.06); border-radius:12px; margin-bottom:.5rem; }
+        .ua { width:36px; height:36px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; font-size:.9rem; color:white; flex-shrink:0; }
+        .un { font-size:.85rem; font-weight:600; color:white; }
+        .ue { font-size:.72rem; color:rgba(255,255,255,.4); }
+        .blout { display:flex; align-items:center; gap:8px; width:100%; padding:.65rem 1rem; background:transparent; border:1px solid rgba(255,255,255,.1); border-radius:10px; color:rgba(255,255,255,.5); font-size:.85rem; font-weight:500; cursor:pointer; transition:all .2s; }
+        .blout:hover { background:rgba(220,53,69,.15); color:#ff6b7a; border-color:rgba(220,53,69,.3); }
+
+        /* ── MAIN ── */
+        #main { margin-left:var(--sidebar-w); min-height:100vh; padding:2rem; }
+        .top-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; }
+        .page-title { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; }
+        .page-sub { font-size:.9rem; color:var(--ink-muted); margin-top:2px; }
+
+        /* TOOL TABS */
+        .tool-tabs { display:flex; gap:.5rem; margin-bottom:2rem; flex-wrap:wrap; }
+        .tool-tab { padding:.6rem 1.2rem; border-radius:50px; border:1.5px solid var(--border); background:white; font-size:.88rem; font-weight:600; color:var(--ink-muted); cursor:pointer; transition:all .2s; }
+        .tool-tab:hover { border-color:var(--accent); color:var(--accent); }
+        .tool-tab.active { background:var(--accent); color:white; border-color:var(--accent); }
+
+        /* PANELS */
+        .tool-panel { display:none; }
+        .tool-panel.active { display:block; }
+
+        /* COMMON CARD */
+        .card { background:white; border-radius:20px; border:1px solid var(--border); padding:1.8rem; margin-bottom:1.5rem; }
+        .card-title { font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; margin-bottom:.3rem; }
+        .card-desc { font-size:.88rem; color:var(--ink-muted); margin-bottom:1.5rem; }
+
+        /* DROP ZONE */
+        .drop-zone { border:2px dashed rgba(91,79,245,.25); border-radius:16px; padding:2.5rem; text-align:center; background:var(--surface); cursor:pointer; transition:all .3s; position:relative; }
+        .drop-zone:hover, .drop-zone.dragover { border-color:var(--accent); background:rgba(91,79,245,.05); }
+        .drop-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+        .drop-icon { font-size:2.5rem; color:var(--accent); margin-bottom:.8rem; }
+        .drop-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; margin-bottom:.4rem; }
+        .drop-hint { font-size:.8rem; color:var(--ink-muted); }
+
+        /* SETTINGS ROW */
+        .settings-row { display:flex; gap:1rem; flex-wrap:wrap; margin-top:1.2rem; }
+        .setting-item { flex:1; min-width:160px; }
+        .s-label { font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--ink-muted); margin-bottom:6px; display:block; }
+        .s-input, .s-select { width:100%; padding:.6rem .9rem; border:1.5px solid #e0e0f0; border-radius:10px; font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none; transition:border-color .2s; }
+        .s-input:focus, .s-select:focus { border-color:var(--accent); }
+        .s-range { width:100%; accent-color:var(--accent); }
+        .s-val { font-size:.82rem; font-weight:700; color:var(--accent); text-align:center; }
+
+        /* ACTION BTN */
+        .btn-action { padding:.8rem 1.8rem; background:var(--accent); color:white; border:none; border-radius:50px; font-family:'Syne',sans-serif; font-weight:700; font-size:.95rem; cursor:pointer; transition:all .3s; box-shadow:0 6px 20px var(--glow); display:inline-flex; align-items:center; gap:8px; margin-top:1rem; }
+        .btn-action:hover { transform:translateY(-2px); box-shadow:0 10px 28px var(--glow); }
+        .btn-action:disabled { opacity:.6; cursor:not-allowed; transform:none; }
+
+        .btn-dl { padding:.7rem 1.5rem; background:transparent; border:1.5px solid var(--accent); color:var(--accent); border-radius:50px; font-family:'Syne',sans-serif; font-weight:700; font-size:.9rem; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:8px; }
+        .btn-dl:hover { background:var(--accent); color:white; }
+
+        /* RESULT CARD */
+        .result-card { background:white; border-radius:16px; padding:1.5rem; border:1px solid var(--border); }
+        .result-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem; flex-wrap:wrap; gap:1rem; }
+        .result-stat { text-align:center; }
+        .stat-big { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; }
+        .stat-small { font-size:.75rem; color:var(--ink-muted); }
+
+        /* PROGRESS */
+        .prog-wrap { background:#f0f0f8; border-radius:50px; height:8px; margin:1rem 0; overflow:hidden; }
+        .prog-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); border-radius:50px; width:0; transition:width .5s ease; }
+
+        /* PREVIEW GRID */
+        .preview-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem; }
+        .preview-box { border:1px solid var(--border); border-radius:12px; overflow:hidden; text-align:center; }
+        .preview-box img { max-width:100%; max-height:200px; object-fit:contain; padding:1rem; }
+        .preview-label { font-size:.75rem; font-weight:700; padding:.4rem; background:var(--surface); color:var(--ink-muted); text-transform:uppercase; letter-spacing:.5px; }
+
+        /* TOAST */
+        .toast-wrap { position:fixed; top:1.5rem; right:1.5rem; z-index:9999; }
+        .toast-item { background:white; border-radius:12px; padding:.9rem 1.2rem; box-shadow:0 8px 30px rgba(0,0,0,.12); border-left:4px solid var(--accent); display:flex; align-items:center; gap:10px; min-width:260px; margin-bottom:.5rem; font-size:.88rem; animation:tIn .3s ease; }
+        .toast-item.ok  { border-color:#22c55e; }
+        .toast-item.err { border-color:#ef4444; }
+        @keyframes tIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+        /* LOADING */
+        #ldo { position:fixed; inset:0; background:white; display:flex; align-items:center; justify-content:center; z-index:9999; }
+        .lsp { width:44px; height:44px; border:3px solid #f0f0f0; border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 1rem; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* DOC STORAGE SECTION */
+        .doc-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:1rem; }
+        .doc-item { background:white; border:1px solid var(--border); border-radius:14px; padding:1.2rem; text-align:center; transition:all .25s; cursor:pointer; }
+        .doc-item:hover { transform:translateY(-3px); box-shadow:0 8px 24px var(--glow); border-color:var(--accent); }
+        .doc-item-icon { font-size:2.2rem; margin-bottom:.6rem; }
+        .doc-item-name { font-size:.82rem; font-weight:600; word-break:break-word; }
+        .doc-item-size { font-size:.72rem; color:var(--ink-muted); margin-top:2px; }
+        .doc-item-del { background:transparent; border:none; color:#ef4444; font-size:.75rem; cursor:pointer; margin-top:.5rem; }
+        .empty-state { text-align:center; padding:3rem; color:var(--ink-muted); }
+        .empty-state-icon { font-size:3rem; margin-bottom:1rem; opacity:.4; }
+
+        @media (max-width:768px) {
+            #main { margin-left:0; }
+            #sidebar { display:none; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="ldo">
+    <div style="text-align:center">
+        <div class="lsp"></div>
+        <p style="font-size:.9rem;color:var(--ink-muted)">Loading...</p>
+    </div>
+</div>
+
+<div class="toast-wrap" id="tc"></div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+    <div class="sl">
+        <div class="sl-txt">AI<span>Form</span>Filler</div>
+        <div class="sl-sub">Auto-fill any government form</div>
+    </div>
+    <nav class="sn">
+        <a href="dashboard.html"       class="ni"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="customer-profile.html"class="ni"><i class="bi bi-person-fill-add"></i> Create Profile</a>
+        <a href="my-customers.html"    class="ni"><i class="bi bi-people-fill"></i> My Customers</a>
+        <a href="recharge.html"        class="ni"><i class="bi bi-wallet-fill"></i> Recharge Credits</a>
+        <a href="documents.html"       class="ni active"><i class="bi bi-file-earmark-zip-fill"></i> Document Tools</a>
+        <a href="download-extension.html" class="ni"><i class="bi bi-puzzle-fill"></i> Chrome Extension</a>
+        <a href="admin-recharge-approvals.html" class="ni"><i class="bi bi-person-gear"></i> Admin Panel</a>
+    </nav>
+    <div class="sf">
+        <div class="uc">
+            <div class="ua" id="avInit">?</div>
+            <div><div class="un" id="sbName">Loading...</div><div class="ue" id="sbEmail">...</div></div>
+        </div>
+        <button class="blout" id="logoutBtn"><i class="bi bi-box-arrow-left"></i> Logout</button>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+    <div class="top-bar">
+        <div>
+            <div class="page-title">Document Tools</div>
+            <div class="page-sub">Compress, resize, convert & store your customer documents</div>
+        </div>
+    </div>
+
+    <!-- TOOL TABS -->
+    <div class="tool-tabs">
+        <button class="tool-tab active" onclick="switchTab('compress')"><i class="bi bi-file-zip"></i> Compress Image</button>
+        <button class="tool-tab" onclick="switchTab('resize')"><i class="bi bi-crop"></i> Resize Image</button>
+        <button class="tool-tab" onclick="switchTab('pdf')"><i class="bi bi-file-pdf"></i> Image → PDF</button>
+        <button class="tool-tab" onclick="switchTab('storage')"><i class="bi bi-cloud-arrow-up"></i> My Documents</button>
+    </div>
+
+    <!-- ── TAB 1: COMPRESS ── -->
+    <div class="tool-panel active" id="panel-compress">
+        <div class="card">
+            <div class="card-title">🗜️ Image Compressor</div>
+            <div class="card-desc">Reduce image file size for government form uploads. Supports JPG, PNG, WebP. Target ≤200KB for most portals.</div>
+
+            <div class="drop-zone" id="dz-compress">
+                <input type="file" id="fi-compress" accept="image/*" multiple>
+                <div class="drop-icon"><i class="bi bi-cloud-upload"></i></div>
+                <div class="drop-title">Drop images here or click to browse</div>
+                <div class="drop-hint">JPG, PNG, WebP supported · Multiple files OK</div>
+            </div>
+
+            <div class="settings-row">
+                <div class="setting-item">
+                    <span class="s-label">Quality</span>
+                    <input type="range" class="s-range" id="qualitySlider" min="10" max="95" value="70">
+                    <div class="s-val" id="qualityVal">70%</div>
+                </div>
+                <div class="setting-item">
+                    <span class="s-label">Max Width (px)</span>
+                    <input type="number" class="s-input" id="maxWidth" value="1600" placeholder="e.g. 1600">
+                </div>
+                <div class="setting-item">
+                    <span class="s-label">Output Format</span>
+                    <select class="s-select" id="outFormat">
+                        <option value="jpeg">JPEG (smallest)</option>
+                        <option value="png">PNG (lossless)</option>
+                        <option value="webp">WebP (modern)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn-action" id="compressBtn" onclick="compressImages()">
+                <i class="bi bi-lightning-fill"></i> Compress Now
+            </button>
+        </div>
+
+        <!-- Results -->
+        <div id="compress-results" style="display:none">
+            <div class="card">
+                <div class="card-title">✅ Compression Complete</div>
+                <div id="compress-stats" class="result-row" style="margin-bottom:1.2rem"></div>
+                <div id="compress-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── TAB 2: RESIZE ── -->
+    <div class="tool-panel" id="panel-resize">
+        <div class="card">
+            <div class="card-title">📐 Image Resizer</div>
+            <div class="card-desc">Resize images to exact pixel dimensions required by government portals (e.g., passport photo 35×45mm, signature 4×2cm).</div>
+
+            <div class="drop-zone" id="dz-resize">
+                <input type="file" id="fi-resize" accept="image/*">
+                <div class="drop-icon"><i class="bi bi-aspect-ratio"></i></div>
+                <div class="drop-title">Drop an image or click to browse</div>
+                <div class="drop-hint">JPG, PNG, WebP supported</div>
+            </div>
+
+            <div class="settings-row" style="margin-top:1.2rem">
+                <div class="setting-item">
+                    <span class="s-label">Preset</span>
+                    <select class="s-select" id="presetSel" onchange="applyPreset()">
+                        <option value="">Custom</option>
+                        <option value="200,200">Passport Photo (200×200)</option>
+                        <option value="400,300">Signature (400×300)</option>
+                        <option value="600,450">ID Photo (600×450)</option>
+                        <option value="35,45">BPSC Passport (35×45)</option>
+                        <option value="1024,768">Document Scan (1024×768)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span class="s-label">Width (px)</span>
+                    <input type="number" class="s-input" id="rWidth" value="200">
+                </div>
+                <div class="setting-item">
+                    <span class="s-label">Height (px)</span>
+                    <input type="number" class="s-input" id="rHeight" value="200">
+                </div>
+                <div class="setting-item">
+                    <span class="s-label">Max KB (target)</span>
+                    <input type="number" class="s-input" id="targetKB" value="50" placeholder="50">
+                </div>
+            </div>
+
+            <div style="margin-top:.8rem">
+                <label style="font-size:.85rem;font-weight:600;color:var(--ink-muted)">
+                    <input type="checkbox" id="keepRatio" checked style="accent-color:var(--accent)"> Maintain aspect ratio
+                </label>
+            </div>
+
+            <button class="btn-action" onclick="resizeImage()">
+                <i class="bi bi-crop"></i> Resize Image
+            </button>
+
+            <div id="resize-result" style="display:none;margin-top:1.2rem">
+                <div class="result-card">
+                    <div class="preview-grid">
+                        <div class="preview-box">
+                            <div class="preview-label">Original</div>
+                            <img id="orig-preview" src="" alt="Original">
+                        </div>
+                        <div class="preview-box">
+                            <div class="preview-label">Resized</div>
+                            <img id="resized-preview" src="" alt="Resized">
+                        </div>
+                    </div>
+                    <div style="text-align:center;margin-top:1rem">
+                        <button class="btn-dl" onclick="downloadResized()"><i class="bi bi-download"></i> Download Resized</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── TAB 3: IMAGE → PDF ── -->
+    <div class="tool-panel" id="panel-pdf">
+        <div class="card">
+            <div class="card-title">📄 Images → PDF</div>
+            <div class="card-desc">Combine multiple images into a single PDF for document submission. Arrange in order before converting.</div>
+
+            <div class="drop-zone" id="dz-pdf">
+                <input type="file" id="fi-pdf" accept="image/*" multiple>
+                <div class="drop-icon"><i class="bi bi-images"></i></div>
+                <div class="drop-title">Drop multiple images or click to browse</div>
+                <div class="drop-hint">JPG, PNG supported · Will be added in upload order</div>
+            </div>
+
+            <div id="pdf-preview-list" style="display:none;margin-top:1rem">
+                <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:.8rem">
+                    Pages to include:
+                </div>
+                <div id="pdf-thumbs" style="display:flex;gap:.8rem;flex-wrap:wrap"></div>
+            </div>
+
+            <div class="settings-row" style="margin-top:1.2rem">
+                <div class="setting-item">
+                    <span class="s-label">Page Size</span>
+                    <select class="s-select" id="pdfPageSize">
+                        <option value="a4">A4 (standard)</option>
+                        <option value="letter">Letter</option>
+                        <option value="fit">Fit to image</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <span class="s-label">Image Quality</span>
+                    <input type="range" class="s-range" id="pdfQuality" min="50" max="95" value="80">
+                    <div class="s-val" id="pdfQualVal">80%</div>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="imagesToPDF()">
+                <i class="bi bi-file-pdf"></i> Create PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- ── TAB 4: MY DOCUMENTS ── -->
+    <div class="tool-panel" id="panel-storage">
+        <div class="card">
+            <div class="card-title">☁️ My Saved Documents</div>
+            <div class="card-desc">Upload & store compressed documents here. Attach them to customer profiles for auto-attaching to forms.</div>
+
+            <div class="drop-zone" id="dz-store">
+                <input type="file" id="fi-store" accept="image/*,.pdf" multiple>
+                <div class="drop-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                <div class="drop-title">Upload & save documents</div>
+                <div class="drop-hint">Images and PDFs · Stored in your account</div>
+            </div>
+
+            <div style="margin-top:1.5rem">
+                <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;margin-bottom:1rem">Saved Documents</div>
+                <div class="doc-grid" id="docGrid">
+                    <div class="empty-state" style="grid-column:1/-1">
+                        <div class="empty-state-icon"><i class="bi bi-folder2-open"></i></div>
+                        <div>No documents saved yet</div>
+                        <div style="font-size:.8rem;margin-top:.3rem">Upload some documents above to get started</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jsPDF for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script>
+firebase.initializeApp({
+    apiKey:'AIzaSyCGnA0-2QiSQ2Dg8n3xhzBxjvVKcXKf9P0',
+    authDomain:'form-filling-service-5a261.firebaseapp.com',
+    projectId:'form-filling-service-5a261',
+    storageBucket:'form-filling-service-5a261.firebasestorage.app',
+    messagingSenderId:'417118407948',
+    appId:'1:417118407948:web:4daf44a54875a1b0f6cd29'
+});
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+// State
+let resizedDataURL = null;
+let pdfImages      = [];
+let savedDocs      = JSON.parse(localStorage.getItem('aiFormDocs') || '[]');
+
+// Auth
+auth.onAuthStateChanged(user => {
+    if (!user) { window.location.href = 'login.html'; return; }
+    document.getElementById('avInit').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+    document.getElementById('sbName').textContent  = user.displayName || 'User';
+    document.getElementById('sbEmail').textContent = user.email;
+    document.getElementById('ldo').style.display   = 'none';
+    renderDocs();
+});
+document.getElementById('logoutBtn').onclick = async () => { await auth.signOut(); window.location.href = 'login.html'; };
+
+// ── TOAST ────────────────────────────────────────────────────────────────
+function toast(msg, type='info', ms=4000) {
+    const ic = { info:'ℹ️', ok:'✅', err:'❌', warn:'⚠️' };
+    const tc = document.getElementById('tc');
+    const t  = document.createElement('div');
+    t.className = `toast-item ${type}`;
+    t.innerHTML = `<span>${ic[type]||'ℹ️'}</span><span>${msg}</span>`;
+    tc.appendChild(t);
+    setTimeout(() => t.remove(), ms);
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────────
+function switchTab(name) {
+    document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    event.target.classList.add('active');
+}
+
+// ── QUALITY SLIDER ────────────────────────────────────────────────────────
+document.getElementById('qualitySlider').oninput = function() {
+    document.getElementById('qualityVal').textContent = this.value + '%';
+};
+document.getElementById('pdfQuality').oninput = function() {
+    document.getElementById('pdfQualVal').textContent = this.value + '%';
+};
+
+// ── PRESET ───────────────────────────────────────────────────────────────
+function applyPreset() {
+    const v = document.getElementById('presetSel').value;
+    if (!v) return;
+    const [w, h] = v.split(',');
+    document.getElementById('rWidth').value  = w;
+    document.getElementById('rHeight').value = h;
+}
+
+// ── DRAG & DROP ──────────────────────────────────────────────────────────
+['dz-compress','dz-resize','dz-pdf','dz-store'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('dragover'); });
+    el.addEventListener('dragleave', () => el.classList.remove('dragover'));
+    el.addEventListener('drop', e => { e.preventDefault(); el.classList.remove('dragover'); });
+});
+
+// ── FILE SIZE HELPER ──────────────────────────────────────────────────────
+function fmtSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+}
+
+// ── COMPRESS ─────────────────────────────────────────────────────────────
+async function compressImages() {
+    const files = document.getElementById('fi-compress').files;
+    if (!files.length) { toast('Please select image(s) first', 'warn'); return; }
+    const btn = document.getElementById('compressBtn');
+    btn.disabled = true; btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Compressing...';
+
+    const quality  = document.getElementById('qualitySlider').value / 100;
+    const maxW     = parseInt(document.getElementById('maxWidth').value) || 1600;
+    const fmt      = document.getElementById('outFormat').value;
+    const mimeType = `image/${fmt}`;
+
+    const results = [];
+    for (const file of files) {
+        const url  = URL.createObjectURL(file);
+        const comp = await compressOne(url, maxW, quality, mimeType, file.name);
+        results.push({ orig: file, ...comp });
+        URL.revokeObjectURL(url);
+    }
+
+    // Show results
+    const totalOrig = results.reduce((a,r) => a + r.origSize, 0);
+    const totalComp = results.reduce((a,r) => a + r.compSize, 0);
+    const saved     = Math.round((1 - totalComp / totalOrig) * 100);
+
+    document.getElementById('compress-stats').innerHTML = `
+        <div class="result-stat"><div class="stat-big">${fmtSize(totalOrig)}</div><div class="stat-small">Original</div></div>
+        <div style="font-size:2rem;color:var(--ink-muted)">→</div>
+        <div class="result-stat"><div class="stat-big" style="color:var(--accent)">${fmtSize(totalComp)}</div><div class="stat-small">Compressed</div></div>
+        <div class="result-stat"><div class="stat-big" style="color:#22c55e">${saved}%</div><div class="stat-small">Saved</div></div>
+    `;
+
+    const list = document.getElementById('compress-list');
+    list.innerHTML = '';
+    results.forEach((r, i) => {
+        const pct = Math.round((1 - r.compSize / r.origSize) * 100);
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:.8rem 0;border-bottom:1px solid var(--border);gap:1rem;flex-wrap:wrap';
+        div.innerHTML = `
+            <div style="flex:1;min-width:120px">
+                <div style="font-weight:600;font-size:.88rem">${r.name}</div>
+                <div style="font-size:.75rem;color:var(--ink-muted)">${fmtSize(r.origSize)} → ${fmtSize(r.compSize)} (−${pct}%)</div>
+            </div>
+            <button class="btn-dl" onclick="downloadFile('${r.dataURL}','${r.name}')">
+                <i class="bi bi-download"></i> Download
+            </button>
+        `;
+        list.appendChild(div);
+    });
+
+    document.getElementById('compress-results').style.display = 'block';
+    document.getElementById('compress-results').scrollIntoView({ behavior: 'smooth' });
+    toast(`✅ Compressed ${results.length} file(s) — saved ${saved}%`, 'ok');
+
+    btn.disabled = false; btn.innerHTML = '<i class="bi bi-lightning-fill"></i> Compress Now';
+}
+
+function compressOne(url, maxW, quality, mimeType, origName) {
+    return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => {
+            let w = img.width, h = img.height;
+            if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            const dataURL = canvas.toDataURL(mimeType, quality);
+            const origSize = Math.round(url.length * 0.75); // approx for blob URLs
+            const compSize = Math.round(dataURL.length * 0.75);
+            const ext = mimeType.split('/')[1];
+            const name = origName.replace(/\.[^.]+$/, '') + '_compressed.' + ext;
+            resolve({ dataURL, name, origSize: img.width * img.height * 3, compSize, mimeType });
+        };
+        img.src = url;
+    });
+}
+
+// ── RESIZE ────────────────────────────────────────────────────────────────
+async function resizeImage() {
+    const file = document.getElementById('fi-resize').files[0];
+    if (!file) { toast('Please select an image first', 'warn'); return; }
+
+    const targetW   = parseInt(document.getElementById('rWidth').value);
+    const targetH   = parseInt(document.getElementById('rHeight').value);
+    const targetKB  = parseInt(document.getElementById('targetKB').value) || 0;
+    const keepRatio = document.getElementById('keepRatio').checked;
+
+    const url = URL.createObjectURL(file);
+    document.getElementById('orig-preview').src = url;
+
+    const img = new Image();
+    img.onload = () => {
+        let w = targetW, h = targetH;
+        if (keepRatio) {
+            const ratio = img.width / img.height;
+            if (w / ratio <= h) h = Math.round(w / ratio);
+            else w = Math.round(h * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+        // Reduce quality to hit target KB if specified
+        let quality = 0.92;
+        let dataURL = canvas.toDataURL('image/jpeg', quality);
+        if (targetKB) {
+            while (dataURL.length * 0.75 > targetKB * 1024 && quality > 0.1) {
+                quality -= 0.05;
+                dataURL = canvas.toDataURL('image/jpeg', quality);
+            }
+        }
+        resizedDataURL = dataURL;
+        document.getElementById('resized-preview').src = dataURL;
+        document.getElementById('resize-result').style.display = 'block';
+        const kb = (dataURL.length * 0.75 / 1024).toFixed(1);
+        toast(`✅ Resized to ${w}×${h}px · ~${kb} KB`, 'ok');
+        URL.revokeObjectURL(url);
+    };
+    img.src = url;
+}
+
+function downloadResized() {
+    if (!resizedDataURL) return;
+    downloadFile(resizedDataURL, 'resized_image.jpg');
+}
+
+// ── IMAGE → PDF ───────────────────────────────────────────────────────────
+document.getElementById('fi-pdf').addEventListener('change', function() {
+    pdfImages = Array.from(this.files);
+    const thumbs = document.getElementById('pdf-thumbs');
+    thumbs.innerHTML = '';
+    pdfImages.forEach((f, i) => {
+        const url = URL.createObjectURL(f);
+        const div = document.createElement('div');
+        div.style.cssText = 'text-align:center;position:relative';
+        div.innerHTML = `
+            <img src="${url}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid var(--border)">
+            <div style="font-size:.7rem;color:var(--ink-muted);margin-top:4px">Page ${i+1}</div>
+        `;
+        thumbs.appendChild(div);
+    });
+    document.getElementById('pdf-preview-list').style.display = pdfImages.length ? 'block' : 'none';
+});
+
+async function imagesToPDF() {
+    if (!pdfImages.length) { toast('Please select images first', 'warn'); return; }
+    const quality  = document.getElementById('pdfQuality').value / 100;
+    const pageSize = document.getElementById('pdfPageSize').value;
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: pageSize === 'fit' ? 'a4' : pageSize });
+    toast('Creating PDF...', 'info', 2000);
+
+    for (let i = 0; i < pdfImages.length; i++) {
+        const file = pdfImages[i];
+        const dataURL = await fileToDataURL(file);
+        const img = await loadImage(dataURL);
+        const pw  = doc.internal.pageSize.getWidth();
+        const ph  = doc.internal.pageSize.getHeight();
+        const ratio = Math.min(pw / img.width * 25.4, ph / img.height * 25.4); // approx
+        const iw = img.width * ratio / 25.4;
+        const ih = img.height * ratio / 25.4;
+        if (i > 0) doc.addPage();
+        doc.addImage(dataURL, 'JPEG', (pw - iw) / 2, (ph - ih) / 2, iw, ih, undefined, 'FAST');
+    }
+
+    doc.save('document_' + Date.now() + '.pdf');
+    toast(`✅ PDF created with ${pdfImages.length} page(s)`, 'ok');
+}
+
+// ── DOCUMENT STORAGE (localStorage) ──────────────────────────────────────
+document.getElementById('fi-store').addEventListener('change', function() {
+    const files = Array.from(this.files);
+    if (!files.length) return;
+
+    files.forEach(f => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const entry = {
+                id:   Date.now() + '_' + Math.random().toString(36).slice(2,7),
+                name: f.name,
+                size: f.size,
+                type: f.type,
+                data: e.target.result,
+                date: new Date().toLocaleDateString('en-IN')
+            };
+            savedDocs.push(entry);
+            localStorage.setItem('aiFormDocs', JSON.stringify(savedDocs));
+            renderDocs();
+            toast(`✅ Saved: ${f.name}`, 'ok');
+        };
+        reader.readAsDataURL(f);
+    });
+});
+
+function renderDocs() {
+    const grid = document.getElementById('docGrid');
+    if (!savedDocs.length) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon"><i class="bi bi-folder2-open"></i></div><div>No documents saved yet</div><div style="font-size:.8rem;margin-top:.3rem">Upload some documents above to get started</div></div>`;
+        return;
+    }
+    grid.innerHTML = '';
+    savedDocs.forEach(doc => {
+        const icon = doc.type.includes('pdf') ? '📄' : '🖼️';
+        const div  = document.createElement('div');
+        div.className = 'doc-item';
+        div.innerHTML = `
+            <div class="doc-item-icon">${icon}</div>
+            <div class="doc-item-name">${doc.name}</div>
+            <div class="doc-item-size">${fmtSize(doc.size)} · ${doc.date}</div>
+            <div style="display:flex;gap:6px;margin-top:.5rem;justify-content:center">
+                <button class="btn-dl" style="padding:4px 10px;font-size:.75rem" onclick="downloadFile('${doc.data}','${doc.name}')">
+                    <i class="bi bi-download"></i>
+                </button>
+                <button class="doc-item-del" onclick="deleteDoc('${doc.id}')">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+            </div>
+        `;
+        grid.appendChild(div);
+    });
+}
+
+function deleteDoc(id) {
+    savedDocs = savedDocs.filter(d => d.id !== id);
+    localStorage.setItem('aiFormDocs', JSON.stringify(savedDocs));
+    renderDocs();
+    toast('Document deleted', 'info');
+}
+
+// ── UTILITIES ─────────────────────────────────────────────────────────────
+function downloadFile(dataURL, name) {
+    const a = document.createElement('a');
+    a.href = dataURL; a.download = name; a.click();
+}
+
+function fileToDataURL(file) {
+    return new Promise(resolve => {
+        const r = new FileReader();
+        r.onload = e => resolve(e.target.result);
+        r.readAsDataURL(file);
+    });
+}
+
+function loadImage(src) {
+    return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.src = src;
+    });
+}
+</script>
+</body>
+</html>

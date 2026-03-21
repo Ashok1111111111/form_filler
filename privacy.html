@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Privacy Policy — AI Form Filler</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#f6f6fa;color:#0d0d14;line-height:1.7;}
+
+header{background:linear-gradient(135deg,#1a1535,#0d0d14);padding:28px 0;text-align:center;}
+.brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:#fff;}
+.brand span{color:#8b7fff;}
+.tagline{font-size:.9rem;color:rgba(255,255,255,.5);margin-top:4px;}
+
+.container{max-width:780px;margin:0 auto;padding:48px 24px;}
+
+.last-updated{background:#e8e8ff;border-radius:8px;padding:10px 16px;font-size:.82rem;color:#5b4ff5;font-weight:600;margin-bottom:32px;display:inline-block;}
+
+h1{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;margin-bottom:8px;}
+.intro{font-size:.95rem;color:#555;margin-bottom:36px;}
+
+h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;color:#1a1535;margin:32px 0 10px;padding-left:12px;border-left:4px solid #5b4ff5;}
+p{color:#444;font-size:.92rem;margin-bottom:12px;}
+ul{padding-left:20px;margin-bottom:12px;}
+li{color:#444;font-size:.92rem;margin-bottom:6px;}
+li::marker{color:#5b4ff5;}
+
+.highlight{background:#f0eeff;border-radius:10px;padding:14px 18px;margin:16px 0;border-left:4px solid #5b4ff5;}
+.highlight p{margin:0;color:#2d1f6e;font-size:.88rem;}
+
+.no-collect{background:#f0fff4;border-radius:10px;padding:14px 18px;margin:16px 0;border-left:4px solid #22c55e;}
+.no-collect p{margin:0;color:#166534;font-size:.88rem;}
+
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.85rem;}
+th{background:#1a1535;color:#fff;padding:10px 14px;text-align:left;}
+td{padding:10px 14px;border-bottom:1px solid #e8e8f0;}
+tr:nth-child(even) td{background:#f8f8fc;}
+
+footer{background:#1a1535;color:rgba(255,255,255,.5);text-align:center;padding:24px;font-size:.82rem;margin-top:60px;}
+footer a{color:#8b7fff;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">AI<span>Form</span>Filler</div>
+  <div class="tagline">Privacy Policy</div>
+</header>
+
+<div class="container">
+
+  <div class="last-updated">📅 Last Updated: February 2026</div>
+
+  <h1>Privacy Policy</h1>
+  <p class="intro">AI Form Filler ("we", "our", or "us") is committed to protecting your privacy. This policy explains what data we collect, how we use it, and your rights — in plain language.</p>
+
+  <div class="highlight">
+    <p>🔐 <strong>Short version:</strong> We collect only what's necessary to run the service. We never sell your data. You can delete your account anytime.</p>
+  </div>
+
+  <h2>1. Who We Are</h2>
+  <p>AI Form Filler is a Chrome Extension and web service that helps users auto-fill Indian government forms (SSC, UPSC, Railways, IBPS, etc.) using AI. The service is operated by:</p>
+  <p><strong>Ashok Prajapati</strong><br/>
+  Isaadhi Village, Uttar Pradesh, India<br/>
+  Email: <a href="mailto:ashokprajapati6789@gmail.com">ashokprajapati6789@gmail.com</a><br/>
+  Website: <a href="https://ai-workflows.cloud">https://ai-workflows.cloud</a></p>
+
+  <h2>2. Data We Collect</h2>
+
+  <table>
+    <tr><th>Data Type</th><th>What</th><th>Why</th><th>Where Stored</th></tr>
+    <tr><td><strong>Account Info</strong></td><td>Name, email address</td><td>Login &amp; account management</td><td>Firebase (Google)</td></tr>
+    <tr><td><strong>Customer Data</strong></td><td>Names, DOB, addresses, education details you enter for form-filling</td><td>To auto-fill forms</td><td>Firebase Firestore</td></tr>
+    <tr><td><strong>Usage Data</strong></td><td>Number of forms filled, credits used</td><td>Billing &amp; account dashboard</td><td>Firebase Firestore</td></tr>
+    <tr><td><strong>Payment Info</strong></td><td>UPI Transaction ID only</td><td>Verify manual recharge</td><td>Firebase Firestore</td></tr>
+    <tr><td><strong>Auth Token</strong></td><td>Firebase ID token</td><td>Secure API calls from extension</td><td>Browser localStorage (temporary)</td></tr>
+  </table>
+
+  <div class="no-collect">
+    <p>✅ <strong>We do NOT collect:</strong> Passwords · Credit card numbers · Aadhaar/PAN numbers · Biometric data · Browsing history · Cookies from other websites · Any data from pages you visit (we only read form fields on government portals when you click "Fill")</p>
+  </div>
+
+  <h2>3. How the Chrome Extension Works</h2>
+  <p>The AI Form Filler Chrome Extension:</p>
+  <ul>
+    <li>Reads form fields <strong>only on the currently active tab</strong> when you click "Auto-Fill"</li>
+    <li>Sends field labels (not values) to OpenAI's API via our proxy server to identify which customer data goes where</li>
+    <li>Fills fields locally in your browser — no form data is stored on our servers</li>
+    <li>Detects document upload fields to show you resize requirements</li>
+    <li>Does <strong>not</strong> run in the background or track your browsing</li>
+  </ul>
+
+  <div class="highlight">
+    <p>📋 <strong>Form field data</strong> (what gets filled into forms) is processed locally in your browser. Only the field <em>labels/names</em> are sent to AI for mapping — never the actual personal values.</p>
+  </div>
+
+  <h2>4. Third-Party Services We Use</h2>
+  <table>
+    <tr><th>Service</th><th>Purpose</th><th>Their Privacy Policy</th></tr>
+    <tr><td>Firebase (Google)</td><td>Authentication, database, cloud storage</td><td><a href="https://firebase.google.com/support/privacy" target="_blank">firebase.google.com/support/privacy</a></td></tr>
+    <tr><td>OpenAI</td><td>AI field mapping (form field labels only)</td><td><a href="https://openai.com/privacy" target="_blank">openai.com/privacy</a></td></tr>
+    <tr><td>EmailJS</td><td>Welcome emails on signup</td><td><a href="https://www.emailjs.com/legal/privacy-policy/" target="_blank">emailjs.com/legal/privacy-policy</a></td></tr>
+  </table>
+
+  <h2>5. Data Storage &amp; Security</h2>
+  <ul>
+    <li>All data is stored on <strong>Google Firebase</strong> — encrypted at rest and in transit (TLS/SSL)</li>
+    <li>Authentication is handled by Firebase Auth — we never see or store your password</li>
+    <li>Customer data is tied to your account and only accessible by you</li>
+    <li>Firebase security rules ensure no other user can access your data</li>
+  </ul>
+
+  <h2>6. Data Retention</h2>
+  <ul>
+    <li><strong>Account data:</strong> Kept until you delete your account</li>
+    <li><strong>Customer data:</strong> Kept until you delete it or close your account</li>
+    <li><strong>Transaction records:</strong> Kept for 3 years for billing purposes</li>
+    <li><strong>Auth tokens:</strong> Cleared when you log out</li>
+  </ul>
+
+  <h2>7. Your Rights</h2>
+  <ul>
+    <li>✅ <strong>Access:</strong> Request a copy of your data anytime</li>
+    <li>✅ <strong>Correction:</strong> Update your name, email from dashboard</li>
+    <li>✅ <strong>Deletion:</strong> Email us to permanently delete your account and all data</li>
+    <li>✅ <strong>Export:</strong> Request your customer data in JSON format</li>
+    <li>✅ <strong>Opt-out:</strong> Uninstall extension anytime — no background tracking</li>
+  </ul>
+  <p>To exercise any right, email: <a href="mailto:ashokprajapati6789@gmail.com">ashokprajapati6789@gmail.com</a></p>
+
+  <h2>8. Children's Privacy</h2>
+  <p>AI Form Filler is not directed at children under 13. We do not knowingly collect data from children. If you believe a child has provided us data, contact us immediately.</p>
+
+  <h2>9. Changes to This Policy</h2>
+  <p>We may update this policy occasionally. When we do, we'll update the "Last Updated" date above. Continued use of the service after changes means you accept the updated policy.</p>
+
+  <h2>10. Contact Us</h2>
+  <p>Questions about this policy? Reach us at:</p>
+  <p>
+    📧 Email: <a href="mailto:ashokprajapati6789@gmail.com">ashokprajapati6789@gmail.com</a><br/>
+    💬 WhatsApp: <a href="https://wa.me/919296914511">+91 9296914511</a><br/>
+    🌐 Website: <a href="https://ai-workflows.cloud">ai-workflows.cloud</a>
+  </p>
+
+</div>
+
+<footer>
+  © 2026 AI Form Filler · <a href="https://ai-workflows.cloud">ai-workflows.cloud</a> · 
+  <a href="mailto:ashokprajapati6789@gmail.com">ashokprajapati6789@gmail.com</a>
+</footer>
+
+</body>
+</html>

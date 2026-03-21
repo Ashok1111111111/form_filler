@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Document Tools – AI Form Filler</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<style>
+/* ── DESIGN SYSTEM ── */
+:root {
+  --accent:#5b4ff5; --accent-2:#f5724f;
+  --glow:rgba(91,79,245,0.15);
+  --ink:#0d0d14; --ink-muted:#6b6b80;
+  --surface:#f5f4ff; --border:rgba(91,79,245,0.1);
+  --sidebar-w:260px;
+  /* Tool colors */
+  --primary:#5b4ff5; --primary-dark:#4a3fd4; --primary-light:#f0eeff;
+  --success:#22c55e; --success-light:#f0fdf4;
+  --warning:#f59e0b; --warning-light:#fffbeb;
+  --danger:#ef4444; --danger-light:#fef2f2;
+  --bg:#f6f6fa; --card:#ffffff;
+  --border-tool:#e5e7f0; --text:#0d0d14; --text-muted:#6b6b80;
+  --shadow:0 4px 20px rgba(91,79,245,0.08);
+  --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── SIDEBAR ── */
+#sidebar{position:fixed;top:0;left:0;height:100vh;width:var(--sidebar-w);background:linear-gradient(160deg,#1a1535,#0d0d14);color:white;z-index:200;display:flex;flex-direction:column;box-shadow:4px 0 30px rgba(0,0,0,.15);}
+.sl{padding:1.8rem 1.5rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:.5rem;}
+.sl-txt{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:white;}
+.sl-txt span{color:#8b7fff;}
+.sl-sub{font-size:.75rem;color:rgba(255,255,255,.4);margin-top:3px;}
+.sn{flex:1;padding:.5rem 1rem;}
+.ni{display:flex;align-items:center;gap:12px;padding:.75rem 1rem;border-radius:12px;text-decoration:none;color:rgba(255,255,255,.6);font-weight:500;font-size:.9rem;margin-bottom:4px;transition:all .2s;}
+.ni i{width:20px;text-align:center;}
+.ni:hover{background:rgba(255,255,255,.08);color:white;}
+.ni.active{background:rgba(139,127,255,.2);color:white;border:1px solid rgba(139,127,255,.3);}
+.ni.active i{color:#8b7fff;}
+.sf{padding:1rem;border-top:1px solid rgba(255,255,255,.08);}
+.uc{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;background:rgba(255,255,255,.06);border-radius:12px;margin-bottom:.5rem;}
+.ua{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:white;flex-shrink:0;}
+.un{font-size:.85rem;font-weight:600;color:white;}
+.ue{font-size:.72rem;color:rgba(255,255,255,.4);}
+.blout{display:flex;align-items:center;gap:8px;width:100%;padding:.65rem 1rem;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:rgba(255,255,255,.5);font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;}
+.blout:hover{background:rgba(220,53,69,.15);color:#ff6b7a;border-color:rgba(220,53,69,.3);}
+
+/* ── FREE BADGE BANNER ── */
+.free-banner{background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(34,197,94,.06));border:1px solid rgba(34,197,94,.25);border-radius:14px;padding:.85rem 1.2rem;display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;}
+.free-pill{background:#22c55e;color:white;border-radius:50px;padding:3px 12px;font-family:'Syne',sans-serif;font-weight:800;font-size:.75rem;flex-shrink:0;}
+.free-text{font-size:.88rem;color:#166534;font-weight:600;}
+
+/* ── MAIN ── */
+#main{margin-left:var(--sidebar-w);min-height:100vh;padding:2rem;}
+.top-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;}
+.page-title{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;}
+.page-sub{font-size:.9rem;color:var(--ink-muted);margin-top:2px;}
+
+/* ── TOOL TABS ── */
+.tabs-wrap{background:white;border-radius:16px;border:1px solid var(--border);padding:.5rem;display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:1.5rem;box-shadow:var(--shadow);}
+.tab-btn{padding:.65rem 1.2rem;border:none;background:none;cursor:pointer;font-size:.88rem;font-weight:700;color:var(--text-muted);border-radius:10px;transition:all .2s;display:flex;align-items:center;gap:7px;white-space:nowrap;font-family:'DM Sans',sans-serif;}
+.tab-btn:hover{background:var(--primary-light);color:var(--primary);}
+.tab-btn.active{background:var(--primary);color:white;}
+.tab-icon{font-size:1rem;}
+
+/* ── PORTAL PRESET BAR ── */
+.preset-bar{background:white;border:1px solid var(--border);border-radius:16px;padding:1rem 1.4rem;margin-bottom:1.2rem;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.preset-label{font-size:.75rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+.portal-btns{display:flex;gap:6px;flex-wrap:wrap;flex:1;}
+.portal-btn{padding:6px 12px;border-radius:8px;border:1.5px solid var(--border-tool);background:#fafbff;cursor:pointer;font-size:.78rem;font-weight:700;color:var(--text);transition:all .18s;}
+.portal-btn:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-light);}
+.portal-btn.active{background:var(--primary);color:white;border-color:var(--primary);}
+.preset-type-tabs{display:flex;gap:6px;}
+.preset-type-btn{padding:5px 11px;border-radius:6px;border:1.5px solid var(--border-tool);background:#fafbff;cursor:pointer;font-size:.75rem;font-weight:700;color:var(--text-muted);transition:all .18s;}
+.preset-type-btn.active{background:var(--success);color:white;border-color:var(--success);}
+
+/* ── PANELS ── */
+.tab-panel{display:none;} .tab-panel.active{display:block;}
+.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+.pdf-tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+@media(max-width:900px){.panel-grid,.pdf-tools-grid{grid-template-columns:1fr;}}
+
+/* ── CARDS ── */
+.card{background:white;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;}
+.card-header{padding:1rem 1.2rem;border-bottom:1px solid var(--border-tool);font-size:.8rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:8px;background:#fafbff;}
+.card-body{padding:1.2rem;}
+
+/* ── DROPZONE ── */
+.dropzone{border:2.5px dashed var(--border-tool);border-radius:12px;padding:2.5rem 1.2rem;text-align:center;cursor:pointer;transition:all .2s;background:#fafbff;}
+.dropzone:hover,.dropzone.dragover{border-color:var(--primary);background:var(--primary-light);}
+.dz-icon{font-size:2.2rem;margin-bottom:8px;}
+.dz-title{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:4px;}
+.dz-title span{color:var(--primary);text-decoration:underline;}
+.dz-sub{font-size:.75rem;color:var(--text-muted);}
+#file-input,#pdf-input{display:none;}
+
+/* ── FORM ELEMENTS ── */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.form-group{display:flex;flex-direction:column;gap:4px;}
+.form-group label{font-size:.75rem;font-weight:700;color:var(--text-muted);}
+.form-group input,.form-group select{padding:9px 12px;border:1.5px solid var(--border-tool);border-radius:10px;font-size:.875rem;background:#fafbff;color:var(--text);transition:border-color .15s;font-family:'DM Sans',sans-serif;}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary);background:white;}
+.form-group input:disabled,.form-group select:disabled{opacity:.5;cursor:not-allowed;}
+.slider-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.slider-row label{font-size:.75rem;font-weight:700;color:var(--text-muted);min-width:60px;}
+input[type=range]{flex:1;accent-color:var(--primary);}
+.slider-val{font-size:.8rem;font-weight:800;color:var(--primary);min-width:36px;text-align:right;}
+.checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:.82rem;font-weight:500;}
+.checkbox-row input[type=checkbox]{accent-color:var(--primary);width:15px;height:15px;}
+
+/* ── PREVIEW ── */
+.preview-box{background:#f1f5f9;border-radius:10px;min-height:170px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+.preview-box img,.preview-box canvas{max-width:100%;max-height:190px;border-radius:6px;object-fit:contain;}
+.file-size-badge{position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,.65);color:white;border-radius:6px;padding:3px 8px;font-size:.72rem;font-weight:800;}
+.preview-placeholder{display:flex;flex-direction:column;align-items:center;color:var(--text-muted);gap:8px;padding:20px;}
+.preview-placeholder span{font-size:2rem;}
+.preview-placeholder p{font-size:.78rem;text-align:center;}
+
+/* ── INFO BOX ── */
+.info-box{background:var(--primary-light);border:1px solid rgba(91,79,245,.2);border-radius:10px;padding:10px 14px;font-size:.78rem;color:#1e1270;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start;}
+.info-box.success{background:var(--success-light);border-color:#86efac;color:#166534;}
+.info-box.warning{background:var(--warning-light);border-color:#fde68a;color:#92400e;}
+.info-box.danger{background:var(--danger-light);border-color:#fca5a5;color:#991b1b;}
+
+/* ── BUTTONS ── */
+.btn{padding:10px 20px;border-radius:10px;border:none;cursor:pointer;font-size:.875rem;font-weight:700;transition:all .18s;display:inline-flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;}
+.btn-primary{background:var(--primary);color:white;}
+.btn-primary:hover{background:var(--primary-dark);transform:translateY(-1px);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-success{background:var(--success);color:white;}
+.btn-success:hover{background:#16a34a;transform:translateY(-1px);}
+.btn-success:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary);}
+.btn-outline:hover{background:var(--primary-light);}
+.btn-block{width:100%;justify-content:center;}
+.btn-row{display:flex;gap:10px;margin-top:14px;}
+
+/* ── PROGRESS ── */
+.progress-wrap{margin-top:10px;display:none;}
+.progress-wrap.show{display:block;}
+.progress-bar-bg{background:#e5e7f0;border-radius:99px;height:7px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:var(--primary);border-radius:99px;width:0%;transition:width .3s;}
+.progress-text{font-size:.74rem;color:var(--text-muted);margin-top:4px;}
+
+/* ── PRESET INFO ── */
+.preset-info{background:#fafbff;border:1px solid var(--border-tool);border-radius:10px;padding:12px 14px;margin-bottom:12px;font-size:.78rem;}
+.preset-info h4{font-size:.8rem;font-weight:800;color:var(--primary);margin-bottom:8px;}
+.preset-info table{width:100%;border-collapse:collapse;}
+.preset-info td{padding:4px 8px;color:var(--text-muted);}
+.preset-info td:first-child{font-weight:700;color:var(--text);}
+
+/* ── RESULT ── */
+.result-card{background:var(--success-light);border:1px solid #86efac;border-radius:12px;padding:12px 16px;margin-top:12px;display:none;}
+.result-card.show{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.result-info{flex:1;}
+.result-info h4{font-size:.85rem;font-weight:800;color:var(--success);}
+.result-info p{font-size:.77rem;color:#166534;margin-top:2px;}
+
+/* ── FILE TABLE ── */
+.file-table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:10px;}
+.file-table th{background:#f1f5f9;padding:8px 10px;text-align:left;font-weight:800;color:var(--text-muted);border-bottom:1px solid var(--border-tool);font-size:.72rem;text-transform:uppercase;}
+.file-table td{padding:8px 10px;border-bottom:1px solid #f0f4ff;vertical-align:middle;}
+.status-pill{padding:3px 8px;border-radius:99px;font-size:.7rem;font-weight:800;}
+.status-pill.pending{background:#f3f4f6;color:var(--text-muted);}
+.status-pill.processing{background:var(--warning-light);color:var(--warning);}
+.status-pill.done{background:var(--success-light);color:var(--success);}
+.status-pill.error{background:var(--danger-light);color:var(--danger);}
+
+/* ── CONVERT ── */
+.convert-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-bottom:14px;}
+.arrow-icon{font-size:1.4rem;text-align:center;padding-bottom:8px;color:var(--primary);}
+.section-divider{border:none;border-top:1px solid var(--border-tool);margin:14px 0;}
+
+/* ── STATUS BAR ── */
+#status-bar{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--ink);color:white;border-radius:12px;padding:10px 18px;font-size:.82rem;font-weight:700;display:none;z-index:999;box-shadow:0 6px 24px rgba(0,0,0,.2);animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+#status-bar.success{background:var(--success);}
+#status-bar.error{background:var(--danger);}
+
+@media(max-width:768px){#main{margin-left:0;padding:1rem;}#sidebar{display:none;}.form-row{grid-template-columns:1fr;}.preset-bar{flex-direction:column;align-items:flex-start;}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+    <div class="sl"><div class="sl-txt">AI<span>Form</span>Filler</div><div class="sl-sub">Auto-fill any government form</div></div>
+    <nav class="sn">
+        <a href="dashboard.html"          class="ni"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="customer-profile.html"   class="ni"><i class="bi bi-person-fill-add"></i> Create Profile</a>
+        <a href="my-customers.html"       class="ni"><i class="bi bi-people-fill"></i> My Customers</a>
+        <a href="recharge.html"           class="ni"><i class="bi bi-wallet-fill"></i> Recharge Credits</a>
+        <a href="tools.html"              class="ni active"><i class="bi bi-file-earmark-zip-fill"></i> Document Tools</a>
+        <a href="download-extension.html" class="ni"><i class="bi bi-puzzle-fill"></i> Chrome Extension</a>
+    </nav>
+    <div class="sf">
+        <div class="uc"><div class="ua" id="avInit">G</div><div><div class="un" id="sbName">Guest</div><div class="ue" id="sbEmail">Not logged in</div></div></div>
+        <button class="blout" id="logoutBtn"><i class="bi bi-box-arrow-left"></i> Logout</button>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+    <div class="top-bar">
+        <div>
+            <div class="page-title">📄 Document Tools</div>
+            <div class="page-sub">Compress, resize & convert documents for government portals — 100% free, works in browser</div>
+        </div>
+    </div>
+
+    <!-- FREE BANNER -->
+    <div class="free-banner">
+        <span class="free-pill">FREE</span>
+        <span class="free-text">✅ Yeh tool bilkul free hai — No credits needed! Compress karo, resize karo, convert karo — sab browser mein hota hai, koi data upload nahi hota.</span>
+    </div>
+
+    <!-- PORTAL PRESET BAR -->
+    <div class="preset-bar">
+        <span class="preset-label">🏛️ Portal</span>
+        <div class="portal-btns">
+            <button class="portal-btn active" onclick="setPortal('custom',this)">✏️ Custom</button>
+            <button class="portal-btn" onclick="setPortal('ssc',this)">SSC</button>
+            <button class="portal-btn" onclick="setPortal('upsc',this)">UPSC</button>
+            <button class="portal-btn" onclick="setPortal('ibps',this)">IBPS</button>
+            <button class="portal-btn" onclick="setPortal('rrb',this)">Railways</button>
+            <button class="portal-btn" onclick="setPortal('sbi',this)">SBI PO</button>
+            <button class="portal-btn" onclick="setPortal('nta',this)">NTA/JEE/NEET</button>
+            <button class="portal-btn" onclick="setPortal('nps',this)">NPS/EPFO</button>
+            <button class="portal-btn" onclick="setPortal('psc',this)">State PSC</button>
+            <button class="portal-btn" onclick="setPortal('bpsc',this)">BPSC</button>
+        </div>
+        <div class="preset-type-tabs">
+            <button class="preset-type-btn active" id="ptype-photo" onclick="setPresetType('photo',this)">📷 Photo</button>
+            <button class="preset-type-btn" id="ptype-sign" onclick="setPresetType('sign',this)">✍️ Sign</button>
+            <button class="preset-type-btn" id="ptype-thumb" onclick="setPresetType('thumb',this)">👆 Thumb</button>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-wrap">
+        <button class="tab-btn active" onclick="switchTab('image',this)"><span class="tab-icon">🖼️</span> Image Compressor</button>
+        <button class="tab-btn" onclick="switchTab('pdf',this)"><span class="tab-icon">📄</span> PDF Tools</button>
+        <button class="tab-btn" onclick="switchTab('convert',this)"><span class="tab-icon">🔄</span> Format Converter</button>
+        <button class="tab-btn" onclick="switchTab('batch',this)"><span class="tab-icon">📦</span> Batch Process</button>
+    </div>
+
+    <!-- IMAGE COMPRESSOR TAB -->
+    <div class="tab-panel active" id="tab-image">
+        <div class="panel-grid">
+            <div>
+                <div class="card" style="margin-bottom:1.2rem">
+                    <div class="card-header">⬆️ Upload Image</div>
+                    <div class="card-body">
+                        <div class="dropzone" id="img-dropzone" onclick="document.getElementById('file-input').click()" ondragover="handleDrag(event,'img-dropzone')" ondragleave="removeDrag('img-dropzone')" ondrop="handleDrop(event,'img')">
+                            <div class="dz-icon">🖼️</div>
+                            <div class="dz-title">Drop image here or <span>browse</span></div>
+                            <div class="dz-sub">JPG, PNG, WEBP, BMP • Max 20MB</div>
+                        </div>
+                        <input type="file" id="file-input" accept="image/*" onchange="loadImage(event)"/>
+                        <div id="img-info" style="display:none;margin-top:10px;">
+                            <div class="info-box" id="img-info-box"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">⚙️ Compression Settings</div>
+                    <div class="card-body">
+                        <div id="preset-info-box" style="display:none"><div class="preset-info" id="preset-info-content"></div></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Max Size (KB) *</label><input type="number" id="target-kb" value="50" min="1" max="5000" placeholder="e.g. 50"/></div>
+                            <div class="form-group"><label>Output Format</label><select id="out-format"><option value="jpeg">JPEG (recommended)</option><option value="png">PNG</option><option value="webp">WEBP</option></select></div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Width (px)</label><input type="number" id="out-width" placeholder="e.g. 200" min="10" max="4000"/></div>
+                            <div class="form-group"><label>Height (px)</label><input type="number" id="out-height" placeholder="e.g. 230" min="10" max="4000"/></div>
+                        </div>
+                        <div class="checkbox-row"><input type="checkbox" id="maintain-ratio" checked/><label for="maintain-ratio">Maintain aspect ratio</label></div>
+                        <div class="checkbox-row"><input type="checkbox" id="exact-size"/><label for="exact-size">Try to hit exact KB size (auto-quality)</label></div>
+                        <div class="slider-row">
+                            <label>Quality</label>
+                            <input type="range" id="quality-slider" min="1" max="100" value="85" oninput="document.getElementById('quality-val').textContent=this.value+'%'"/>
+                            <span class="slider-val" id="quality-val">85%</span>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-primary" id="compress-btn" onclick="compressImage()" disabled>🗜️ Compress & Resize</button>
+                            <button class="btn btn-outline" onclick="resetImage()">↺ Reset</button>
+                        </div>
+                        <div class="progress-wrap" id="img-progress">
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" id="img-progress-fill"></div></div>
+                            <div class="progress-text" id="img-progress-text">Processing...</div>
+                        </div>
+                        <div class="result-card" id="img-result">
+                            <div class="result-info"><h4>✅ Done!</h4><p id="result-detail"></p></div>
+                            <button class="btn btn-success" onclick="downloadResult()">⬇️ Download</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="card" style="margin-bottom:1.2rem">
+                    <div class="card-header">👁️ Original</div>
+                    <div class="card-body">
+                        <div class="preview-box" id="original-preview"><div class="preview-placeholder"><span>🖼️</span><p>Original image will appear here</p></div></div>
+                        <div id="original-meta" style="font-size:.74rem;color:var(--text-muted);margin-top:8px;"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">✨ Output</div>
+                    <div class="card-body">
+                        <div class="preview-box" id="output-preview"><div class="preview-placeholder"><span>✨</span><p>Compressed output will appear here</p></div></div>
+                        <div id="output-meta" style="font-size:.74rem;color:var(--text-muted);margin-top:8px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF TOOLS TAB -->
+    <div class="tab-panel" id="tab-pdf">
+        <div class="pdf-tools-grid">
+            <!-- PDF Compress -->
+            <div class="card">
+                <div class="card-header">🗜️ PDF Compress</div>
+                <div class="card-body">
+                    <div class="dropzone" id="pdf-compress-dz" onclick="document.getElementById('pdf-compress-input').click()" ondragover="handleDrag(event,'pdf-compress-dz')" ondragleave="removeDrag('pdf-compress-dz')" ondrop="handlePdfDrop(event,'compress')">
+                        <div class="dz-icon">📄</div>
+                        <div class="dz-title">Drop PDF here or <span>browse</span></div>
+                        <div class="dz-sub">Compress PDF file size</div>
+                    </div>
+                    <input type="file" id="pdf-compress-input" accept="application/pdf" onchange="loadPdfCompress(event)"/>
+                    <div id="pdf-compress-info" style="display:none;margin-top:10px;"><div class="info-box" id="pdf-compress-info-box"></div></div>
+                    <div class="slider-row" style="margin-top:12px;">
+                        <label>Quality</label>
+                        <input type="range" id="pdf-quality" min="0.3" max="1.0" step="0.1" value="0.7" oninput="document.getElementById('pdf-quality-val').textContent=Math.round(this.value*100)+'%'"/>
+                        <span class="slider-val" id="pdf-quality-val">70%</span>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="pdf-compress-btn" onclick="compressPDF()" disabled>🗜️ Compress PDF</button>
+                    <div class="progress-wrap" id="pdf-compress-progress"><div class="progress-bar-bg"><div class="progress-bar-fill" id="pdf-compress-fill"></div></div><div class="progress-text" id="pdf-compress-text">Processing pages...</div></div>
+                    <div class="result-card" id="pdf-compress-result"><div class="result-info"><h4>✅ PDF Compressed!</h4><p id="pdf-compress-detail"></p></div><button class="btn btn-success" onclick="downloadPdfResult('compress')">⬇️ Download</button></div>
+                </div>
+            </div>
+            <!-- PDF to Images -->
+            <div class="card">
+                <div class="card-header">🖼️ PDF → Images</div>
+                <div class="card-body">
+                    <div class="dropzone" id="pdf-toimg-dz" onclick="document.getElementById('pdf-toimg-input').click()" ondragover="handleDrag(event,'pdf-toimg-dz')" ondragleave="removeDrag('pdf-toimg-dz')" ondrop="handlePdfDrop(event,'toimg')">
+                        <div class="dz-icon">🔄</div>
+                        <div class="dz-title">Drop PDF here or <span>browse</span></div>
+                        <div class="dz-sub">Convert PDF pages to images</div>
+                    </div>
+                    <input type="file" id="pdf-toimg-input" accept="application/pdf" onchange="loadPdfToImg(event)"/>
+                    <div id="pdf-toimg-info" style="display:none;margin-top:10px;"><div class="info-box" id="pdf-toimg-info-box"></div></div>
+                    <div class="form-row" style="margin-top:12px;">
+                        <div class="form-group"><label>Pages</label><select id="pdf-page-range"><option value="all">All Pages</option><option value="first">First Page Only</option><option value="custom">Custom Range</option></select></div>
+                        <div class="form-group"><label>DPI</label><select id="pdf-dpi"><option value="72">72 (Web)</option><option value="150" selected>150 (Standard)</option><option value="200">200 (High)</option><option value="300">300 (Print)</option></select></div>
+                    </div>
+                    <input type="text" id="pdf-custom-range" placeholder="e.g. 1-3" style="display:none;width:100%;padding:8px 12px;border:1.5px solid var(--border-tool);border-radius:10px;margin-bottom:10px;font-family:'DM Sans',sans-serif;"/>
+                    <button class="btn btn-primary btn-block" id="pdf-toimg-btn" onclick="convertPdfToImages()" disabled>🖼️ Convert to Images</button>
+                    <div class="progress-wrap" id="pdf-toimg-progress"><div class="progress-bar-bg"><div class="progress-bar-fill" id="pdf-toimg-fill"></div></div><div class="progress-text" id="pdf-toimg-text">Rendering pages...</div></div>
+                    <div id="pdf-toimg-previews" style="display:none;margin-top:12px;"><p style="font-size:.78rem;font-weight:700;margin-bottom:8px;">📸 Converted Pages:</p><div id="pdf-toimg-grid" style="display:flex;gap:8px;flex-wrap:wrap;"></div><button class="btn btn-success" style="margin-top:10px;width:100%;justify-content:center;" onclick="downloadAllPdfImages()">⬇️ Download All Images</button></div>
+                </div>
+            </div>
+            <!-- Images to PDF -->
+            <div class="card">
+                <div class="card-header">📄 Images → PDF</div>
+                <div class="card-body">
+                    <div class="dropzone" id="imgs-topdf-dz" onclick="document.getElementById('imgs-topdf-input').click()" ondragover="handleDrag(event,'imgs-topdf-dz')" ondragleave="removeDrag('imgs-topdf-dz')" ondrop="handleImgsToPdfDrop(event)">
+                        <div class="dz-icon">📦</div>
+                        <div class="dz-title">Drop images here or <span>browse</span></div>
+                        <div class="dz-sub">Multiple images → single PDF</div>
+                    </div>
+                    <input type="file" id="imgs-topdf-input" accept="image/*" multiple onchange="loadImgsToPdf(event)"/>
+                    <div id="imgs-topdf-list" style="display:none;margin-top:10px;"><p style="font-size:.78rem;font-weight:700;margin-bottom:6px;">📋 Files:</p><div id="imgs-topdf-items"></div></div>
+                    <div class="form-row" style="margin-top:12px;">
+                        <div class="form-group"><label>Page Size</label><select id="pdf-page-size"><option value="a4">A4</option><option value="letter">Letter</option><option value="fit">Fit to Image</option></select></div>
+                        <div class="form-group"><label>Orientation</label><select id="pdf-orientation"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select></div>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="imgs-topdf-btn" onclick="convertImagesToPdf()" disabled>📄 Create PDF</button>
+                    <div class="progress-wrap" id="imgs-topdf-progress"><div class="progress-bar-bg"><div class="progress-bar-fill" id="imgs-topdf-fill"></div></div></div>
+                    <div class="result-card" id="imgs-topdf-result"><div class="result-info"><h4>✅ PDF Created!</h4><p id="imgs-topdf-detail"></p></div><button class="btn btn-success" onclick="downloadPdfResult('imgstopdf')">⬇️ Download</button></div>
+                </div>
+            </div>
+            <!-- PDF Split -->
+            <div class="card">
+                <div class="card-header">✂️ PDF Split / Info</div>
+                <div class="card-body">
+                    <div class="dropzone" id="pdf-split-dz" onclick="document.getElementById('pdf-split-input').click()" ondragover="handleDrag(event,'pdf-split-dz')" ondragleave="removeDrag('pdf-split-dz')" ondrop="handlePdfDrop(event,'split')">
+                        <div class="dz-icon">✂️</div>
+                        <div class="dz-title">Drop PDF here or <span>browse</span></div>
+                        <div class="dz-sub">Extract specific pages as a new PDF</div>
+                    </div>
+                    <input type="file" id="pdf-split-input" accept="application/pdf" onchange="loadPdfSplit(event)"/>
+                    <div id="pdf-split-info" style="display:none;margin-top:10px;"><div class="info-box" id="pdf-split-info-box"></div></div>
+                    <div class="form-group" style="margin-top:12px;margin-bottom:12px;"><label>Pages to Extract (e.g. 1,3,5-7)</label><input type="text" id="split-pages" placeholder="1-3 or 1,2,5"/></div>
+                    <button class="btn btn-primary btn-block" id="pdf-split-btn" onclick="splitPDF()" disabled>✂️ Extract Pages</button>
+                    <div class="progress-wrap" id="pdf-split-progress"><div class="progress-bar-bg"><div class="progress-bar-fill" id="pdf-split-fill"></div></div><div class="progress-text">Extracting...</div></div>
+                    <div class="result-card" id="pdf-split-result"><div class="result-info"><h4>✅ Pages Extracted!</h4><p id="pdf-split-detail"></p></div><button class="btn btn-success" onclick="downloadPdfResult('split')">⬇️ Download</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMAT CONVERTER TAB -->
+    <div class="tab-panel" id="tab-convert">
+        <div class="card">
+            <div class="card-header">🔄 Format Converter</div>
+            <div class="card-body">
+                <div class="convert-grid">
+                    <div class="form-group"><label>From Format</label><select id="from-format" onchange="updateConvertDropzone()"><option value="image">Image (JPG/PNG/WEBP/BMP)</option><option value="pdf">PDF</option></select></div>
+                    <div class="arrow-icon">➡️</div>
+                    <div class="form-group"><label>To Format</label><select id="to-format"><option value="jpeg">JPEG</option><option value="png">PNG</option><option value="webp">WEBP</option><option value="pdf">PDF</option></select></div>
+                </div>
+                <div class="dropzone" id="convert-dz" onclick="document.getElementById('convert-input').click()" ondragover="handleDrag(event,'convert-dz')" ondragleave="removeDrag('convert-dz')" ondrop="handleConvertDrop(event)">
+                    <div class="dz-icon" id="convert-dz-icon">🔄</div>
+                    <div class="dz-title">Drop file here or <span>browse</span></div>
+                    <div class="dz-sub" id="convert-dz-sub">Upload a file to convert</div>
+                </div>
+                <input type="file" id="convert-input" onchange="loadConvert(event)"/>
+                <div id="convert-info" style="display:none;margin-top:10px;"><div class="info-box" id="convert-info-box"></div></div>
+                <div class="form-row" style="margin-top:12px;">
+                    <div class="form-group"><label>Width (px) — optional</label><input type="number" id="conv-width" placeholder="Auto"/></div>
+                    <div class="form-group"><label>Height (px) — optional</label><input type="number" id="conv-height" placeholder="Auto"/></div>
+                </div>
+                <div class="slider-row"><label>Quality</label><input type="range" id="conv-quality" min="1" max="100" value="90" oninput="document.getElementById('conv-qual-val').textContent=this.value+'%'"/><span class="slider-val" id="conv-qual-val">90%</span></div>
+                <div class="btn-row"><button class="btn btn-primary" id="convert-btn" onclick="convertFile()" disabled>🔄 Convert Now</button></div>
+                <div class="progress-wrap" id="convert-progress"><div class="progress-bar-bg"><div class="progress-bar-fill" id="convert-fill"></div></div><div class="progress-text">Converting...</div></div>
+                <div class="result-card" id="convert-result"><div class="result-info"><h4>✅ Conversion Complete!</h4><p id="convert-detail"></p></div><button class="btn btn-success" id="convert-download" onclick="downloadConvertResult()">⬇️ Download</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BATCH PROCESS TAB -->
+    <div class="tab-panel" id="tab-batch">
+        <div class="card">
+            <div class="card-header">📦 Batch Image Compressor</div>
+            <div class="card-body">
+                <div class="info-box">ℹ️ Upload multiple images at once. All will be compressed using the same settings. Download as ZIP.</div>
+                <div class="dropzone" id="batch-dz" onclick="document.getElementById('batch-input').click()" ondragover="handleDrag(event,'batch-dz')" ondragleave="removeDrag('batch-dz')" ondrop="handleBatchDrop(event)">
+                    <div class="dz-icon">📦</div>
+                    <div class="dz-title">Drop multiple images here or <span>browse</span></div>
+                    <div class="dz-sub">JPG, PNG, WEBP — up to 50 files at once</div>
+                </div>
+                <input type="file" id="batch-input" accept="image/*" multiple onchange="loadBatch(event)"/>
+                <div class="form-row" style="margin-top:14px;">
+                    <div class="form-group"><label>Max Size per file (KB)</label><input type="number" id="batch-kb" value="50" min="1" max="5000"/></div>
+                    <div class="form-group"><label>Output Format</label><select id="batch-format"><option value="jpeg">JPEG</option><option value="png">PNG</option></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Width (px) — optional</label><input type="number" id="batch-width" placeholder="Auto"/></div>
+                    <div class="form-group"><label>Height (px) — optional</label><input type="number" id="batch-height" placeholder="Auto"/></div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" id="batch-btn" onclick="processBatch()" disabled>🚀 Process All</button>
+                    <button class="btn btn-success" id="batch-dl-btn" onclick="downloadAllBatch()" style="display:none">⬇️ Download All (ZIP)</button>
+                </div>
+                <div id="batch-table-wrap" style="display:none;margin-top:14px;">
+                    <table class="file-table"><thead><tr><th>File Name</th><th>Original</th><th>Output</th><th>Reduction</th><th>Status</th></tr></thead><tbody id="batch-table-body"></tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="status-bar">✅ Done!</div>
+
+<script>
+// ── AUTH (optional — works even without login) ────────────────────────────
+try {
+    // Try Firebase if available
+    if(typeof firebase !== 'undefined'){
+        const auth = firebase.auth();
+        auth.onAuthStateChanged(user => {
+            if(user){
+                document.getElementById('avInit').textContent = (user.displayName||user.email).charAt(0).toUpperCase();
+                document.getElementById('sbName').textContent = user.displayName||'User';
+                document.getElementById('sbEmail').textContent = user.email;
+            }
+        });
+        document.getElementById('logoutBtn').onclick = () => auth.signOut().then(()=>window.location.href='login.html');
+    }
+} catch(e){}
+
+// ── PORTAL PRESETS ────────────────────────────────────────────────────────
+const PORTALS = {
+  custom: null,
+  ssc:  { name:'SSC (Staff Selection Commission)', photo:{maxKb:50,minKb:20,w:200,h:230,format:'jpeg',note:'200×230px, 20-50KB, JPG'}, sign:{maxKb:20,minKb:10,w:140,h:60,format:'jpeg',note:'140×60px, 10-20KB, JPG'}, thumb:{maxKb:20,minKb:10,w:200,h:200,format:'jpeg',note:'200×200px, 10-20KB, JPG'} },
+  upsc: { name:'UPSC Civil Services', photo:{maxKb:300,minKb:20,w:350,h:450,format:'jpeg',note:'350×450px, max 300KB, JPG'}, sign:{maxKb:300,minKb:10,w:350,h:150,format:'jpeg',note:'350×150px, max 300KB, JPG'}, thumb:{maxKb:300,minKb:10,w:200,h:200,format:'jpeg',note:'200×200px, max 300KB, JPG'} },
+  ibps: { name:'IBPS (Banking)', photo:{maxKb:50,minKb:20,w:200,h:230,format:'jpeg',note:'200×230px, 20-50KB, JPG'}, sign:{maxKb:20,minKb:10,w:140,h:60,format:'jpeg',note:'140×60px, 10-20KB, JPG'}, thumb:{maxKb:20,minKb:10,w:200,h:200,format:'jpeg',note:'200×200px, 10-20KB, JPG'} },
+  rrb:  { name:'Railways (RRB/RRC)', photo:{maxKb:40,minKb:20,w:200,h:230,format:'jpeg',note:'200×230px, 20-40KB, JPG'}, sign:{maxKb:40,minKb:10,w:140,h:60,format:'jpeg',note:'140×60px, 10-40KB, JPG'}, thumb:{maxKb:40,minKb:10,w:200,h:200,format:'jpeg',note:'200×200px, 10-40KB, JPG'} },
+  sbi:  { name:'SBI PO / Clerk', photo:{maxKb:50,minKb:20,w:200,h:230,format:'jpeg',note:'200×230px, 20-50KB, JPG'}, sign:{maxKb:20,minKb:10,w:200,h:80,format:'jpeg',note:'200×80px, 10-20KB, JPG'}, thumb:{maxKb:20,minKb:10,w:200,h:200,format:'jpeg',note:'200×200px, 10-20KB, JPG'} },
+  nta:  { name:'NTA / JEE / NEET', photo:{maxKb:200,minKb:10,w:350,h:450,format:'jpeg',note:'10-200KB, JPG'}, sign:{maxKb:30,minKb:4,w:350,h:150,format:'jpeg',note:'4-30KB, JPG'}, thumb:{maxKb:30,minKb:10,w:200,h:200,format:'jpeg',note:'10-30KB, JPG'} },
+  nps:  { name:'NPS / EPFO', photo:{maxKb:100,minKb:20,w:300,h:400,format:'jpeg',note:'300×400px, max 100KB, JPG'}, sign:{maxKb:50,minKb:10,w:300,h:100,format:'jpeg',note:'300×100px, max 50KB, JPG'}, thumb:{maxKb:50,minKb:10,w:200,h:200,format:'jpeg',note:'200×200px, max 50KB, JPG'} },
+  psc:  { name:'State PSC (General)', photo:{maxKb:100,minKb:10,w:250,h:300,format:'jpeg',note:'250×300px, max 100KB, JPG'}, sign:{maxKb:50,minKb:5,w:250,h:80,format:'jpeg',note:'250×80px, max 50KB, JPG'}, thumb:{maxKb:50,minKb:10,w:200,h:200,format:'jpeg',note:'200×200px, max 50KB, JPG'} },
+  bpsc: { name:'BPSC (Bihar PSC)', photo:{maxKb:50,minKb:10,w:200,h:230,format:'jpeg',note:'200×230px, max 50KB, JPG'}, sign:{maxKb:20,minKb:5,w:140,h:60,format:'jpeg',note:'140×60px, max 20KB, JPG'}, thumb:{maxKb:20,minKb:5,w:200,h:200,format:'jpeg',note:'200×200px, max 20KB, JPG'} },
+};
+
+let currentPortal='custom', currentPresetType='photo';
+let originalFile=null, originalImg=null, resultBlob=null;
+let pdfCompressResult=null, pdfToImgResult=[], imgsToPdfResult=null, pdfSplitResult=null, convertResult=null;
+let batchFiles=[], batchResults=[], imgsToPdfFiles=[];
+let pdfCompressData=null, pdfToImgData=null, pdfSplitData=null;
+
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+}
+function setPortal(p,btn){
+  currentPortal=p;
+  document.querySelectorAll('.portal-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  applyPreset();
+}
+function setPresetType(t,btn){
+  currentPresetType=t;
+  document.querySelectorAll('.preset-type-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  applyPreset();
+}
+function applyPreset(){
+  const portal=PORTALS[currentPortal];
+  const box=document.getElementById('preset-info-box');
+  if(!portal){box.style.display='none';return;}
+  const p=portal[currentPresetType];
+  if(!p)return;
+  box.style.display='block';
+  document.getElementById('preset-info-content').innerHTML=`<h4>📋 ${portal.name} — ${currentPresetType.charAt(0).toUpperCase()+currentPresetType.slice(1)} Requirements</h4><table><tr><td>Max Size</td><td>${p.minKb}–${p.maxKb} KB</td></tr><tr><td>Dimensions</td><td>${p.w} × ${p.h} px</td></tr><tr><td>Format</td><td>${p.format.toUpperCase()}</td></tr><tr><td>Note</td><td>${p.note}</td></tr></table>`;
+  document.getElementById('target-kb').value=p.maxKb;
+  document.getElementById('out-width').value=p.w;
+  document.getElementById('out-height').value=p.h;
+  document.getElementById('out-format').value=p.format;
+  document.getElementById('maintain-ratio').checked=false;
+  document.getElementById('exact-size').checked=true;
+}
+
+// DRAG & DROP
+function handleDrag(e,id){e.preventDefault();e.stopPropagation();document.getElementById(id).classList.add('dragover');}
+function removeDrag(id){document.getElementById(id).classList.remove('dragover');}
+function handleDrop(e,type){e.preventDefault();removeDrag('img-dropzone');const f=e.dataTransfer.files;if(f.length>0)loadImageFile(f[0]);}
+function handleImgsToPdfDrop(e){e.preventDefault();removeDrag('imgs-topdf-dz');const f=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));if(f.length>0){imgsToPdfFiles=f;renderImgsToPdfList();document.getElementById('imgs-topdf-btn').disabled=false;}}
+function handleBatchDrop(e){e.preventDefault();removeDrag('batch-dz');const f=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));if(f.length>0){batchFiles=f;renderBatchTable();document.getElementById('batch-btn').disabled=false;}}
+function handlePdfDrop(e,type){e.preventDefault();const id='pdf-'+type+'-dz';removeDrag(id);const f=e.dataTransfer.files[0];if(!f||f.type!=='application/pdf'){showStatus('Please drop a PDF file!','error');return;}if(type==='compress')loadPdfCompressFile(f);if(type==='toimg')loadPdfToImgFile(f);if(type==='split')loadPdfSplitFile(f);}
+function handleConvertDrop(e){e.preventDefault();removeDrag('convert-dz');const f=e.dataTransfer.files[0];if(f)loadConvertFile(f);}
+
+// IMAGE LOAD
+function loadImage(event){if(event.target.files[0])loadImageFile(event.target.files[0]);}
+function loadImageFile(file){
+  if(!file.type.startsWith('image/')){showStatus('Please upload an image file!','error');return;}
+  originalFile=file;
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    const img=new Image();
+    img.onload=()=>{
+      originalImg=img;
+      document.getElementById('original-preview').innerHTML=`<img src="${e.target.result}" alt="Original"/><div class="file-size-badge">${formatSize(file.size)}</div>`;
+      document.getElementById('original-meta').textContent=`${img.naturalWidth} × ${img.naturalHeight} px | ${file.type} | ${formatSize(file.size)}`;
+      document.getElementById('img-info').style.display='block';
+      document.getElementById('img-info-box').innerHTML=`📎 <strong>${file.name}</strong> | ${img.naturalWidth}×${img.naturalHeight}px | ${formatSize(file.size)}`;
+      document.getElementById('compress-btn').disabled=false;
+      document.getElementById('output-preview').innerHTML=`<div class="preview-placeholder"><span>✨</span><p>Output will appear here</p></div>`;
+      document.getElementById('img-result').classList.remove('show');
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// COMPRESSION
+async function compressImage(){
+  if(!originalImg)return;
+  const btn=document.getElementById('compress-btn');btn.disabled=true;
+  setProgress('img',10,'Starting...');
+  const targetKb=parseInt(document.getElementById('target-kb').value)||50;
+  const outFormat=document.getElementById('out-format').value;
+  const outW=parseInt(document.getElementById('out-width').value)||originalImg.naturalWidth;
+  const outH=parseInt(document.getElementById('out-height').value)||originalImg.naturalHeight;
+  const maintainRatio=document.getElementById('maintain-ratio').checked;
+  const exactSize=document.getElementById('exact-size').checked;
+  const qualityVal=parseInt(document.getElementById('quality-slider').value)/100;
+  setProgress('img',30,'Resizing...');
+  let finalW=outW,finalH=outH;
+  if(maintainRatio){const ratio=originalImg.naturalWidth/originalImg.naturalHeight;if(document.getElementById('out-width').value&&!document.getElementById('out-height').value){finalH=Math.round(finalW/ratio);}else if(!document.getElementById('out-width').value&&document.getElementById('out-height').value){finalW=Math.round(finalH*ratio);}else{const r2=finalW/finalH;if(r2>ratio)finalW=Math.round(finalH*ratio);else finalH=Math.round(finalW/ratio);}}
+  const canvas=document.createElement('canvas');canvas.width=finalW;canvas.height=finalH;canvas.getContext('2d').drawImage(originalImg,0,0,finalW,finalH);
+  setProgress('img',60,'Compressing...');
+  let mime=outFormat==='jpeg'?'image/jpeg':(outFormat==='png'?'image/png':'image/webp');
+  let quality=qualityVal,dataUrl;
+  if(exactSize&&mime!=='image/png'){let lo=0.01,hi=1.0;for(let i=0;i<15;i++){quality=(lo+hi)/2;dataUrl=canvas.toDataURL(mime,quality);const sz=Math.round((dataUrl.length-dataUrl.indexOf(',')-1)*0.75);if(sz/1024>targetKb)hi=quality;else lo=quality;if(Math.abs(sz/1024-targetKb)<1)break;}}
+  dataUrl=canvas.toDataURL(mime,quality);
+  const blob=await(await fetch(dataUrl)).blob();resultBlob=blob;
+  setProgress('img',90,'Preview...');
+  document.getElementById('output-preview').innerHTML=`<img src="${dataUrl}" alt="Output"/><div class="file-size-badge">${formatSize(blob.size)}</div>`;
+  document.getElementById('output-meta').textContent=`${finalW}×${finalH}px | ${formatSize(blob.size)} | Q:${Math.round(quality*100)}%`;
+  const pct=Math.round((1-blob.size/originalFile.size)*100);
+  document.getElementById('result-detail').textContent=`${formatSize(originalFile.size)} → ${formatSize(blob.size)} (${pct>0?pct+'% smaller':'Size increased'}) | ${finalW}×${finalH}px`;
+  document.getElementById('img-result').classList.add('show');
+  setProgress('img',100,'Done!');setTimeout(()=>hideProgress('img'),1000);
+  btn.disabled=false;showStatus('✅ Image compressed!','success');
+}
+
+function downloadResult(){if(!resultBlob)return;const ext=document.getElementById('out-format').value==='jpeg'?'jpg':document.getElementById('out-format').value;saveAs(resultBlob,(originalFile?.name||'image').replace(/\.[^.]+$/,'')+'_compressed.'+ext);}
+function resetImage(){originalFile=null;originalImg=null;resultBlob=null;document.getElementById('original-preview').innerHTML='<div class="preview-placeholder"><span>🖼️</span><p>Original image will appear here</p></div>';document.getElementById('output-preview').innerHTML='<div class="preview-placeholder"><span>✨</span><p>Compressed output will appear here</p></div>';document.getElementById('original-meta').textContent='';document.getElementById('output-meta').textContent='';document.getElementById('img-info').style.display='none';document.getElementById('img-result').classList.remove('show');document.getElementById('compress-btn').disabled=true;document.getElementById('file-input').value='';}
+
+// PDF COMPRESS
+function loadPdfCompress(event){const f=event.target.files[0];if(!f)return;loadPdfCompressFile(f);}
+function loadPdfCompressFile(file){pdfCompressData=file;document.getElementById('pdf-compress-info').style.display='block';document.getElementById('pdf-compress-info-box').innerHTML=`📄 <strong>${file.name}</strong> | ${formatSize(file.size)}`;document.getElementById('pdf-compress-btn').disabled=false;}
+async function compressPDF(){
+  if(!pdfCompressData)return;const btn=document.getElementById('pdf-compress-btn');btn.disabled=true;
+  setProgress('pdf-compress',5,'Loading PDF...');
+  const quality=parseFloat(document.getElementById('pdf-quality').value);
+  const arrayBuffer=await pdfCompressData.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+  const numPages=pdf.numPages;
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'px',format:'a4'});
+  for(let i=1;i<=numPages;i++){
+    setProgress('pdf-compress',Math.round((i/numPages)*85)+5,`Processing page ${i}/${numPages}...`);
+    const page=await pdf.getPage(i);
+    const viewport=page.getViewport({scale:quality*2});
+    const canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;
+    await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+    const imgData=canvas.toDataURL('image/jpeg',quality);
+    if(i>1)doc.addPage();
+    const pw=doc.internal.pageSize.getWidth(),ph=doc.internal.pageSize.getHeight();
+    doc.addImage(imgData,'JPEG',0,0,pw,ph);
+  }
+  setProgress('pdf-compress',95,'Finalizing...');
+  const outBlob=doc.output('blob');pdfCompressResult=outBlob;
+  const pct=Math.round((1-outBlob.size/pdfCompressData.size)*100);
+  document.getElementById('pdf-compress-detail').textContent=`${formatSize(pdfCompressData.size)} → ${formatSize(outBlob.size)} (${pct>0?pct+'% smaller':'Larger — try lower quality'})`;
+  document.getElementById('pdf-compress-result').classList.add('show');
+  setProgress('pdf-compress',100,'Done!');setTimeout(()=>hideProgress('pdf-compress'),1000);
+  btn.disabled=false;showStatus('✅ PDF compressed!','success');
+}
+
+// PDF TO IMAGES
+function loadPdfToImg(event){const f=event.target.files[0];if(!f)return;loadPdfToImgFile(f);}
+function loadPdfToImgFile(file){pdfToImgData=file;document.getElementById('pdf-toimg-info').style.display='block';document.getElementById('pdf-toimg-info-box').innerHTML=`📄 <strong>${file.name}</strong> | ${formatSize(file.size)}`;document.getElementById('pdf-toimg-btn').disabled=false;}
+async function convertPdfToImages(){
+  if(!pdfToImgData)return;const btn=document.getElementById('pdf-toimg-btn');btn.disabled=true;
+  setProgress('pdf-toimg',5,'Loading PDF...');
+  const dpi=parseInt(document.getElementById('pdf-dpi').value)||150;
+  const scale=dpi/72;
+  const arrayBuffer=await pdfToImgData.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+  const numPages=pdf.numPages;
+  const pageRange=document.getElementById('pdf-page-range').value;
+  let pagesToRender=[];
+  if(pageRange==='all')for(let i=1;i<=numPages;i++)pagesToRender.push(i);
+  else if(pageRange==='first')pagesToRender=[1];
+  else pagesToRender=parsePageRange(document.getElementById('pdf-custom-range').value,numPages);
+  pdfToImgResult=[];
+  const grid=document.getElementById('pdf-toimg-grid');grid.innerHTML='';
+  for(let i=0;i<pagesToRender.length;i++){
+    const pNum=pagesToRender[i];
+    setProgress('pdf-toimg',Math.round((i/pagesToRender.length)*90)+5,`Rendering page ${pNum}...`);
+    const page=await pdf.getPage(pNum);
+    const viewport=page.getViewport({scale});
+    const canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;
+    await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+    const dataUrl=canvas.toDataURL('image/jpeg',0.92);
+    pdfToImgResult.push({dataUrl,page:pNum});
+    const thumb=document.createElement('div');
+    thumb.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px;';
+    thumb.innerHTML=`<img src="${dataUrl}" style="height:80px;border-radius:6px;border:1px solid #e5e7f0;cursor:pointer;" onclick="window.open('${dataUrl}','_blank')" title="Click to open full size"/><span style="font-size:.7rem;color:var(--text-muted)">Page ${pNum}</span>`;
+    grid.appendChild(thumb);
+  }
+  document.getElementById('pdf-toimg-previews').style.display='block';
+  setProgress('pdf-toimg',100,'Done!');setTimeout(()=>hideProgress('pdf-toimg'),1000);
+  btn.disabled=false;showStatus(`✅ ${pagesToRender.length} page(s) converted!`,'success');
+}
+async function downloadAllPdfImages(){
+  if(!pdfToImgResult.length)return;
+  const zip=new JSZip();
+  pdfToImgResult.forEach(r=>{const b64=r.dataUrl.split(',')[1];zip.file(`page_${r.page}.jpg`,b64,{base64:true});});
+  const blob=await zip.generateAsync({type:'blob'});
+  saveAs(blob,'pdf_pages.zip');
+}
+
+// IMAGES TO PDF
+function loadImgsToPdf(event){const files=Array.from(event.target.files).filter(f=>f.type.startsWith('image/'));if(!files.length)return;imgsToPdfFiles=files;renderImgsToPdfList();document.getElementById('imgs-topdf-btn').disabled=false;}
+function renderImgsToPdfList(){const wrap=document.getElementById('imgs-topdf-list');const items=document.getElementById('imgs-topdf-items');wrap.style.display='block';items.innerHTML=imgsToPdfFiles.map((f,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f0f4ff;font-size:.8rem;"><span style="flex:1">📎 ${f.name}</span><span style="color:var(--text-muted)">${formatSize(f.size)}</span></div>`).join('');}
+async function convertImagesToPdf(){
+  if(!imgsToPdfFiles.length)return;const btn=document.getElementById('imgs-topdf-btn');btn.disabled=true;
+  setProgress('imgs-topdf',5,'Loading images...');
+  const {jsPDF}=window.jspdf;
+  const pgSz=document.getElementById('pdf-page-size').value;
+  const orient=document.getElementById('pdf-orientation').value;
+  const doc=new jsPDF({orientation:orient,unit:'mm',format:pgSz==='fit'?'a4':pgSz});
+  for(let i=0;i<imgsToPdfFiles.length;i++){
+    setProgress('imgs-topdf',Math.round((i/imgsToPdfFiles.length)*90)+5,`Adding image ${i+1}/${imgsToPdfFiles.length}...`);
+    const dataUrl=await readAsDataURL(imgsToPdfFiles[i]);
+    const img=await loadImageFromUrl(dataUrl);
+    if(i>0)doc.addPage(pgSz==='fit'?[img.naturalWidth*0.264583,img.naturalHeight*0.264583]:undefined,orient);
+    const pw=doc.internal.pageSize.getWidth(),ph=doc.internal.pageSize.getHeight();
+    const iw=img.naturalWidth*0.264583,ih=img.naturalHeight*0.264583;
+    const scale2=Math.min(pw/iw,ph/ih);
+    const fw=iw*scale2,fh=ih*scale2;
+    doc.addImage(dataUrl,'JPEG',(pw-fw)/2,(ph-fh)/2,fw,fh);
+  }
+  setProgress('imgs-topdf',95,'Finalizing...');
+  imgsToPdfResult=doc.output('blob');
+  document.getElementById('imgs-topdf-detail').textContent=`${imgsToPdfFiles.length} image(s) → PDF (${formatSize(imgsToPdfResult.size)})`;
+  document.getElementById('imgs-topdf-result').classList.add('show');
+  setProgress('imgs-topdf',100,'Done!');setTimeout(()=>hideProgress('imgs-topdf'),1000);
+  btn.disabled=false;showStatus('✅ PDF created!','success');
+}
+
+// PDF SPLIT
+function loadPdfSplit(event){const f=event.target.files[0];if(!f)return;loadPdfSplitFile(f);}
+function loadPdfSplitFile(file){pdfSplitData=file;document.getElementById('pdf-split-info').style.display='block';document.getElementById('pdf-split-info-box').innerHTML=`📄 <strong>${file.name}</strong> | ${formatSize(file.size)}`;document.getElementById('pdf-split-btn').disabled=false;}
+async function splitPDF(){
+  if(!pdfSplitData)return;const btn=document.getElementById('pdf-split-btn');btn.disabled=true;
+  setProgress('pdf-split',5,'Loading PDF...');
+  const arrayBuffer=await pdfSplitData.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
+  const numPages=pdf.numPages;
+  const pages=parsePageRange(document.getElementById('split-pages').value,numPages);
+  if(!pages.length){showStatus('Please enter valid page numbers','error');btn.disabled=false;return;}
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'px',format:'a4'});
+  for(let i=0;i<pages.length;i++){
+    setProgress('pdf-split',Math.round((i/pages.length)*90)+5,`Extracting page ${pages[i]}...`);
+    const page=await pdf.getPage(pages[i]);
+    const viewport=page.getViewport({scale:2});
+    const canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;
+    await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+    const imgData=canvas.toDataURL('image/jpeg',0.9);
+    if(i>0)doc.addPage();
+    const pw=doc.internal.pageSize.getWidth(),ph=doc.internal.pageSize.getHeight();
+    doc.addImage(imgData,'JPEG',0,0,pw,ph);
+  }
+  pdfSplitResult=doc.output('blob');
+  document.getElementById('pdf-split-detail').textContent=`${pages.length} page(s) extracted (${formatSize(pdfSplitResult.size)})`;
+  document.getElementById('pdf-split-result').classList.add('show');
+  setProgress('pdf-split',100,'Done!');setTimeout(()=>hideProgress('pdf-split'),1000);
+  btn.disabled=false;showStatus('✅ Pages extracted!','success');
+}
+
+// FORMAT CONVERTER
+function updateConvertDropzone(){const fmt=document.getElementById('from-format').value;document.getElementById('convert-dz-sub').textContent=fmt==='pdf'?'Upload PDF file':'Upload image file (JPG/PNG/WEBP/BMP)';document.getElementById('convert-input').accept=fmt==='pdf'?'application/pdf':'image/*';}
+function loadConvert(event){const f=event.target.files[0];if(f)loadConvertFile(f);}
+function loadConvertFile(file){document.getElementById('convert-info').style.display='block';document.getElementById('convert-info-box').innerHTML=`📎 <strong>${file.name}</strong> | ${formatSize(file.size)}`;document.getElementById('convert-btn').disabled=false;window._convertFile=file;}
+async function convertFile(){
+  const file=window._convertFile;if(!file)return;
+  const btn=document.getElementById('convert-btn');btn.disabled=true;
+  const from=document.getElementById('from-format').value;
+  const to=document.getElementById('to-format').value;
+  const w=parseInt(document.getElementById('conv-width').value)||0;
+  const h=parseInt(document.getElementById('conv-height').value)||0;
+  const q=parseInt(document.getElementById('conv-quality').value)/100;
+  setProgress('convert',20,'Converting...');
+  let blob,detail;
+  if(from==='image'&&to!=='pdf'){
+    const dataUrl=await readAsDataURL(file);const img=await loadImageFromUrl(dataUrl);
+    const canvas=document.createElement('canvas');canvas.width=w||img.naturalWidth;canvas.height=h||img.naturalHeight;
+    canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+    const mime=to==='jpeg'?'image/jpeg':to==='png'?'image/png':'image/webp';
+    blob=await new Promise(res=>canvas.toBlob(res,mime,q));
+    detail=`${formatSize(file.size)} → ${formatSize(blob.size)} | ${canvas.width}×${canvas.height}px`;
+  }else if(from==='image'&&to==='pdf'){
+    const dataUrl=await readAsDataURL(file);const img=await loadImageFromUrl(dataUrl);
+    const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pw=doc.internal.pageSize.getWidth(),ph=doc.internal.pageSize.getHeight();
+    const iw=img.naturalWidth*0.264583,ih=img.naturalHeight*0.264583;
+    const sc=Math.min(pw/iw,ph/ih);doc.addImage(dataUrl,'JPEG',(pw-iw*sc)/2,(ph-ih*sc)/2,iw*sc,ih*sc);
+    blob=doc.output('blob');detail=`Image converted to PDF (${formatSize(blob.size)})`;
+  }else{
+    showStatus('PDF to image conversion: Use PDF → Images tab','error');btn.disabled=false;return;
+  }
+  convertResult=blob;document.getElementById('convert-detail').textContent=detail;
+  document.getElementById('convert-result').classList.add('show');
+  setProgress('convert',100,'Done!');setTimeout(()=>hideProgress('convert'),1000);
+  btn.disabled=false;showStatus('✅ Conversion complete!','success');
+}
+function downloadConvertResult(){if(!convertResult)return;const to=document.getElementById('to-format').value;const ext=to==='jpeg'?'jpg':to;saveAs(convertResult,'converted.'+ext);}
+
+// BATCH
+function loadBatch(event){batchFiles=Array.from(event.target.files).filter(f=>f.type.startsWith('image/'));if(batchFiles.length){renderBatchTable();document.getElementById('batch-btn').disabled=false;}}
+function renderBatchTable(){const wrap=document.getElementById('batch-table-wrap');const tbody=document.getElementById('batch-table-body');wrap.style.display='block';tbody.innerHTML=batchFiles.map((f,i)=>`<tr><td>${f.name}</td><td>${formatSize(f.size)}</td><td id="batch-out-${i}">—</td><td id="batch-red-${i}">—</td><td><span class="status-pill pending" id="batch-status-${i}">Pending</span></td></tr>`).join('');}
+async function processBatch(){
+  const kb=parseInt(document.getElementById('batch-kb').value)||50;
+  const fmt=document.getElementById('batch-format').value;
+  const bw=parseInt(document.getElementById('batch-width').value)||0;
+  const bh=parseInt(document.getElementById('batch-height').value)||0;
+  const btn=document.getElementById('batch-btn');btn.disabled=true;batchResults=[];
+  for(let i=0;i<batchFiles.length;i++){
+    document.getElementById(`batch-status-${i}`).textContent='Processing';document.getElementById(`batch-status-${i}`).className='status-pill processing';
+    const f=batchFiles[i];
+    try{
+      const blob=await compressImageFile(f,kb,fmt,bw,bh);
+      batchResults.push({blob,name:f.name.replace(/\.[^.]+$/,'')+'_compressed.'+(fmt==='jpeg'?'jpg':'png')});
+      const pct=Math.round((1-blob.size/f.size)*100);
+      document.getElementById(`batch-out-${i}`).textContent=formatSize(blob.size);
+      document.getElementById(`batch-red-${i}`).textContent=pct>0?pct+'% ↓':'Larger';
+      document.getElementById(`batch-status-${i}`).textContent='Done';document.getElementById(`batch-status-${i}`).className='status-pill done';
+    }catch{document.getElementById(`batch-status-${i}`).textContent='Error';document.getElementById(`batch-status-${i}`).className='status-pill error';batchResults.push(null);}
+  }
+  btn.disabled=false;document.getElementById('batch-dl-btn').style.display='';
+  showStatus(`✅ ${batchResults.filter(Boolean).length}/${batchFiles.length} processed!`,'success');
+}
+async function compressImageFile(file,targetKb,fmt,w,h){
+  const dataUrl=await readAsDataURL(file);const img=await loadImageFromUrl(dataUrl);
+  const canvas=document.createElement('canvas');canvas.width=w||img.naturalWidth;canvas.height=h||img.naturalHeight;
+  canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+  const mime=fmt==='jpeg'?'image/jpeg':'image/png';let lo=0.01,hi=1.0,quality=0.85;
+  if(mime!=='image/png'){for(let i=0;i<12;i++){quality=(lo+hi)/2;const du=canvas.toDataURL(mime,quality);const sz=Math.round((du.length-du.indexOf(',')-1)*0.75);if(sz/1024>targetKb)hi=quality;else lo=quality;if(Math.abs(sz/1024-targetKb)<1)break;}}
+  return new Promise(res=>canvas.toBlob(res,mime,quality));
+}
+async function downloadAllBatch(){const zip=new JSZip();batchResults.forEach(r=>{if(r)zip.file(r.name,r.blob);});const blob=await zip.generateAsync({type:'blob'});saveAs(blob,'compressed_images.zip');}
+
+// PDF DOWNLOAD
+function downloadPdfResult(type){let blob=null,name='';if(type==='compress'){blob=pdfCompressResult;name='compressed.pdf';}else if(type==='imgstopdf'){blob=imgsToPdfResult;name='images_to_pdf.pdf';}else if(type==='split'){blob=pdfSplitResult;name='extracted_pages.pdf';}if(blob)saveAs(blob,name);}
+
+// HELPERS
+function formatSize(bytes){if(bytes<1024)return bytes+' B';if(bytes<1024*1024)return(bytes/1024).toFixed(1)+' KB';return(bytes/(1024*1024)).toFixed(2)+' MB';}
+function readAsDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=rej;r.readAsDataURL(file);});}
+function loadImageFromUrl(url){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>res(img);img.onerror=rej;img.src=url;});}
+function parsePageRange(str,max){const pages=new Set();if(!str)return[];str.split(',').forEach(part=>{part=part.trim();if(part.includes('-')){const[a,b]=part.split('-').map(Number);for(let i=Math.max(1,a);i<=Math.min(max,b);i++)pages.add(i);}else{const n=parseInt(part);if(n>=1&&n<=max)pages.add(n);}});return Array.from(pages).sort((a,b)=>a-b);}
+function showStatus(msg,type=''){const bar=document.getElementById('status-bar');bar.textContent=msg;bar.className=type;bar.style.display='block';clearTimeout(bar._t);bar._t=setTimeout(()=>{bar.style.display='none';},3500);}
+
+// Progress system
+window.setProgress=function(id,val,text){
+  const map={'img':['img-progress','img-progress-fill','img-progress-text'],'pdf-compress':['pdf-compress-progress','pdf-compress-fill','pdf-compress-text'],'pdf-toimg':['pdf-toimg-progress','pdf-toimg-fill','pdf-toimg-text'],'imgs-topdf':['imgs-topdf-progress','imgs-topdf-fill',null],'pdf-split':['pdf-split-progress','pdf-split-fill',null],'convert':['convert-progress','convert-fill',null]};
+  const ids=map[id];if(!ids)return;
+  const wrap=document.getElementById(ids[0]);const fill=ids[1]?document.getElementById(ids[1]):null;const textEl=ids[2]?document.getElementById(ids[2]):null;
+  if(wrap)wrap.classList.add('show');if(fill)fill.style.width=val+'%';if(textEl)textEl.textContent=text;
+};
+window.hideProgress=function(id){
+  const map={'img':'img-progress','pdf-compress':'pdf-compress-progress','pdf-toimg':'pdf-toimg-progress','imgs-topdf':'imgs-topdf-progress','pdf-split':'pdf-split-progress','convert':'convert-progress'};
+  const el=document.getElementById(map[id]);if(el)el.classList.remove('show');
+};
+
+// PDF page range select
+document.getElementById('pdf-page-range').addEventListener('change',function(){
+  document.getElementById('pdf-custom-range').style.display=this.value==='custom'?'block':'none';
+});
+
+// Auto-configure from extension URL params
+// Accepted: ?tool=image|pdf|convert|batch &portal=bpsc|ssc|... &preset=photo|sign|thumb &w=200 &h=230 &kb=50 &fmt=jpeg
+function initFromUrlParams(){
+  const p=new URLSearchParams(location.search);
+  const tool=p.get('tool'),portal=p.get('portal'),preset=p.get('preset');
+  const w=p.get('w'),h=p.get('h'),kb=p.get('kb'),fmt=p.get('fmt');
+  if(!tool&&!portal)return; // normal direct navigation — no change
+
+  // 1. Switch tab
+  if(tool){
+    const tabBtn=document.querySelector(`.tab-btn[onclick*="switchTab('${tool}'"]`);
+    switchTab(tool,tabBtn||null);
+  }
+  // 2. Set portal
+  if(portal){
+    const portalBtn=document.querySelector(`.portal-btn[onclick*="setPortal('${portal}'"]`);
+    setPortal(portal,portalBtn||null);
+  }
+  // 3. Set preset type
+  if(preset){
+    const presetBtn=document.getElementById('ptype-'+preset);
+    setPresetType(preset,presetBtn||null);
+  }
+  // 4. Override individual fields after preset (explicit specs beat portal defaults)
+  if(kb) document.getElementById('target-kb').value=kb;
+  if(w)  document.getElementById('out-width').value=w;
+  if(h)  document.getElementById('out-height').value=h;
+  if(fmt)document.getElementById('out-format').value=fmt;
+
+  // 5. Show dismissible banner
+  const label=portal?portal.toUpperCase():null;
+  const banner=document.createElement('div');
+  banner.style.cssText='background:#1976d2;color:white;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:8px;';
+  banner.innerHTML=`<span>⚡ Auto-configured from your form${label?' · Portal: '+label:''}. Upload your file to continue.</span>`
+    +`<button style="background:none;border:none;color:white;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1;" aria-label="Dismiss">✕</button>`;
+  banner.querySelector('button').addEventListener('click',()=>banner.remove());
+  const tabsWrap=document.querySelector('.tabs-wrap');
+  if(tabsWrap)tabsWrap.parentElement.insertBefore(banner,tabsWrap);
+}
+initFromUrlParams();
+</script>
+</body>
+</html>

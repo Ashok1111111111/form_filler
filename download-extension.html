@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Chrome Extension – AI Form Filler</title>
+    <meta name="description" content="Install AI Form Filler Chrome Extension to auto-fill government forms in seconds.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --accent: #5b4ff5;
+            --accent-2: #f5724f;
+            --accent-glow: rgba(91,79,245,0.25);
+            --ink: #0d0d14;
+            --ink-muted: #4a4a5a;
+            --surface-2: #f6f5ff;
+            --border: rgba(91,79,245,0.12);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'DM Sans',sans-serif; background:#fafafa; color:var(--ink); }
+
+        /* NAV */
+        nav {
+            position:fixed; top:0; left:0; right:0; z-index:100;
+            padding:1rem 2rem;
+            display:flex; align-items:center; justify-content:space-between;
+            background:rgba(255,255,255,0.9); backdrop-filter:blur(20px);
+            border-bottom:1px solid var(--border);
+        }
+        .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.3rem; color:var(--ink); text-decoration:none; }
+        .logo span { color:var(--accent); }
+        .btn-nav {
+            background:var(--accent); color:white; padding:.55rem 1.3rem;
+            border-radius:50px; font-weight:600; font-size:.9rem;
+            text-decoration:none; transition:all .3s;
+            box-shadow:0 4px 16px var(--accent-glow);
+        }
+        .btn-nav:hover { transform:translateY(-2px); color:white; }
+
+        /* HERO */
+        .hero {
+            min-height:100vh;
+            display:flex; align-items:center;
+            padding-top:80px;
+            background:linear-gradient(145deg,#f6f5ff 0%,#fff 60%);
+            position:relative; overflow:hidden;
+        }
+        .hero::before {
+            content:'';
+            position:absolute;
+            top:-100px; right:-150px;
+            width:500px; height:500px;
+            background:radial-gradient(circle,rgba(91,79,245,0.1),transparent 70%);
+            border-radius:50%;
+        }
+
+        .ext-preview {
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            border-radius:24px;
+            padding:1.5rem;
+            box-shadow:0 40px 80px rgba(91,79,245,0.3);
+            position:relative;
+            max-width:380px;
+            margin:0 auto;
+        }
+        .ext-container {
+            background:rgba(255,255,255,0.1);
+            border-radius:12px;
+            padding:1.5rem;
+        }
+        .ext-title { color:white; text-align:center; font-weight:700; font-size:1.1rem; margin-bottom:1rem; }
+        .ext-credit-box {
+            background:rgba(255,255,255,0.2);
+            border-radius:10px;
+            padding:1rem;
+            text-align:center;
+            margin-bottom:1rem;
+            border:2px solid rgba(255,255,255,0.3);
+        }
+        .ext-credit-num { font-size:2.5rem; font-weight:800; color:#ffeb3b; }
+        .ext-credit-lbl { font-size:.75rem; color:rgba(255,255,255,.8); }
+        .ext-input {
+            background:white; border:none; border-radius:8px;
+            padding:.7rem 1rem; width:100%; margin-bottom:.8rem;
+            font-size:.9rem; color:var(--ink);
+        }
+        .ext-btn {
+            width:100%; padding:.8rem; border:none; border-radius:8px;
+            font-weight:700; font-size:.95rem; cursor:pointer; margin-bottom:.6rem;
+        }
+        .ext-btn-load { background:#00bcd4; color:white; }
+        .ext-btn-fill { background:#4caf50; color:white; }
+        .ext-badge {
+            display:inline-block; padding:2px 8px; border-radius:12px;
+            font-size:.7rem; font-weight:700; margin-left:4px;
+        }
+        .badge-ai { background:#00bcd4; color:white; }
+        .badge-cache { background:#4caf50; color:white; }
+        .browser-bar {
+            background:rgba(0,0,0,0.2);
+            border-radius:8px 8px 0 0;
+            padding:.4rem .8rem;
+            display:flex;
+            align-items:center;
+            gap:8px;
+            margin-bottom:1rem;
+        }
+        .browser-dot { width:10px; height:10px; border-radius:50%; }
+
+        /* STEPS */
+        .step-card {
+            background:white;
+            border-radius:20px;
+            padding:2rem;
+            border:1px solid var(--border);
+            height:100%;
+            transition:all .3s;
+            position:relative;
+        }
+        .step-card:hover { transform:translateY(-4px); box-shadow:0 20px 50px rgba(91,79,245,0.1); border-color:var(--accent); }
+        .step-num-big {
+            font-family:'Syne',sans-serif;
+            font-size:3.5rem;
+            font-weight:800;
+            color:rgba(91,79,245,0.1);
+            line-height:1;
+            margin-bottom:.5rem;
+        }
+        .step-card:hover .step-num-big { color:rgba(91,79,245,0.2); }
+        .step-icon-circle {
+            width:52px; height:52px;
+            border-radius:14px;
+            background:var(--surface-2);
+            border:1px solid var(--border);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.4rem; color:var(--accent);
+            margin-bottom:1rem;
+        }
+        .step-card h5 { font-family:'Syne',sans-serif; font-weight:700; margin-bottom:.5rem; }
+        .step-card p { font-size:.9rem; color:var(--ink-muted); line-height:1.6; }
+
+        /* CODE BLOCK */
+        .code-tip {
+            background:#1e1e2e;
+            border-radius:12px;
+            padding:1rem 1.5rem;
+            font-family:monospace;
+            font-size:.9rem;
+            color:#cdd6f4;
+            position:relative;
+        }
+        .code-tip .kw { color:#cba6f7; }
+        .code-tip .str { color:#a6e3a1; }
+        .code-tip .comment { color:#6c7086; }
+
+        /* CTA BAR */
+        .cta-bar {
+            background:linear-gradient(135deg,var(--ink) 0%,#1a1535 100%);
+            border-radius:24px;
+            padding:3rem;
+            text-align:center;
+            color:white;
+            position:relative;
+            overflow:hidden;
+        }
+        .cta-bar::before {
+            content:'';
+            position:absolute; inset:0;
+            background:radial-gradient(ellipse 60% 60% at 30% 50%,rgba(91,79,245,0.25),transparent 70%);
+        }
+
+        /* FAQ MINI */
+        .faq-mini {
+            border-bottom:1px solid var(--border);
+            padding:1.2rem 0;
+        }
+        .faq-mini-q {
+            font-weight:700;
+            font-size:.95rem;
+            color:var(--ink);
+            margin-bottom:.5rem;
+            display:flex; align-items:center; gap:8px;
+        }
+        .faq-mini-q i { color:var(--accent); font-size:.85rem; }
+        .faq-mini-a { font-size:.9rem; color:var(--ink-muted); line-height:1.6; }
+
+        /* SECTION */
+        .section { padding:80px 0; }
+        .section-label {
+            font-size:.78rem; font-weight:700; letter-spacing:3px;
+            text-transform:uppercase; color:var(--accent); margin-bottom:.8rem;
+        }
+        .section-title {
+            font-family:'Syne',sans-serif;
+            font-size:clamp(1.8rem,3.5vw,2.5rem);
+            font-weight:800; line-height:1.2; margin-bottom:1rem;
+        }
+
+        /* FOOTER */
+        footer {
+            background:var(--ink); color:rgba(255,255,255,.55);
+            padding:2rem 0; text-align:center; font-size:.88rem;
+        }
+        footer a { color:rgba(255,255,255,.75); text-decoration:none; }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+    <a href="index.html" class="logo">AI<span>Form</span>Filler</a>
+    <div style="display:flex; gap:1rem; align-items:center;">
+        <a href="index.html" style="color:var(--ink-muted); text-decoration:none; font-size:.9rem; font-weight:500;">← Home</a>
+        <a href="login.html" class="btn-nav">My Dashboard</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="container position-relative">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="section-label">Chrome Extension</div>
+                <h1 style="font-family:'Syne',sans-serif; font-size:clamp(2.2rem,4vw,3.5rem); font-weight:800; line-height:1.15; margin-bottom:1.5rem;">
+                    Auto-fill Forms<br>with <span style="background:linear-gradient(135deg,var(--accent),var(--accent-2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">One Click</span>
+                </h1>
+                <p style="font-size:1.1rem; color:var(--ink-muted); line-height:1.7; margin-bottom:2rem;">
+                    Our Chrome Extension connects to your customer profiles and fills government forms in 2-5 seconds. Install once, use forever.
+                </p>
+
+                <!-- Store button -->
+                <div style="display:flex; flex-direction:column; gap:1rem; margin-bottom:2rem;" id="storeSection">
+                    <a href="https://chromewebstore.google.com/detail/ai-form-filler-%E2%80%93-forms-do/ilpbinejiboadnbijkmhbdfliipcbkkn" target="_blank" id="chromeStoreBtn" style="display:inline-flex; align-items:center; gap:12px; background:var(--accent); color:white; padding:1rem 1.8rem; border-radius:50px; font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; text-decoration:none; box-shadow:0 8px 30px var(--accent-glow); transition:all .3s; width:fit-content;">
+                        <i class="fab fa-chrome" style="font-size:1.4rem;"></i>
+                        Add to Chrome — Free
+                    </a>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="width:8px; height:8px; background:#22c55e; border-radius:50%; animation:pulse 2s infinite;"></div>
+                        <span style="font-size:.85rem; color:var(--ink-muted);">✅ Live on Chrome Web Store</span>
+                    </div>
+                </div>
+
+                <!-- Official store notice -->
+                <div style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.25); border-radius:14px; padding:1.2rem 1.5rem;" id="manualNotice">
+                    <div style="font-weight:700; font-size:.9rem; margin-bottom:.5rem; color:var(--ink);">
+                        <i class="fas fa-check-circle" style="color:#22c55e;"></i>
+                        Officially on Chrome Web Store
+                    </div>
+                    <p style="font-size:.85rem; color:var(--ink-muted); margin:0; line-height:1.6;">
+                        Click "Add to Chrome — Free" above to install directly from the Chrome Web Store. No developer mode needed!
+                    </p>
+                </div>
+
+                <div style="display:flex; gap:2rem; margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--border);">
+                    <div>
+                        <div style="font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; color:var(--accent);">v5.0</div>
+                        <div style="font-size:.8rem; color:var(--ink-muted);">Latest version</div>
+                    </div>
+                    <div>
+                        <div style="font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; color:var(--accent);">GPT-4o</div>
+                        <div style="font-size:.8rem; color:var(--ink-muted);">Powered by AI</div>
+                    </div>
+                    <div>
+                        <div style="font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; color:var(--accent);">Free</div>
+                        <div style="font-size:.8rem; color:var(--ink-muted);">No extension cost</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="ext-preview">
+                    <div class="browser-bar">
+                        <div class="browser-dot" style="background:#ef4444;"></div>
+                        <div class="browser-dot" style="background:#f59e0b;"></div>
+                        <div class="browser-dot" style="background:#22c55e;"></div>
+                        <div style="background:rgba(255,255,255,.2); border-radius:6px; padding:2px 12px; font-size:.75rem; color:rgba(255,255,255,.7); flex:1; text-align:center;">bpsc.bih.nic.in</div>
+                        <i class="fab fa-chrome" style="color:rgba(255,255,255,.6); font-size:1.1rem;"></i>
+                    </div>
+                    <div class="ext-container">
+                        <div class="ext-title">
+                            AI Form Filler
+                            <span class="ext-badge badge-ai">AI</span>
+                            <span class="ext-badge badge-cache">CACHE</span>
+                        </div>
+                        <div style="text-align:center; font-size:10px; color:rgba(255,255,255,0.45); margin:-6px 0 8px; letter-spacing:.5px;">v5.0 — Server AI Agent</div>
+                        <input class="ext-input" type="text" value="CUS-1707891234" readonly>
+                        <button class="ext-btn ext-btn-load">Load Customer Data ✓</button>
+                        <div style="background:rgba(255,255,255,.1); border-radius:8px; padding:.6rem .8rem; margin-bottom:.8rem; font-size:.82rem; color:rgba(255,255,255,.9);">
+                            <div><strong style="color:#ffeb3b;">Name:</strong> Rajesh Kumar Singh</div>
+                            <div><strong style="color:#ffeb3b;">Mobile:</strong> 9876543210</div>
+                        </div>
+                        <button class="ext-btn ext-btn-fill">Fill Form with AI 🤖</button>
+                        <div style="background:rgba(245,114,79,.18); border-radius:8px; padding:.5rem .8rem; margin-top:.6rem; font-size:.78rem; color:rgba(255,255,255,.9); border-top:1px solid rgba(255,255,255,.1);">
+                            <div style="font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:rgba(255,255,255,.5); margin-bottom:4px;">📄 Documents Required</div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span>📷 Passport Photo</span>
+                                <span style="background:#f5724f; color:white; border-radius:5px; padding:2px 7px; font-size:10px; font-weight:700;">Open Tool →</span>
+                            </div>
+                        </div>
+                        <div style="text-align:center; font-size:.78rem; color:rgba(255,255,255,.6); margin-top:.5rem;">
+                            💾 Forms cached · ⚡ Next fill = Instant!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- INSTALL STEPS -->
+<section class="section" id="install">
+    <div class="container">
+        <div class="text-center mb-5">
+            <div class="section-label">Installation</div>
+            <h2 class="section-title">Install in 10 seconds</h2>
+            <p style="color:var(--ink-muted); font-size:1rem; max-width:480px; margin:0 auto;">
+                Install directly from the Chrome Web Store with one click — or follow the manual steps below if you prefer.
+            </p>
+        </div>
+
+        <!-- One-click install banner -->
+        <div style="background:linear-gradient(135deg,rgba(91,79,245,0.06),rgba(91,79,245,0.02)); border:1px solid var(--border); border-radius:20px; padding:2rem; text-align:center; margin-bottom:2.5rem;">
+            <div style="font-size:1rem; color:var(--ink-muted); margin-bottom:1rem;">Recommended — One click install:</div>
+            <a href="https://chromewebstore.google.com/detail/ai-form-filler-%E2%80%93-forms-do/ilpbinejiboadnbijkmhbdfliipcbkkn" target="_blank" style="display:inline-flex; align-items:center; gap:12px; background:var(--accent); color:white; padding:1rem 2.2rem; border-radius:50px; font-family:'Syne',sans-serif; font-weight:700; font-size:1.05rem; text-decoration:none; box-shadow:0 8px 30px var(--accent-glow);">
+                <i class="fab fa-chrome" style="font-size:1.3rem;"></i>
+                Add to Chrome from Web Store
+            </a>
+            <div style="margin-top:1rem; font-size:.85rem; color:var(--ink-muted);">Or follow the manual steps below as an alternative</div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-lg-3">
+                <div class="step-card">
+                    <div class="step-num-big">01</div>
+                    <div class="step-icon-circle"><i class="fas fa-download"></i></div>
+                    <h5>Download ZIP</h5>
+                    <p>For manual install: download the extension ZIP file and extract it to a folder on your computer.</p>
+                    <a href="AI-Form-Filler-Extension-v5.0.zip" download style="display:inline-flex; align-items:center; gap:6px; margin-top:1rem; background:var(--accent); color:white; border:1px solid transparent; border-radius:50px; padding:.5rem 1.2rem; font-size:.85rem; font-weight:600; text-decoration:none; box-shadow:0 4px 14px var(--accent-glow);">
+                        <i class="fas fa-download"></i> Download v5.0 ZIP
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="step-card">
+                    <div class="step-num-big">02</div>
+                    <div class="step-icon-circle"><i class="fab fa-chrome"></i></div>
+                    <h5>Open Extensions</h5>
+                    <p>In Chrome browser, go to the address bar and type:</p>
+                    <div class="code-tip" style="margin-top:.8rem;">
+                        <span class="str">chrome://extensions</span>
+                    </div>
+                    <p style="margin-top:.6rem; font-size:.82rem; color:var(--ink-muted);">Press Enter to open Extensions page.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="step-card">
+                    <div class="step-num-big">03</div>
+                    <div class="step-icon-circle"><i class="fas fa-toggle-on"></i></div>
+                    <h5>Enable Dev Mode</h5>
+                    <p>In the top-right corner of the Extensions page, toggle on <strong>"Developer mode"</strong>.</p>
+                    <div style="background:rgba(91,79,245,0.08); border-radius:8px; padding:.6rem .8rem; margin-top:.8rem; font-size:.82rem; color:var(--accent); font-weight:600; border:1px solid var(--border);">
+                        <i class="fas fa-code"></i> Developer mode → ON
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="step-card">
+                    <div class="step-num-big">04</div>
+                    <div class="step-icon-circle"><i class="fas fa-folder-open"></i></div>
+                    <h5>Load Unpacked</h5>
+                    <p>Click <strong>"Load unpacked"</strong> button that appears after enabling Dev mode. Select the extracted folder.</p>
+                    <div style="background:rgba(34,197,94,0.1); border-radius:8px; padding:.6rem .8rem; margin-top:.8rem; font-size:.82rem; color:#16a34a; font-weight:600; border:1px solid rgba(34,197,94,0.2);">
+                        <i class="fas fa-check-circle"></i> Done! Extension installed
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video placeholder -->
+        <div style="background:var(--surface-2); border:1px solid var(--border); border-radius:20px; padding:3rem; text-align:center; max-width:700px; margin:0 auto;">
+            <div style="width:64px; height:64px; background:linear-gradient(135deg,#ef4444,#dc2626); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; font-size:1.5rem; color:white;">
+                <i class="fab fa-youtube"></i>
+            </div>
+            <h5 style="font-family:'Syne',sans-serif; font-weight:700; margin-bottom:.5rem;">Installation Video Tutorial</h5>
+            <p style="color:var(--ink-muted); font-size:.9rem; margin-bottom:1.5rem;">Watch our step-by-step video guide — installation completes in under 2 minutes!</p>
+            <a href="https://wa.me/919296914511?text=Hi%2C+please+share+extension+installation+video" target="_blank" style="display:inline-flex; align-items:center; gap:8px; background:#25D366; color:white; padding:.7rem 1.5rem; border-radius:50px; font-weight:700; text-decoration:none; font-size:.9rem;">
+                <i class="fab fa-whatsapp"></i> Request Tutorial Video
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- HOW TO USE -->
+<section class="section" style="background:var(--surface-2);" id="how-to-use">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-5">
+                <div class="section-label">How to Use</div>
+                <h2 class="section-title">Extension use karna is simple</h2>
+                <p style="color:var(--ink-muted); font-size:1rem; line-height:1.7; margin-bottom:1.5rem;">
+                    After installation, using the extension takes just seconds. Ek baar setup, baar baar use karo.
+                </p>
+                <a href="login.html" style="display:inline-flex; align-items:center; gap:8px; background:var(--accent); color:white; padding:.9rem 1.8rem; border-radius:50px; font-family:'Syne',sans-serif; font-weight:700; font-size:.95rem; text-decoration:none; box-shadow:0 6px 20px var(--accent-glow);">
+                    <i class="fas fa-rocket"></i> Open Dashboard
+                </a>
+            </div>
+            <div class="col-lg-7">
+                <div style="display:flex; flex-direction:column; gap:1.2rem;">
+                    <div style="display:flex; gap:1.2rem; align-items:flex-start; background:white; border-radius:16px; padding:1.2rem 1.5rem; border:1px solid var(--border);">
+                        <div style="width:36px; height:36px; background:var(--accent); color:white; border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; flex-shrink:0;">1</div>
+                        <div>
+                            <div style="font-weight:700; margin-bottom:.3rem;">Dashboard → My Customers</div>
+                            <div style="font-size:.88rem; color:var(--ink-muted);">Apne customer ka <strong>Customer ID</strong> copy karo (format: CUS-XXXXXXXXXX). Click the clipboard icon.</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:1.2rem; align-items:flex-start; background:white; border-radius:16px; padding:1.2rem 1.5rem; border:1px solid var(--border);">
+                        <div style="width:36px; height:36px; background:var(--accent); color:white; border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; flex-shrink:0;">2</div>
+                        <div>
+                            <div style="font-weight:700; margin-bottom:.3rem;">Government Form Website par Jao</div>
+                            <div style="font-size:.88rem; color:var(--ink-muted);">BPSC, SSC, Bihar portal — koi bhi form open karo. Extension automatically detect karega.</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:1.2rem; align-items:flex-start; background:white; border-radius:16px; padding:1.2rem 1.5rem; border:1px solid var(--border);">
+                        <div style="width:36px; height:36px; background:var(--accent); color:white; border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; flex-shrink:0;">3</div>
+                        <div>
+                            <div style="font-weight:700; margin-bottom:.3rem;">Extension Icon Click karo</div>
+                            <div style="font-size:.88rem; color:var(--ink-muted);">Top-right mein extension icon click karo. Customer ID paste karo, Load karo, then <strong>Fill Form with AI</strong> click karo. Extension <strong>📄 Documents Required</strong> section bhi dikhayega — photo/signature ke liye free tool ka link milega!</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:1.2rem; align-items:flex-start; background:linear-gradient(135deg,rgba(34,197,94,0.08),rgba(34,197,94,0.02)); border-radius:16px; padding:1.2rem 1.5rem; border:1px solid rgba(34,197,94,0.25);">
+                        <div style="width:36px; height:36px; background:linear-gradient(135deg,#22c55e,#16a34a); color:white; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight:700; margin-bottom:.3rem; color:#16a34a;">Done! Form filled in 2-5 seconds</div>
+                            <div style="font-size:.88rem; color:var(--ink-muted);">AI ne 60-80 fields fill kar diye. 1 credit use hua. Next time same form — instant &amp; FREE (cache se)! Credits dashboard par check karo.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="section">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-4">
+                <div class="section-label">FAQ</div>
+                <h2 class="section-title">Extension ke baare mein</h2>
+                <p style="color:var(--ink-muted); font-size:.95rem; line-height:1.7;">Any problem? WhatsApp pe message karo — 15 min mein reply!</p>
+                <a href="https://wa.me/919296914511" target="_blank" style="display:inline-flex; align-items:center; gap:8px; background:#25D366; color:white; padding:.7rem 1.4rem; border-radius:50px; font-weight:700; font-size:.9rem; text-decoration:none; margin-top:1rem;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp Support
+                </a>
+            </div>
+            <div class="col-lg-8">
+                <div class="faq-mini">
+                    <div class="faq-mini-q"><i class="fas fa-chevron-right"></i> Extension install karne ke baad kya karna hoga?</div>
+                    <div class="faq-mini-a">Sabse pehle <a href="login.html" style="color:var(--accent); font-weight:600;">website par login karein</a>. Login karne ke baad extension automatically aapka account detect karega. Credits dashboard par dikhenge — extension mein Customer ID daalkar form fill karo.</div>
+                </div>
+                <div class="faq-mini">
+                    <div class="faq-mini-q"><i class="fas fa-chevron-right"></i> Extension safe hai? Data secure rahega?</div>
+                    <div class="faq-mini-a">Haan, bilkul safe. Extension sirf Google Firebase se data read karta hai — aapka hi data, aapki permission se. Koi data third-party ko nahi jaata.</div>
+                </div>
+                <div class="faq-mini">
+                    <div class="faq-mini-q"><i class="fas fa-chevron-right"></i> "Load unpacked" ka option nahi dikh raha?</div>
+                    <div class="faq-mini-a">Pehle Developer mode ON karein (extensions page par top-right toggle). Developer mode ON hone ke baad "Load unpacked" button appear hoga.</div>
+                </div>
+                <div class="faq-mini">
+                    <div class="faq-mini-q"><i class="fas fa-chevron-right"></i> Extension use karne ke baad credit kitna katega?</div>
+                    <div class="faq-mini-a">Pehli baar ek form fill karne par 1 credit katega. Usi form ka same mapping cache mein save ho jaata hai — dobara fill karne par 0 credits katenge (instant &amp; free)!</div>
+                </div>
+                <div class="faq-mini">
+                    <div class="faq-mini-q"><i class="fas fa-chevron-right"></i> Extension Chrome Web Store par available hai?</div>
+                    <div class="faq-mini-a">Haan! Extension ab officially Chrome Web Store par live hai. Upar diye "Add to Chrome — Free" button se seedha install karein — koi developer mode ya ZIP download ki zaroorat nahi.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<div class="container mb-5">
+    <div class="cta-bar">
+        <div class="position-relative" style="z-index:1;">
+            <h3 style="font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; margin-bottom:1rem;">Ready to start filling forms 100x faster?</h3>
+            <p style="color:rgba(255,255,255,.7); margin-bottom:2rem;">Login to your dashboard, get your Customer IDs, and start filling government forms in seconds.</p>
+            <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+                <a href="login.html" style="display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,var(--accent),#7c6ff7); color:white; padding:.9rem 2rem; border-radius:50px; font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; text-decoration:none; box-shadow:0 8px 30px var(--accent-glow);">
+                    <i class="fas fa-rocket"></i> Open Dashboard
+                </a>
+                <a href="https://wa.me/919296914511?text=Hi%2C+I+need+help+installing+the+extension" target="_blank" style="display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.1); color:white; padding:.9rem 2rem; border-radius:50px; font-weight:600; font-size:1rem; text-decoration:none; border:1px solid rgba(255,255,255,.2);">
+                    <i class="fab fa-whatsapp"></i> Help with Install
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="container">
+        <p>Made with ❤️ by <strong style="color:white">Ashok Kumar</strong> | AI Workflows © 2025 |
+        <a href="index.html">Home</a> · <a href="login.html">Login</a> · <a href="privacy.html">Privacy</a></p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+<style>
+    @keyframes pulse {
+        0%,100%{opacity:1;transform:scale(1);}
+        50%{opacity:.6;transform:scale(1.4);}
+    }
+</style>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Form Agent — Test Report</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:1100px;margin:40px auto;padding:0 20px;background:#f8fafc}
+  h1{color:#1e3a5f;border-bottom:3px solid #3b82f6;padding-bottom:10px}
+  .summary{background:#1e3a5f;color:white;border-radius:12px;padding:20px 30px;margin:20px 0;display:flex;gap:40px;align-items:center}
+  .big-num{font-size:3rem;font-weight:800;color:#60a5fa}
+  .suite{background:white;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin:20px 0;padding:20px}
+  .suite h3{margin:0 0 14px;color:#1e3a5f;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .badge{font-size:.8rem;padding:2px 10px;border-radius:20px;font-weight:700}
+  .badge.green{background:#d1fae5;color:#065f46}
+  .badge.orange{background:#fef3c7;color:#92400e}
+  .mapped{font-size:.75rem;color:#6b7280;font-weight:400}
+  table{width:100%;border-collapse:collapse;font-size:.88rem}
+  th{background:#f1f5f9;padding:8px 12px;text-align:left;border-bottom:2px solid #e2e8f0}
+  td{padding:7px 12px;border-bottom:1px solid #f1f5f9}
+  tr.pass td:first-child{border-left:3px solid #22c55e}
+  tr.fail td:first-child{border-left:3px solid #ef4444}
+  tr.fail{background:#fff5f5}
+  .err-msg{color:#ef4444;background:#fff5f5;padding:10px;border-radius:6px}
+  .suite.error{border-left:4px solid #ef4444}
+  .ts{font-size:.8rem;color:#94a3b8;margin-top:30px;text-align:center}
+</style>
+</head>
+<body>
+<h1>🤖 AI Form Agent — Automated Test Report</h1>
+<div class="summary">
+  <div><div class="big-num">100%</div><div>Overall Pass Rate</div></div>
+  <div><div class="big-num">54/54</div><div>Fields Correct</div></div>
+  <div><div class="big-num">4</div><div>Forms Tested</div></div>
+</div>
+
+      <div class="suite">
+        <h3>BPSC / SSC Government Job Form <span class="badge green">18/18</span>
+          <span class="mapped">🗺 32 fields mapped by AI</span></h3>
+        <table>
+          <thead><tr><th>Field</th><th>Expected</th><th>Got</th><th>Result</th></tr></thead>
+          <tbody>
+      <tr class="pass">
+        <td>firstName</td>
+        <td>Ashok</td>
+        <td>Ashok</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>lastName</td>
+        <td>kumar</td>
+        <td>kumar</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>fullName</td>
+        <td>Ashok kumar</td>
+        <td>Ashok kumar</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>fatherName</td>
+        <td>Awadhesh Singh</td>
+        <td>Awadhesh Singh</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>motherName</td>
+        <td>Shankuntala devi</td>
+        <td>Shankuntala devi</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>emailId</td>
+        <td>ashok@test.com</td>
+        <td>ashok@test.com</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>mobileNumber</td>
+        <td>9999988888</td>
+        <td>9999988888</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>aadhaarNumber</td>
+        <td>123456789012</td>
+        <td>123456789012</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>panNumber</td>
+        <td>ABCDE1234F</td>
+        <td>ABCDE1234F</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>permDistrict</td>
+        <td>Bhojpur</td>
+        <td>Bhojpur</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>permState</td>
+        <td>Bihar</td>
+        <td>Bihar</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>permPin</td>
+        <td>802201</td>
+        <td>802201</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>tenthBoard</td>
+        <td>BSEB</td>
+        <td>BSEB</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>tenthYear</td>
+        <td>2010</td>
+        <td>2010</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>gradDegree</td>
+        <td>B.Tech</td>
+        <td>B.Tech</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>gradUniv</td>
+        <td>RGPV Bhopal</td>
+        <td>RGPV Bhopal</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>bankAcc</td>
+        <td>123456789012345</td>
+        <td>123456789012345</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>bankIFSC</td>
+        <td>SBIN0001234</td>
+        <td>SBIN0001234</td>
+        <td>✅</td>
+      </tr></tbody>
+        </table>
+      </div>
+      <div class="suite">
+        <h3>IRCTC / Railway Booking Form <span class="badge green">10/10</span>
+          <span class="mapped">🗺 13 fields mapped by AI</span></h3>
+        <table>
+          <thead><tr><th>Field</th><th>Expected</th><th>Got</th><th>Result</th></tr></thead>
+          <tbody>
+      <tr class="pass">
+        <td>firstName</td>
+        <td>Ashok</td>
+        <td>Ashok</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>lastName</td>
+        <td>kumar</td>
+        <td>kumar</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>emailId</td>
+        <td>ashok@test.com</td>
+        <td>ashok@test.com</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>mobileNumber</td>
+        <td>9999988888</td>
+        <td>9999988888</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>aadhaarNumber</td>
+        <td>123456789012</td>
+        <td>123456789012</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>panNumber</td>
+        <td>ABCDE1234F</td>
+        <td>ABCDE1234F</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>permPin</td>
+        <td>802201</td>
+        <td>802201</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>permDistrict</td>
+        <td>Bhojpur</td>
+        <td>Bhojpur</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>[NO-FILL] occupation</td>
+        <td>(empty)</td>
+        <td></td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>[NO-FILL] organization</td>
+        <td>(empty)</td>
+        <td></td>
+        <td>✅</td>
+      </tr></tbody>
+        </table>
+      </div>
+      <div class="suite">
+        <h3>PM-KISAN / Kisan / Village Form (Hindi Labels) <span class="badge green">10/10</span>
+          <span class="mapped">🗺 20 fields mapped by AI</span></h3>
+        <table>
+          <thead><tr><th>Field</th><th>Expected</th><th>Got</th><th>Result</th></tr></thead>
+          <tbody>
+      <tr class="pass">
+        <td>mobileNo</td>
+        <td>9999988888</td>
+        <td>9999988888</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>aadhaarNo</td>
+        <td>123456789012</td>
+        <td>123456789012</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>pincodeField</td>
+        <td>802201</td>
+        <td>802201</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>bankAccount</td>
+        <td>123456789012345</td>
+        <td>123456789012345</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>ifscCode</td>
+        <td>SBIN0001234</td>
+        <td>SBIN0001234</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>bankNameField</td>
+        <td>SBI</td>
+        <td>SBI</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>casteCertNo</td>
+        <td>CASTE123456</td>
+        <td>CASTE123456</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>incomeCertNo</td>
+        <td>INC123456</td>
+        <td>INC123456</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>domicileCertNo</td>
+        <td>DOM123456</td>
+        <td>DOM123456</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>emailAddress</td>
+        <td>ashok@test.com</td>
+        <td>ashok@test.com</td>
+        <td>✅</td>
+      </tr></tbody>
+        </table>
+      </div>
+      <div class="suite">
+        <h3>Domicile / Caste / Income Certificate Form <span class="badge green">16/16</span>
+          <span class="mapped">🗺 24 fields mapped by AI</span></h3>
+        <table>
+          <thead><tr><th>Field</th><th>Expected</th><th>Got</th><th>Result</th></tr></thead>
+          <tbody>
+      <tr class="pass">
+        <td>fatherName</td>
+        <td>Awadhesh Singh</td>
+        <td>Awadhesh Singh</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>motherName</td>
+        <td>Shankuntala devi</td>
+        <td>Shankuntala devi</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>mobileNumber</td>
+        <td>9999988888</td>
+        <td>9999988888</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>emailId</td>
+        <td>ashok@test.com</td>
+        <td>ashok@test.com</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>aadhaarNumber</td>
+        <td>123456789012</td>
+        <td>123456789012</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>permPO</td>
+        <td>Agiaon</td>
+        <td>Agiaon</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>permPS</td>
+        <td>Agiaon</td>
+        <td>Agiaon</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>permDistrict</td>
+        <td>Bhojpur</td>
+        <td>Bhojpur</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>permState</td>
+        <td>Bihar</td>
+        <td>Bihar</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>permPin</td>
+        <td>802201</td>
+        <td>802201</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>domicileCertNo</td>
+        <td>DOM123456</td>
+        <td>DOM123456</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>domicileAuthority</td>
+        <td>Tehsildar, Bhojpur</td>
+        <td>Tehsildar, Bhojpur</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>casteCertNo</td>
+        <td>CASTE123456</td>
+        <td>CASTE123456</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>casteAuthority</td>
+        <td>Tehsildar</td>
+        <td>Tehsildar</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>incomeCertNo</td>
+        <td>INC123456</td>
+        <td>INC123456</td>
+        <td>✅</td>
+      </tr>
+      <tr class="pass">
+        <td>annualIncome</td>
+        <td>87578</td>
+        <td>87578</td>
+        <td>✅</td>
+      </tr></tbody>
+        </table>
+      </div>
+<p class="ts">Generated: 18/3/2026, 7:14:20 am · AI Form Agent v5.0</p>
+</body>
+</html>

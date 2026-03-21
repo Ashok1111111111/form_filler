@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recharge Credits – AI Form Filler</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --accent: #5b4ff5;
+            --accent-2: #f5724f;
+            --accent-glow: rgba(91,79,245,0.18);
+            --ink: #0d0d14;
+            --ink-muted: #6b6b80;
+            --surface: #f5f4ff;
+            --border: rgba(91,79,245,0.1);
+            --sidebar-w: 260px;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: #f6f6fa; margin: 0; color: var(--ink); }
+
+        /* SIDEBAR — matches dashboard */
+        #sidebar {
+            position: fixed; top: 0; left: 0; height: 100vh; width: var(--sidebar-w);
+            background: linear-gradient(160deg, #1a1535 0%, #0d0d14 100%);
+            color: white; padding: 0; z-index: 200; display: flex; flex-direction: column;
+            box-shadow: 4px 0 30px rgba(0,0,0,0.15);
+        }
+        .sidebar-logo { padding: 1.8rem 1.5rem 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 0.5rem; }
+        .sidebar-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: white; }
+        .sidebar-logo-text span { color: #8b7fff; }
+        .sidebar-tagline { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 3px; }
+        .sidebar-nav { flex: 1; padding: 0.5rem 1rem; }
+        .nav-item-custom {
+            display: flex; align-items: center; gap: 12px; padding: 0.75rem 1rem;
+            border-radius: 12px; text-decoration: none; color: rgba(255,255,255,0.6);
+            font-weight: 500; font-size: 0.9rem; margin-bottom: 4px; transition: all 0.2s;
+        }
+        .nav-item-custom i { width: 20px; text-align: center; font-size: 1rem; }
+        .nav-item-custom:hover { background: rgba(255,255,255,0.08); color: white; }
+        .nav-item-custom.active { background: rgba(139,127,255,0.2); color: white; border: 1px solid rgba(139,127,255,0.3); }
+        .nav-item-custom.active i { color: #8b7fff; }
+        .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
+        .user-chip { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1rem; background: rgba(255,255,255,0.06); border-radius: 12px; margin-bottom: 0.5rem; }
+        .user-avatar { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.9rem; color: white; flex-shrink: 0; }
+        .user-name { font-size: 0.85rem; font-weight: 600; color: white; }
+        .user-email-small { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
+        .btn-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 0.65rem 1rem; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.5); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: left; }
+        .btn-logout:hover { background: rgba(220,53,69,0.15); color: #ff6b7a; border-color: rgba(220,53,69,0.3); }
+
+        /* MAIN */
+        #main { margin-left: var(--sidebar-w); min-height: 100vh; padding: 2rem; }
+        .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+        .page-title { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; }
+        .page-sub { font-size: 0.9rem; color: var(--ink-muted); margin-top: 2px; }
+
+        /* CREDITS HERO CARD */
+        .credits-hero {
+            background: linear-gradient(135deg, #5b4ff5 0%, #7c3aed 100%);
+            border-radius: 20px; padding: 2rem; color: white;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+            box-shadow: 0 12px 40px var(--accent-glow);
+        }
+        .credits-hero-left h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .credits-big { font-family: 'Syne', sans-serif; font-size: 4rem; font-weight: 800; line-height: 1; }
+        .credits-label { font-size: 0.9rem; opacity: 0.7; }
+        .credits-hero-right { text-align: right; }
+        .credits-hero-right p { opacity: 0.75; font-size: 0.85rem; margin-bottom: 1rem; }
+
+        /* PACKAGE CARDS */
+        .packages-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; margin-bottom: 2rem; }
+        @media (max-width: 900px) { .packages-grid { grid-template-columns: repeat(2,1fr); } }
+        @media (max-width: 550px) { .packages-grid { grid-template-columns: 1fr; } }
+
+        .pkg-card {
+            background: white; border: 2px solid var(--border); border-radius: 20px;
+            padding: 1.5rem; text-align: center; cursor: pointer;
+            transition: all 0.25s; position: relative; overflow: hidden;
+        }
+        .pkg-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--accent), #7c3aed); opacity: 0; transition: opacity 0.25s; z-index: 0; }
+        .pkg-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 12px 30px var(--accent-glow); }
+        .pkg-card.selected { border-color: var(--accent); box-shadow: 0 12px 30px var(--accent-glow); }
+        .pkg-card.selected::before { opacity: 1; }
+        .pkg-card > * { position: relative; z-index: 1; }
+        .pkg-card.selected .pkg-name,
+        .pkg-card.selected .pkg-price,
+        .pkg-card.selected .pkg-credits,
+        .pkg-card.selected .pkg-per { color: white !important; }
+        .pkg-badge {
+            position: absolute; top: 12px; right: 12px; z-index: 2;
+            font-size: 0.68rem; font-weight: 700; padding: 3px 10px;
+            border-radius: 50px; color: white;
+        }
+        .pkg-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--ink-muted); margin-bottom: 0.8rem; }
+        .pkg-price { font-family: 'Syne', sans-serif; font-size: 2.4rem; font-weight: 800; color: var(--ink); line-height: 1; }
+        .pkg-credits { font-size: 1rem; font-weight: 700; color: var(--accent); margin: 0.4rem 0 0.2rem; }
+        .pkg-per { font-size: 0.78rem; color: var(--ink-muted); }
+        .pkg-save { display: inline-block; background: rgba(34,197,94,0.12); color: #16a34a; border-radius: 50px; padding: 2px 10px; font-size: 0.72rem; font-weight: 700; margin-top: 0.5rem; }
+        .pkg-card.selected .pkg-save { background: rgba(255,255,255,0.2); color: white; }
+
+        /* PAYMENT SECTION */
+        .payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        @media (max-width: 768px) { .payment-grid { grid-template-columns: 1fr; } }
+
+        .pay-card { background: white; border-radius: 20px; padding: 1.8rem; border: 1px solid var(--border); }
+        .pay-card h4 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; }
+
+        /* QR */
+        .qr-wrapper { text-align: center; }
+        .qr-img { width: 200px; height: 200px; border-radius: 16px; border: 3px solid var(--border); object-fit: cover; margin-bottom: 1rem; }
+        .upi-id-box { background: var(--surface); border-radius: 10px; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+        .btn-copy { background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 4px 12px; font-size: 0.8rem; font-weight: 600; color: var(--accent); cursor: pointer; transition: all 0.2s; }
+        .btn-copy:hover { background: var(--accent); color: white; border-color: var(--accent); }
+        .pay-amount-display { background: linear-gradient(135deg, var(--accent), #7c3aed); color: white; border-radius: 10px; padding: 0.75rem 1rem; text-align: center; margin-bottom: 1rem; }
+        .pay-amount-display .amount { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; }
+        .pay-amount-display small { opacity: 0.8; font-size: 0.78rem; }
+
+        /* SUBMIT FORM */
+        .form-label-custom { font-size: 0.82rem; font-weight: 600; color: var(--ink-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-input-custom { width: 100%; padding: 0.8rem 1rem; border: 1.5px solid #e0e0f0; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; margin-bottom: 1rem; }
+        .form-input-custom:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .btn-submit-pay { width: 100%; padding: 0.9rem; background: linear-gradient(135deg, var(--accent), #7c3aed); color: white; border: none; border-radius: 12px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 20px var(--accent-glow); }
+        .btn-submit-pay:hover { transform: translateY(-2px); box-shadow: 0 10px 28px var(--accent-glow); }
+        .btn-submit-pay:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* STEPS */
+        .steps-row { display: flex; gap: 0; margin: 1.2rem 0; }
+        .step-box { flex: 1; text-align: center; padding: 0.8rem 0.5rem; }
+        .step-num-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; }
+        .step-txt { font-size: 0.75rem; color: var(--ink-muted); line-height: 1.3; }
+        .step-arrow { display: flex; align-items: center; color: var(--border); font-size: 1.2rem; padding-top: 0.5rem; }
+
+        /* TOAST */
+        .toast-container { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; }
+        .toast-msg { background: white; border-radius: 14px; padding: 1rem 1.2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-left: 4px solid var(--accent); display: flex; align-items: center; gap: 10px; min-width: 280px; margin-bottom: 0.5rem; animation: slideIn 0.3s ease; font-size: 0.9rem; }
+        .toast-msg.success { border-color: #22c55e; }
+        .toast-msg.error { border-color: #ef4444; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* TRANSACTIONS TABLE */
+        .txn-section { background: white; border-radius: 20px; padding: 1.5rem; border: 1px solid var(--border); }
+        .section-head { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; margin-bottom: 1rem; }
+        .table { font-size: 0.88rem; }
+        .table th { font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted); border-bottom: 2px solid var(--border); padding: 0.75rem; }
+        .table td { padding: 0.75rem; vertical-align: middle; border-color: rgba(0,0,0,0.04); }
+        .badge-status { padding: 4px 10px; border-radius: 50px; font-size: 0.72rem; font-weight: 700; }
+        .badge-pending { background: #fef9c3; color: #a16207; }
+        .badge-done { background: #dcfce7; color: #166534; }
+        .badge-fail { background: #fee2e2; color: #b91c1c; }
+        .badge-deduct { background: rgba(245,114,79,0.12); color: #c2410c; }
+        .badge-recharge { background: rgba(91,79,245,0.1); color: var(--accent); }
+
+        /* LOADING */
+        #loading-overlay { position: fixed; inset: 0; background: white; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .loading-spinner { width: 44px; height: 44px; border: 3px solid #f0f0f0; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading-overlay">
+    <div style="text-align:center">
+        <div class="loading-spinner"></div>
+        <p style="font-size:0.9rem;color:var(--ink-muted)">Loading...</p>
+    </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-text">AI<span>Form</span>Filler</div>
+        <div class="sidebar-tagline">Auto-fill any government form</div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="dashboard.html" class="nav-item-custom"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="customer-profile.html" class="nav-item-custom"><i class="bi bi-person-fill-add"></i> Create Profile</a>
+        <a href="my-customers.html" class="nav-item-custom"><i class="bi bi-people-fill"></i> My Customers</a>
+        <a href="recharge.html" class="nav-item-custom active"><i class="bi bi-wallet-fill"></i> Add Money</a>
+        <a href="download-extension.html" class="nav-item-custom"><i class="bi bi-puzzle-fill"></i> Chrome Extension</a>
+        <a href="admin-recharge-approvals.html" class="nav-item-custom"><i class="bi bi-person-gear"></i> Admin Panel</a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-chip">
+            <div class="user-avatar" id="avatarInitial">?</div>
+            <div>
+                <div class="user-name" id="sidebarName">Loading...</div>
+                <div class="user-email-small" id="sidebarEmail">...</div>
+            </div>
+        </div>
+        <button class="btn-logout" id="logoutBtn"><i class="bi bi-box-arrow-left"></i> Logout</button>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+    <div class="top-bar">
+        <div>
+            <div class="page-title">Add Money to Wallet</div>
+            <div class="page-sub">Top up your wallet via UPI. Money added within 5–10 minutes after verification.</div>
+        </div>
+    </div>
+
+    <!-- WALLET HERO -->
+    <div class="credits-hero">
+        <div class="credits-hero-left">
+            <h2>Wallet Balance</h2>
+            <div class="credits-big" id="creditsDisplay">--</div>
+            <div class="credits-label">rupees available</div>
+        </div>
+        <div class="credits-hero-right">
+            <p>Each form fill costs only <strong>₹2</strong><br>New users get ₹100 FREE to start</p>
+            <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:0.6rem 1rem;font-size:0.82rem;font-weight:600;">
+                <i class="bi bi-lightning-fill me-1"></i> Only ₹2 per form fill — lowest in market!
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP-UP PACKAGES -->
+    <div class="section-head" style="margin-bottom:1rem">Choose Top-up Amount</div>
+    <div class="packages-grid">
+        <div class="pkg-card" data-amount="50" onclick="selectPackage(this)">
+            <div class="pkg-name">Starter</div>
+            <div class="pkg-price">₹50</div>
+            <div class="pkg-credits">25 Fills</div>
+            <div class="pkg-per">₹2 per form fill</div>
+        </div>
+        <div class="pkg-card selected" data-amount="100" onclick="selectPackage(this)">
+            <span class="pkg-badge" style="background:linear-gradient(135deg,#5b4ff5,#7c3aed)">🔥 Popular</span>
+            <div class="pkg-name">Basic</div>
+            <div class="pkg-price">₹100</div>
+            <div class="pkg-credits">50 Fills</div>
+            <div class="pkg-per">₹2 per form fill</div>
+        </div>
+        <div class="pkg-card" data-amount="200" onclick="selectPackage(this)">
+            <span class="pkg-badge" style="background:linear-gradient(135deg,#22c55e,#16a34a)">Best Value</span>
+            <div class="pkg-name">Premium</div>
+            <div class="pkg-price">₹200</div>
+            <div class="pkg-credits">100 Fills</div>
+            <div class="pkg-per">₹2 per form fill</div>
+        </div>
+        <div class="pkg-card" data-amount="500" onclick="selectPackage(this)">
+            <span class="pkg-badge" style="background:linear-gradient(135deg,#f5724f,#e55a38)">Bulk</span>
+            <div class="pkg-name">Bulk</div>
+            <div class="pkg-price">₹500</div>
+            <div class="pkg-credits">250 Fills</div>
+            <div class="pkg-per">₹2 per form fill</div>
+        </div>
+    </div>
+
+    <!-- CUSTOM AMOUNT -->
+    <div style="background:white;border:1px solid var(--border);border-radius:16px;padding:1.2rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+        <div style="font-weight:700;font-size:.95rem;color:var(--ink);flex-shrink:0;">Or enter custom amount:</div>
+        <div style="display:flex;align-items:center;gap:.5rem;flex:1;min-width:200px;">
+            <span style="font-size:1.2rem;font-weight:800;color:var(--accent);">₹</span>
+            <input type="number" id="customAmtInput" min="10" placeholder="e.g. 150" style="border:1.5px solid #e0e0f0;border-radius:10px;padding:.6rem .9rem;font-size:1rem;font-weight:700;width:130px;outline:none;" oninput="applyCustomAmt(this.value)">
+            <span style="font-size:.85rem;color:var(--ink-muted);" id="customFillCount"></span>
+        </div>
+    </div>
+
+    <!-- PAYMENT SECTION -->
+    <div class="payment-grid">
+        <!-- LEFT: QR CODE -->
+        <div class="pay-card">
+            <h4><i class="bi bi-qr-code" style="color:var(--accent)"></i> Scan & Pay via UPI</h4>
+
+            <!-- Steps -->
+            <div class="steps-row">
+                <div class="step-box">
+                    <div class="step-num-circle">1</div>
+                    <div class="step-txt">Select package above</div>
+                </div>
+                <div class="step-arrow"><i class="bi bi-chevron-right"></i></div>
+                <div class="step-box">
+                    <div class="step-num-circle">2</div>
+                    <div class="step-txt">Scan QR & pay exact amount</div>
+                </div>
+                <div class="step-arrow"><i class="bi bi-chevron-right"></i></div>
+                <div class="step-box">
+                    <div class="step-num-circle">3</div>
+                    <div class="step-txt">Submit your UPI transaction ID</div>
+                </div>
+            </div>
+
+            <div class="qr-wrapper">
+                <div class="pay-amount-display">
+                    <div class="amount">₹<span id="payAmt">100</span></div>
+                    <small>Pay this amount · adds ₹<span id="payCredits">100</span> to your wallet</small>
+                </div>
+                <img src="upi-qr-code.jpeg" alt="UPI QR Code - Ashok Kumar" class="qr-img">
+                <div class="upi-id-box">
+                    <span>9296914511@pthdfc</span>
+                    <button class="btn-copy" onclick="copyUPI()"><i class="bi bi-clipboard"></i> Copy</button>
+                </div>
+                <div style="font-size:0.78rem;color:var(--ink-muted);text-align:center">
+                    <strong>UPI Name:</strong> Ashok Kumar · Supports Paytm, PhonePe, GPay, BHIM
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: SUBMIT FORM -->
+        <div class="pay-card">
+            <h4><i class="bi bi-send-check-fill" style="color:var(--accent)"></i> Submit Payment Proof</h4>
+
+            <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:0.9rem 1rem;margin-bottom:1.2rem;font-size:0.82rem;color:#92400e;">
+                <strong>⚠️ Important:</strong> Pay the <strong>exact</strong> amount shown. Note your UPI transaction ID and enter it below. Wallet credited within <strong>5–10 minutes</strong> after manual verification.
+            </div>
+
+            <label class="form-label-custom">Your Name</label>
+            <input type="text" class="form-input-custom" id="submitterName" placeholder="As registered in this app">
+
+            <label class="form-label-custom">Amount Selected</label>
+            <input type="text" class="form-input-custom" id="pkgDisplay" value="Basic — ₹100 wallet top-up" readonly style="background:#f8f8fd;cursor:not-allowed">
+
+            <label class="form-label-custom">Your UPI Transaction ID</label>
+            <input type="text" class="form-input-custom" id="txnIdInput" placeholder="e.g. 427318654321 (from your UPI app)">
+
+            <label class="form-label-custom">Payment Screenshot (optional note)</label>
+            <input type="text" class="form-input-custom" id="noteInput" placeholder="Any additional note for admin">
+
+            <button class="btn-submit-pay" id="submitBtn" onclick="submitRecharge()">
+                <i class="bi bi-send-fill me-2"></i> Submit Payment Request
+            </button>
+            <p style="text-align:center;font-size:0.75rem;color:var(--ink-muted);margin-top:0.8rem">
+                You'll be notified once money is added to your wallet
+            </p>
+        </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div class="txn-section">
+        <div class="section-head">Transaction History</div>
+        <div class="table-responsive">
+            <table class="table" id="txnTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Amount (₹)</th>
+                        <th>Status</th>
+                        <th>Txn ID</th>
+                    </tr>
+                </thead>
+                <tbody id="txnBody">
+                    <tr><td colspan="7" style="text-align:center;color:var(--ink-muted);padding:2rem">Loading transactions...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+    apiKey: 'AIzaSyCGnA0-2QiSQ2Dg8n3xhzBxjvVKcXKf9P0',
+    authDomain: 'form-filling-service-5a261.firebaseapp.com',
+    projectId: 'form-filling-service-5a261',
+    storageBucket: 'form-filling-service-5a261.firebasestorage.app',
+    messagingSenderId: '417118407948',
+    appId: '1:417118407948:web:4daf44a54875a1b0f6cd29'
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const COST_PER_FILL = 2;
+let currentUser = null;
+let selectedAmt = 100;
+
+// ─── TOAST SYSTEM (replaces all alert() calls) ───────────────────────────
+function showToast(msg, type = 'info', duration = 4000) {
+    const icons = { success: '✅', error: '❌', info: 'ℹ️', warn: '⚠️' };
+    const tc = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast-msg ${type}`;
+    t.innerHTML = `<span style="font-size:1.1rem">${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+    tc.appendChild(t);
+    setTimeout(() => t.remove(), duration);
+}
+
+// ─── AUTH ────────────────────────────────────────────────────────────────
+auth.onAuthStateChanged(async (user) => {
+    if (!user) { window.location.href = 'login.html'; return; }
+    currentUser = user;
+    document.getElementById('avatarInitial').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+    document.getElementById('sidebarName').textContent = user.displayName || 'User';
+    document.getElementById('sidebarEmail').textContent = user.email;
+    document.getElementById('submitterName').value = user.displayName || '';
+
+    // Live wallet balance listener
+    db.collection('users').doc(user.uid).onSnapshot(doc => {
+        const bal = (doc.data()?.walletBalance ?? 0).toFixed(2);
+        document.getElementById('creditsDisplay').textContent = '₹' + bal;
+    });
+
+    loadTransactions();
+    document.getElementById('loading-overlay').style.display = 'none';
+});
+
+document.getElementById('logoutBtn').onclick = async () => {
+    await auth.signOut(); window.location.href = 'login.html';
+};
+
+// ─── PACKAGE SELECTION ────────────────────────────────────────────────────
+function selectPackage(card) {
+    document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedAmt = parseInt(card.dataset.amount);
+    document.getElementById('customAmtInput').value = '';
+    document.getElementById('customFillCount').textContent = '';
+    updatePayDisplay(selectedAmt);
+}
+
+function applyCustomAmt(val) {
+    const amt = parseInt(val);
+    if (!amt || amt < 10) {
+        document.getElementById('customFillCount').textContent = '';
+        return;
+    }
+    document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
+    selectedAmt = amt;
+    const fills = Math.floor(amt / COST_PER_FILL);
+    document.getElementById('customFillCount').textContent = `= ${fills} form fills`;
+    updatePayDisplay(amt);
+}
+
+function updatePayDisplay(amt) {
+    document.getElementById('payAmt').textContent = amt;
+    document.getElementById('payCredits').textContent = amt;
+    document.getElementById('pkgDisplay').value = `Wallet top-up — ₹${amt}`;
+}
+
+// ─── COPY UPI ─────────────────────────────────────────────────────────────
+function copyUPI() {
+    navigator.clipboard.writeText('9296914511@pthdfc')
+        .then(() => showToast('UPI ID copied to clipboard!', 'success'))
+        .catch(() => showToast('Please copy manually: 9296914511@pthdfc', 'warn'));
+}
+
+// ─── SUBMIT RECHARGE ──────────────────────────────────────────────────────
+async function submitRecharge() {
+    if (!currentUser) { showToast('Please login first', 'error'); return; }
+    const txnId = document.getElementById('txnIdInput').value.trim();
+    const note = document.getElementById('noteInput').value.trim();
+    if (!txnId) { showToast('Please enter your UPI Transaction ID', 'warn'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i> Submitting...';
+
+    try {
+        await db.collection('transactions').add({
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            userName: currentUser.displayName || '',
+            type: 'recharge',
+            amount: selectedAmt,
+            status: 'pending_verification',
+            description: `Wallet top-up: ₹${selectedAmt}`,
+            userUpiTransactionId: txnId,
+            adminNote: note,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        showToast(`✅ Request submitted! ₹${selectedAmt} will be added to your wallet within 5–10 mins after verification.`, 'success', 6000);
+        document.getElementById('txnIdInput').value = '';
+        document.getElementById('noteInput').value = '';
+        loadTransactions();
+    } catch (e) {
+        showToast('Error submitting request. Please try again.', 'error');
+        console.error(e);
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-send-fill me-2"></i> Submit Recharge Request';
+}
+
+// ─── TRANSACTION HISTORY ──────────────────────────────────────────────────
+async function loadTransactions() {
+    if (!currentUser) return;
+    const tbody = document.getElementById('txnBody');
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--ink-muted)">Loading...</td></tr>';
+    try {
+        const snap = await db.collection('transactions')
+            .where('userId', '==', currentUser.uid)
+            .orderBy('timestamp', 'desc')
+            .limit(15)
+            .get();
+
+        if (snap.empty) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--ink-muted)">No transactions yet. Make your first recharge!</td></tr>';
+            return;
+        }
+        tbody.innerHTML = '';
+        snap.forEach(doc => {
+            const d = doc.data();
+            const tsRaw = d.timestamp;
+            const tsDate = tsRaw?.toDate ? tsRaw.toDate()
+                         : tsRaw?.seconds ? new Date(tsRaw.seconds * 1000)
+                         : tsRaw ? new Date(tsRaw) : null;
+            const date = tsDate && !isNaN(tsDate) ? tsDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+            const isRecharge = d.type === 'recharge';
+            const typeBadge = isRecharge
+                ? `<span class="badge-status badge-recharge">+ Added</span>`
+                : `<span class="badge-status badge-deduct">− Used</span>`;
+            let statusBadge;
+            if (d.status === 'completed' || d.status === 'approved') statusBadge = `<span class="badge-status badge-done">✓ Done</span>`;
+            else if (d.status === 'pending_verification') statusBadge = `<span class="badge-status badge-pending">⏳ Pending</span>`;
+            else if (d.status === 'rejected' || d.status === 'failed') statusBadge = `<span class="badge-status badge-fail">✗ Rejected</span>`;
+            else statusBadge = `<span class="badge-status badge-done">✓ Done</span>`;
+
+            const amtColor = isRecharge ? '#16a34a' : '#c2410c';
+            const amtPrefix = isRecharge ? '+' : '−';
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="white-space:nowrap">${date}</td>
+                <td>${typeBadge}</td>
+                <td style="max-width:180px;word-break:break-word">${d.description || '—'}</td>
+                <td style="font-weight:700;color:${amtColor}">${amtPrefix}₹${d.amount ?? '—'}</td>
+                <td>${isRecharge ? statusBadge : '<span class="badge-status badge-done">✓ Done</span>'}</td>
+                <td style="font-size:0.75rem;color:var(--ink-muted)">${d.userUpiTransactionId || '—'}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#ef4444;padding:1.5rem">Error loading. Check Firestore index for "userId + timestamp".</td></tr>';
+        console.error(e);
+    }
+}
+</script>
+</body>
+</html>

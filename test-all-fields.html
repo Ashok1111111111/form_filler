@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Test Form - Indian Govt. Fields</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <style>
+        body { background-color: #f8f9fa; padding: 20px; }
+        .form-container { max-width: 900px; margin: 20px auto; padding: 30px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        .section-heading { border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-bottom: 25px; color: #007bff; font-weight: bold; }
+        .form-group { margin-bottom: 1rem; }
+        .card-education { border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 20px; padding: 15px; background-color: #fcfcfc; }
+        .card-education h5 { color: #007bff; margin-bottom: 15px; }
+        .col-label { font-size: 0.9em; color: #6c757d; }
+        .conditional-field { display: none; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2 class="text-center mb-4">Comprehensive Test Form (Indian Govt. Fields)</h2>
+        <p class="text-muted text-center">This form includes a wide range of input fields common in Indian government applications, for testing automated form filling.</p>
+        <form id="comprehensiveTestForm">
+
+            <!-- 1. PERSONAL INFORMATION SECTION -->
+            <h4 class="section-heading">1. Personal Information / व्यक्तिगत जानकारी</h4>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="fullName" class="form-label">Full Name / आवेदक का नाम <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="fullName" name="fullName" required>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="fatherName" class="form-label">Father's Name / पिता का नाम <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="fatherName" name="fatherName" required>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="motherName" class="form-label">Mother's Name / माता का नाम <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="motherName" name="motherName" required>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="husbandName" class="form-label">Husband's Name / पति का नाम</label>
+                    <input type="text" class="form-control" id="husbandName" name="husbandName">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label for="dob" class="form-label">Date of Birth / जन्म तिथि <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="dob" name="dob" required>
+                </div>
+                <div class="col-md-2 form-group">
+                    <label for="age" class="form-label">Age / आयु</label>
+                    <input type="number" class="form-control" id="age" name="age" min="1" max="120">
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="form-label d-block">Gender / लिंग <span class="text-danger">*</span></label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" id="genderMale" value="Male" required>
+                        <label class="form-check-label" for="genderMale">Male</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" id="genderFemale" value="Female">
+                        <label class="form-check-label" for="genderFemale">Female</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="gender" id="genderOther" value="Other">
+                        <label class="form-check-label" for="genderOther">Other</label>
+                    </div>
+                </div>
+                <div class="col-md-3 form-group">
+                    <label for="maritalStatus" class="form-label">Marital Status / वैवाहिक स्थिति <span class="text-danger">*</span></label>
+                    <select class="form-select" id="maritalStatus" name="maritalStatus" required>
+                        <option value="">Select</option>
+                        <option value="Unmarried">Unmarried</option>
+                        <option value="Married">Married</option>
+                        <option value="Widow">Widow</option>
+                        <option value="Divorced">Divorced</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 2. CONTACT INFORMATION -->
+            <h4 class="section-heading mt-4">2. Contact Information / संपर्क जानकारी</h4>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="mobileNumber" class="form-label">Mobile Number / मोबाइल नंबर <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" id="mobileNumber" name="mobileNumber" pattern="[0-9]{10}" placeholder="10-digit mobile" required>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="alternativeMobile" class="form-label">Alternative Mobile / वैकल्पिक मोबाइल</label>
+                    <input type="tel" class="form-control" id="alternativeMobile" name="alternativeMobile" pattern="[0-9]{10}" placeholder="10-digit mobile">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="emailId" class="form-label">Email ID / ईमेल <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="emailId" name="emailId" required>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="aadhaarNumber" class="form-label">Aadhaar Number / आधार नंबर <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="aadhaarNumber" name="aadhaarNumber" pattern="[0-9]{12}" placeholder="12-digit Aadhaar" required>
+                </div>
+            </div>
+
+            <!-- 3. ADDRESS SECTION -->
+            <h4 class="section-heading mt-4">3. Address Information / पता जानकारी</h4>
+            <div class="row">
+                <div class="col-12 form-group">
+                    <label for="permAddressLine1" class="form-label">Permanent Address Line 1 / स्थायी पता पंक्ति 1 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="permAddressLine1" name="permAddressLine1" required>
+                </div>
+                <div class="col-12 form-group">
+                    <label for="permAddressLine2" class="form-label">Permanent Address Line 2 / स्थायी पता पंक्ति 2</label>
+                    <input type="text" class="form-control" id="permAddressLine2" name="permAddressLine2">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="permVillageTown" class="form-label">Permanent Village/Town / गाँव/शहर <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="permVillageTown" name="permVillageTown" required>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="permPostOffice" class="form-label">Permanent Post Office / डाकघर <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="permPostOffice" name="permPostOffice" required>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="permPoliceStation" class="form-label">Permanent Police Station / थाना <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="permPoliceStation" name="permPoliceStation" required>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="permBlock" class="form-label">Permanent Block / ब्लॉक</label>
+                    <input type="text" class="form-control" id="permBlock" name="permBlock">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label for="permDistrict" class="form-label">Permanent District / जिला <span class="text-danger">*</span></label>
+                    <select class="form-select" id="permDistrict" name="permDistrict" required>
+                        <option value="">Select District</option>
+                        <option value="Araria">Araria</option>
+                        <option value="Arwal">Arwal</option>
+                        <option value="Aurangabad">Aurangabad</option>
+                        <option value="Banka">Banka</option>
+                        <option value="Begusarai">Begusarai</option>
+                        <option value="Bhagalpur">Bhagalpur</option>
+                        <option value="Bhojpur">Bhojpur</option>
+                        <option value="Buxar">Buxar</option>
+                        <option value="Darbhanga">Darbhanga</option>
+                        <option value="East Champaran">East Champaran</option>
+                        <option value="Gaya">Gaya</option>
+                        <option value="Gopalganj">Gopalganj</option>
+                        <option value="Jamui">Jamui</option>
+                        <option value="Jehanabad">Jehanabad</option>
+                        <option value="Kaimur">Kaimur</option>
+                        <option value="Katihar">Katihar</option>
+                        <option value="Khagaria">Khagaria</option>
+                        <option value="Kishanganj">Kishanganj</option>
+                        <option value="Lakhisarai">Lakhisarai</option>
+                        <option value="Madhepura">Madhepura</option>
+                        <option value="Madhubani">Madhubani</option>
+                        <option value="Munger">Munger</option>
+                        <option value="Muzaffarpur">Muzaffarpur</option>
+                        <option value="Nalanda">Nalanda</option>
+                        <option value="Nawada">Nawada</option>
+                        <option value="Patna">Patna</option>
+                        <option value="Purnia">Purnia</option>
+                        <option value="Rohtas">Rohtas</option>
+                        <option value="Saharsa">Saharsa</option>
+                        <option value="Samastipur">Samastipur</option>
+                        <option value="Saran">Saran</option>
+                        <option value="Sheikhpura">Sheikhpura</option>
+                        <option value="Sheohar">Sheohar</option>
+                        <option value="Sitamarhi">Sitamarhi</option>
+                        <option value="Siwan">Siwan</option>
+                        <option value="Supaul">Supaul</option>
+                        <option value="Vaishali">Vaishali</option>
+                        <option value="West Champaran">West Champaran</option>
+                    </select>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label for="permState" class="form-label">Permanent State / राज्य <span class="text-danger">*</span></label>
+                    <select class="form-select" id="permState" name="permState" required>
+                        <option value="Bihar">Bihar</option>
+                        <!-- Add other Indian states if needed -->
+                    </select>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label for="permPinCode" class="form-label">Permanent Pin Code / पिन कोड <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="permPinCode" name="permPinCode" pattern="[0-9]{6}" placeholder="6-digit Pin Code" required>
+                </div>
+            </div>
+
+            <div class="form-check form-group mt-3">
+                <input class="form-check-input" type="checkbox" id="correspondenceSameAsPermanent">
+                <label class="form-check-label" for="correspondenceSameAsPermanent">Correspondence Address Same as Permanent Address / पत्राचार का पता स्थायी पता के समान</label>
+            </div>
+
+            <div id="correspondenceAddressSection" class="row mt-3">
+                <h5 class="section-heading pt-3">Correspondence Address / पत्राचार का पता</h5>
+                <div class="col-12 form-group">
+                    <label for="corrAddressLine1" class="form-label">Correspondence Address Line 1 / पत्राचार पता पंक्ति 1 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="corrAddressLine1" name="corrAddressLine1">
+                </div>
+                <div class="col-12 form-group">
+                    <label for="corrAddressLine2" class="form-label">Correspondence Address Line 2 / पत्राचार पता पंक्ति 2</label>
+                    <input type="text" class="form-control" id="corrAddressLine2" name="corrAddressLine2">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="corrVillageTown" class="form-label">Correspondence Village/Town / गाँव/शहर <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="corrVillageTown" name="corrVillageTown">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="corrPostOffice" class="form-label">Correspondence Post Office / डाकघर <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="corrPostOffice" name="corrPostOffice">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="corrPoliceStation" class="form-label">Correspondence Police Station / थाना <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="corrPoliceStation" name="corrPoliceStation">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="corrBlock" class="form-label">Correspondence Block / ब्लॉक</label>
+                    <input type="text" class="form-control" id="corrBlock" name="corrBlock">
+                </div>
+                <div class="col-md-4 form-group">
+                    <label for="corrDistrict" class="form-label">Correspondence District / जिला <span class="text-danger">*</span></label>
+                    <select class="form-select" id="corrDistrict" name="corrDistrict">
+                        <option value="">Select District</option>
+                        <!-- Bihar districts same as permDistrict -->
+                    </select>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label for="corrState" class="form-label">Correspondence State / राज्य <span class="text-danger">*</span></label>
+                    <select class="form-select" id="corrState" name="corrState">
+                        <option value="Bihar">Bihar</option>
+                    </select>
+                </div>
+                <div class="col-md-4 form-group">
+                    <label for="corrPinCode" class="form-label">Correspondence Pin Code / पिन कोड <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="corrPinCode" name="corrPinCode" pattern="[0-9]{6}" placeholder="6-digit Pin Code">
+                </div>
+            </div>
+
+            <!-- 4. CATEGORY & RESERVATION -->
+            <h4 class="section-heading mt-4">4. Category & Reservation / वर्ग और आरक्षण</h4>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="category" class="form-label">Category / वर्ग <span class="text-danger">*</span></label>
+                    <select class="form-select" id="category" name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="General">General</option>
+                        <option value="EBC">EBC</option>
+                        <option value="BC">BC</option>
+                        <option value="SC">SC</option>
+                        <option value="ST">ST</option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="subCategory" class="form-label">Sub-Category / उप-वर्ग</label>
+                    <input type="text" class="form-control" id="subCategory" name="subCategory">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="casteCertNumber" class="form-label">Caste Certificate Number / जाति प्रमाण पत्र संख्या</label>
+                    <input type="text" class="form-control" id="casteCertNumber" name="casteCertNumber">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="casteCertIssuedDate" class="form-label">Issued Date / जारी करने की तारीख</label>
+                    <input type="date" class="form-control" id="casteCertIssuedDate" name="casteCertIssuedDate">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="casteCertIssuedAuthority" class="form-label">Issuing Authority / जारी करने वाला प्राधिकरण</label>
+                    <input type="text" class="form-control" id="casteCertIssuedAuthority" name="casteCertIssuedAuthority">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="form-label d-block">PWD / विकलांग <span class="text-danger">*</span></label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="pwd" id="pwdYes" value="Yes" required>
+                        <label class="form-check-label" for="pwdYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="pwd" id="pwdNo" value="No" checked>
+                        <label class="form-check-label" for="pwdNo">No</label>
+                    </div>
+                </div>
+                <div class="col-md-6 form-group conditional-field" id="typeOfDisabilityGroup">
+                    <label for="typeOfDisability" class="form-label">Type of Disability / विकलांगता का प्रकार <span class="text-danger">*</span></label>
+                    <select class="form-select" id="typeOfDisability" name="typeOfDisability">
+                        <option value="">Select</option>
+                        <option value="Locomotor Disability">Locomotor Disability</option>
+                        <option value="Visual Impairment">Visual Impairment</option>
+                        <option value="Hearing Impairment">Hearing Impairment</option>
+                        <option value="Intellectual Disability">Intellectual Disability</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="form-label d-block">Ex-Serviceman / भूतपूर्व सैनिक <span class="text-danger">*</span></label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="exServiceman" id="exServicemanYes" value="Yes" required>
+                        <label class="form-check-label" for="exServicemanYes">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="exServiceman" id="exServicemanNo" value="No" checked>
+                        <label class="form-check-label" for="exServicemanNo">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. EDUCATIONAL QUALIFICATIONS -->
+            <h4 class="section-heading mt-4">5. Educational Qualifications / शैक्षणिक योग्यताएँ</h4>
+
+            <!-- 10th/Matric -->
+            <div class="card-education">
+                <h5>10th/Matriculation / मैट्रिक</h5>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label for="10thBoardName" class="form-label">Board Name / बोर्ड का नाम</label>
+                        <input type="text" class="form-control" id="10thBoardName" name="10thBoardName">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="10thRollNumber" class="form-label">Roll Number / रोल नंबर</label>
+                        <input type="text" class="form-control" id="10thRollNumber" name="10thRollNumber">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="10thPassingYear" class="form-label">Year of Passing / उत्तीर्ण होने का वर्ष</label>
+                        <input type="number" class="form-control" id="10thPassingYear" name="10thPassingYear" min="1900" max="2100">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="10thPercentage" class="form-label">Percentage/Grade / प्रतिशत/ग्रेड</label>
+                        <input type="text" class="form-control" id="10thPercentage" name="10thPercentage">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="10thDivision" class="form-label">Division / श्रेणी</label>
+                        <select class="form-select" id="10thDivision" name="10thDivision">
+                            <option value="">Select</option>
+                            <option value="First">First</option>
+                            <option value="Second">Second</option>
+                            <option value="Third">Third</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12th/Intermediate -->
+            <div class="card-education">
+                <h5>12th/Intermediate / इंटरमीडिएट</h5>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label for="12thBoardName" class="form-label">Board Name / बोर्ड का नाम</label>
+                        <input type="text" class="form-control" id="12thBoardName" name="12thBoardName">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="12thStream" class="form-label">Stream / संकाय</label>
+                        <select class="form-select" id="12thStream" name="12thStream">
+                            <option value="">Select</option>
+                            <option value="Science">Science</option>
+                            <option value="Commerce">Commerce</option>
+                            <option value="Arts">Arts</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="12thRollNumber" class="form-label">Roll Number / रोल नंबर</label>
+                        <input type="text" class="form-control" id="12thRollNumber" name="12thRollNumber">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="12thPassingYear" class="form-label">Year of Passing / उत्तीर्ण होने का वर्ष</label>
+                        <input type="number" class="form-control" id="12thPassingYear" name="12thPassingYear" min="1900" max="2100">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="12thPercentage" class="form-label">Percentage/Grade / प्रतिशत/ग्रेड</label>
+                        <input type="text" class="form-control" id="12thPercentage" name="12thPercentage">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="12thDivision" class="form-label">Division / श्रेणी</label>
+                        <select class="form-select" id="12thDivision" name="12thDivision">
+                            <option value="">Select</option>
+                            <option value="First">First</option>
+                            <option value="Second">Second</option>
+                            <option value="Third">Third</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graduation -->
+            <div class="card-education">
+                <h5>Graduation / स्नातक</h5>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label for="graduationDegreeName" class="form-label">Degree Name / डिग्री का नाम</label>
+                        <input type="text" class="form-control" id="graduationDegreeName" name="graduationDegreeName">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="graduationUniversityName" class="form-label">University Name / विश्वविद्यालय का नाम</label>
+                        <input type="text" class="form-control" id="graduationUniversityName" name="graduationUniversityName">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="graduationSubject" class="form-label">Subject/Specialization / विषय/विशेषज्ञता</label>
+                        <input type="text" class="form-control" id="graduationSubject" name="graduationSubject">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="graduationPassingYear" class="form-label">Year of Passing / उत्तीर्ण होने का वर्ष</label>
+                        <input type="number" class="form-control" id="graduationPassingYear" name="graduationPassingYear" min="1900" max="2100">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="graduationPercentage" class="form-label">Percentage/CGPA / प्रतिशत/सीजीपीए</label>
+                        <input type="text" class="form-control" id="graduationPercentage" name="graduationPercentage">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="graduationDivision" class="form-label">Division/Class / श्रेणी/कक्षा</label>
+                        <select class="form-select" id="graduationDivision" name="graduationDivision">
+                            <option value="">Select</option>
+                            <option value="First">First</option>
+                            <option value="Second">Second</option>
+                            <option value="Third">Third</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Post-Graduation -->
+            <div class="card-education">
+                <h5>Post-Graduation / स्नातकोत्तर</h5>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label for="pgDegreeName" class="form-label">Degree Name / डिग्री का नाम</label>
+                        <input type="text" class="form-control" id="pgDegreeName" name="pgDegreeName">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="pgUniversity" class="form-label">University / विश्वविद्यालय</label>
+                        <input type="text" class="form-control" id="pgUniversity" name="pgUniversity">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="pgSubject" class="form-label">Subject / विषय</label>
+                        <input type="text" class="form-control" id="pgSubject" name="pgSubject">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="pgPassingYear" class="form-label">Year of Passing / उत्तीर्ण होने का वर्ष</label>
+                        <input type="number" class="form-control" id="pgPassingYear" name="pgPassingYear" min="1900" max="2100">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="pgPercentage" class="form-label">Percentage/CGPA / प्रतिशत/सीजीपीए</label>
+                        <input type="text" class="form-control" id="pgPercentage" name="pgPercentage">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. DOCUMENT UPLOAD SECTION -->
+            <h4 class="section-heading mt-4">6. Document Uploads (Placeholder) / दस्तावेज़ अपलोड (प्लेसहोल्डर)</h4>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="photoUpload" class="form-label">Photograph / तस्वीर</label>
+                    <input type="file" class="form-control" id="photoUpload" name="photoUpload" accept="image/*">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="signatureUpload" class="form-label">Signature / हस्ताक्षर</label>
+                    <input type="file" class="form-control" id="signatureUpload" name="signatureUpload" accept="image/*">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="aadhaarCardUpload" class="form-label">Aadhaar Card / आधार कार्ड</label>
+                    <input type="file" class="form-control" id="aadhaarCardUpload" name="aadhaarCardUpload" accept="image/*,application/pdf">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="10thCertUpload" class="form-label">10th Certificate / 10वीं प्रमाण पत्र</label>
+                    <input type="file" class="form-control" id="10thCertUpload" name="10thCertUpload" accept="image/*,application/pdf">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="12thCertUpload" class="form-label">12th Certificate / 12वीं प्रमाण पत्र</label>
+                    <input type="file" class="form-control" id="12thCertUpload" name="12thCertUpload" accept="image/*,application/pdf">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="graduationCertUpload" class="form-label">Graduation Certificate / स्नातक प्रमाण पत्र</label>
+                    <input type="file" class="form-control" id="graduationCertUpload" name="graduationCertUpload" accept="image/*,application/pdf">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="casteCertUpload" class="form-label">Caste Certificate / जाति प्रमाण पत्र</label>
+                    <input type="file" class="form-control" id="casteCertUpload" name="casteCertUpload" accept="image/*,application/pdf">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="incomeCertUpload" class="form-label">Income Certificate / आय प्रमाण पत्र</label>
+                    <input type="file" class="form-control" id="incomeCertUpload" name="incomeCertUpload" accept="image/*,application/pdf">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="domicileCertUpload" class="form-label">Domicile Certificate / अधिवास प्रमाण पत्र</label>
+                    <input type="file" class="form-control" id="domicileCertUpload" name="domicileCertUpload" accept="image/*,application/pdf">
+                </div>
+            </div>
+
+            <!-- 7. SPECIAL BIHAR GOVERNMENT FIELDS -->
+            <h4 class="section-heading mt-4">7. Special Bihar Government Fields / विशेष बिहार सरकारी क्षेत्र</h4>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="registryNumber" class="form-label">Registry Number / रजिस्ट्री संख्या</label>
+                    <input type="text" class="form-control" id="registryNumber" name="registryNumber">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="khatiyanNumber" class="form-label">Khatiyan Number / खतियान संख्या</label>
+                    <input type="text" class="form-control" id="khatiyanNumber" name="khatiyanNumber">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="khataNumber" class="form-label">Khata Number / खाता संख्या</label>
+                    <input type="text" class="form-control" id="khataNumber" name="khataNumber">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="plotNumber" class="form-label">Plot Number / प्लाट संख्या</label>
+                    <input type="text" class="form-control" id="plotNumber" name="plotNumber">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="ticketType" class="form-label">Ticket Type / टिकट प्रकार</label>
+                    <select class="form-select" id="ticketType" name="ticketType">
+                        <option value="">Select</option>
+                        <option value="New Application">New Application</option>
+                        <option value="Renewal">Renewal</option>
+                        <option value="Correction">Correction</option>
+                        <option value="Duplicate">Duplicate</option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="serviceType" class="form-label">Service Type / सेवा प्रकार</label>
+                    <select class="form-select" id="serviceType" name="serviceType">
+                        <option value="">Select</option>
+                        <option value="Birth Certificate">Birth Certificate</option>
+                        <option value="Death Certificate">Death Certificate</option>
+                        <option value="Caste Certificate">Caste Certificate</option>
+                        <option value="Income Certificate">Income Certificate</option>
+                        <option value="Domicile">Domicile</option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="applicationType" class="form-label">Application Type / आवेदन का प्रकार</label>
+                    <select class="form-select" id="applicationType" name="applicationType">
+                        <option value="">Select</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Tatkal">Tatkal</option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="dataEntryOperatorName" class="form-label">Data Entry Operator Name / डेटा एंट्री ऑपरेटर का नाम</label>
+                    <input type="text" class="form-control" id="dataEntryOperatorName" name="dataEntryOperatorName">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="dataEntryDate" class="form-label">Data Entry Date / डेटा एंट्री तिथि</label>
+                    <input type="date" class="form-control" id="dataEntryDate" name="dataEntryDate">
+                </div>
+            </div>
+
+            <!-- 8. EMPLOYMENT DETAILS -->
+            <h4 class="section-heading mt-4">8. Employment Details / रोजगार विवरण</h4>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="occupation" class="form-label">Occupation / व्यवसाय</label>
+                    <select class="form-select" id="occupation" name="occupation">
+                        <option value="">Select</option>
+                        <option value="Student">Student</option>
+                        <option value="Employed">Employed</option>
+                        <option value="Self-Employed">Self-Employed</option>
+                        <option value="Unemployed">Unemployed</option>
+                        <option value="Retired">Retired</option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="organizationName" class="form-label">Organization Name / संगठन का नाम</label>
+                    <input type="text" class="form-control" id="organizationName" name="organizationName">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="designation" class="form-label">Designation / पद</label>
+                    <input type="text" class="form-control" id="designation" name="designation">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="monthlyIncome" class="form-label">Monthly Income / मासिक आय</label>
+                    <input type="number" class="form-control" id="monthlyIncome" name="monthlyIncome" min="0">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="incomeCertNumber" class="form-label">Income Certificate Number / आय प्रमाण पत्र संख्या</label>
+                    <input type="text" class="form-control" id="incomeCertNumber" name="incomeCertNumber">
+                </div>
+            </div>
+
+            <!-- 9. BANK DETAILS -->
+            <h4 class="section-heading mt-4">9. Bank Details / बैंक विवरण</h4>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="bankName" class="form-label">Bank Name / बैंक का नाम</label>
+                    <input type="text" class="form-control" id="bankName" name="bankName">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="branchName" class="form-label">Branch Name / शाखा का नाम</label>
+                    <input type="text" class="form-control" id="branchName" name="branchName">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="accountNumber" class="form-label">Account Number / खाता संख्या</label>
+                    <input type="text" class="form-control" id="accountNumber" name="accountNumber">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="ifscCode" class="form-label">IFSC Code / आईएफएससी कोड</label>
+                    <input type="text" class="form-control" id="ifscCode" name="ifscCode" pattern="[A-Z]{4}0[A-Z0-9]{6}">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="accountType" class="form-label">Account Type / खाते का प्रकार</label>
+                    <select class="form-select" id="accountType" name="accountType">
+                        <option value="">Select</option>
+                        <option value="Savings">Savings</option>
+                        <option value="Current">Current</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 10. DECLARATION & SUBMISSION -->
+            <h4 class="section-heading mt-4">10. Declaration & Submission / घोषणा और जमा</h4>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="declarationCheckbox" required>
+                <label class="form-check-label" for="declarationCheckbox">
+                    I hereby declare that all information provided is true to the best of my knowledge and belief. / मैं घोषणा करता हूँ कि मेरे द्वारा दी गई सभी जानकारी मेरे सर्वोत्तम ज्ञान और विश्वास के अनुसार सत्य है। <span class="text-danger">*</span>
+                </label>
+            </div>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label for="place" class="form-label">Place / स्थान</label>
+                    <input type="text" class="form-control" id="place" name="place">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label for="date" class="form-label">Date / तारीख</label>
+                    <input type="date" class="form-control" id="date" name="date">
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg me-3">Submit Form</button>
+                <button type="reset" class="btn btn-secondary btn-lg">Reset Form</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Conditional display for Type of Disability
+            const pwdRadios = document.querySelectorAll('input[name="pwd"]');
+            const typeOfDisabilityGroup = document.getElementById('typeOfDisabilityGroup');
+            const typeOfDisabilitySelect = document.getElementById('typeOfDisability');
+
+            function toggleTypeOfDisability() {
+                if (document.getElementById('pwdYes').checked) {
+                    typeOfDisabilityGroup.style.display = 'block';
+                    typeOfDisabilitySelect.setAttribute('required', 'required');
+                } else {
+                    typeOfDisabilityGroup.style.display = 'none';
+                    typeOfDisabilitySelect.removeAttribute('required');
+                    typeOfDisabilitySelect.value = ''; // Clear selection
+                }
+            }
+            pwdRadios.forEach(radio => radio.addEventListener('change', toggleTypeOfDisability));
+            toggleTypeOfDisability(); // Initial check
+
+            // Correspondence Address Same as Permanent
+            const correspondenceSameAsPermanent = document.getElementById('correspondenceSameAsPermanent');
+            const correspondenceAddressSection = document.getElementById('correspondenceAddressSection');
+            const corrAddressFields = correspondenceAddressSection.querySelectorAll('input, select');
+
+            function toggleCorrespondenceAddress() {
+                if (correspondenceSameAsPermanent.checked) {
+                    correspondenceAddressSection.style.display = 'none';
+                    corrAddressFields.forEach(field => {
+                        field.removeAttribute('required');
+                        field.value = ''; // Clear values
+                    });
+                } else {
+                    correspondenceAddressSection.style.display = 'flex'; // Use flex to maintain row layout
+                    // Re-add required attribute to necessary fields if they were required originally
+                    document.getElementById('corrAddressLine1').setAttribute('required', 'required');
+                    document.getElementById('corrVillageTown').setAttribute('required', 'required');
+                    document.getElementById('corrPostOffice').setAttribute('required', 'required');
+                    document.getElementById('corrPoliceStation').setAttribute('required', 'required');
+                    document.getElementById('corrDistrict').setAttribute('required', 'required');
+                    document.getElementById('corrState').setAttribute('required', 'required');
+                    document.getElementById('corrPinCode').setAttribute('required', 'required');
+
+                    // Copy values if they exist on the permanent address fields
+                    document.getElementById('corrAddressLine1').value = document.getElementById('permAddressLine1').value;
+                    document.getElementById('corrAddressLine2').value = document.getElementById('permAddressLine2').value;
+                    document.getElementById('corrVillageTown').value = document.getElementById('permVillageTown').value;
+                    document.getElementById('corrPostOffice').value = document.getElementById('permPostOffice').value;
+                    document.getElementById('corrPoliceStation').value = document.getElementById('permPoliceStation').value;
+                    document.getElementById('corrBlock').value = document.getElementById('permBlock').value;
+                    document.getElementById('corrDistrict').value = document.getElementById('permDistrict').value;
+                    document.getElementById('corrState').value = document.getElementById('permState').value;
+                    document.getElementById('corrPinCode').value = document.getElementById('permPinCode').value;
+                }
+            }
+            correspondenceSameAsPermanent.addEventListener('change', toggleCorrespondenceAddress);
+            toggleCorrespondenceAddress(); // Initial check
+
+            // Populate Bihar districts for correspondence address dropdown
+            const permDistrictSelect = document.getElementById('permDistrict');
+            const corrDistrictSelect = document.getElementById('corrDistrict');
+            if (permDistrictSelect && corrDistrictSelect) {
+                // Clone options from permDistrictSelect
+                for (let i = 0; i < permDistrictSelect.options.length; i++) {
+                    corrDistrictSelect.options[corrDistrictSelect.options.length] = new Option(permDistrictSelect.options[i].text, permDistrictSelect.options[i].value);
+                }
+            }
+
+            // Simple age calculation from DOB
+            const dobInput = document.getElementById('dob');
+            const ageInput = document.getElementById('age');
+            if (dobInput && ageInput) {
+                dobInput.addEventListener('change', function() {
+                    if (this.value) {
+                        const birthDate = new Date(this.value);
+                        const today = new Date();
+                        let age = today.getFullYear() - birthDate.getFullYear();
+                        const m = today.getMonth() - birthDate.getMonth();
+                        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                            age--;
+                        }
+                        ageInput.value = age;
+                    } else {
+                        ageInput.value = '';
+                    }
+                });
+            }
+
+        });
+    </script>
+</body>
+</html>

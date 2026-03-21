@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saveur — Fine Dining Restaurant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ============ RESET & ROOT ============ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97e;
+      --gold-dark: #8a6c28;
+      --bg-dark: #0d0d0b;
+      --bg-card: #141410;
+      --bg-section: #111110;
+      --text-primary: #f0ead6;
+      --text-muted: #8a856e;
+      --text-light: #c8c0a4;
+      --border: rgba(201,168,76,0.2);
+      --ff-serif: 'Cormorant Garamond', Georgia, serif;
+      --ff-sans: 'Raleway', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--ff-sans);
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* ============ CUSTOM SCROLLBAR ============ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-dark); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+
+    /* ============ NAV ============ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 24px 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all 0.4s ease;
+    }
+    nav.scrolled {
+      background: rgba(13,13,11,0.95);
+      backdrop-filter: blur(12px);
+      padding: 16px 60px;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--ff-serif);
+      font-size: 2rem;
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      text-decoration: none;
+    }
+    .nav-logo span { font-style: italic; }
+    .nav-links {
+      display: flex; gap: 40px; list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--ff-sans);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-light);
+      text-decoration: none;
+      transition: color 0.3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--gold);
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-reserve {
+      font-family: var(--ff-sans);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--bg-dark);
+      background: var(--gold);
+      padding: 10px 22px;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .nav-reserve:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { width: 24px; height: 1px; background: var(--gold); display: block; transition: all 0.3s; }
+
+    /* ============ HERO ============ */
+    #hero {
+      position: relative;
+      height: 100vh; min-height: 700px;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: 
+        radial-gradient(ellipse at 50% 60%, rgba(201,168,76,0.08) 0%, transparent 60%),
+        linear-gradient(180deg, rgba(13,13,11,0.3) 0%, rgba(13,13,11,0.7) 60%, var(--bg-dark) 100%),
+        url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1800&q=80') center/cover no-repeat;
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      max-width: 800px; padding: 0 24px;
+      animation: fadeUp 1.2s ease both;
+    }
+    .hero-tagline {
+      font-family: var(--ff-sans);
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+      opacity: 0.9;
+    }
+    .hero-title {
+      font-family: var(--ff-serif);
+      font-size: clamp(4rem, 10vw, 8rem);
+      font-weight: 300;
+      line-height: 0.95;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+    .hero-subtitle {
+      font-family: var(--ff-serif);
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text-muted);
+      margin-top: 20px;
+      margin-bottom: 50px;
+      letter-spacing: 0.05em;
+    }
+    .hero-actions { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      font-family: var(--ff-sans);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--bg-dark);
+      background: var(--gold);
+      padding: 16px 40px;
+      text-decoration: none;
+      transition: all 0.3s;
+      border: 1px solid var(--gold);
+    }
+    .btn-primary:hover { background: transparent; color: var(--gold); }
+    .btn-outline {
+      font-family: var(--ff-sans);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      background: transparent;
+      padding: 16px 40px;
+      text-decoration: none;
+      border: 1px solid rgba(240,234,214,0.3);
+      transition: all 0.3s;
+    }
+    .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+    .hero-scroll {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      color: var(--text-muted); font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase;
+      animation: bounce 2s ease infinite;
+    }
+    .hero-scroll::after {
+      content: ''; display: block;
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+    }
+
+    /* ============ SECTION COMMONS ============ */
+    section { padding: 120px 0; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 60px; }
+    .section-label {
+      font-family: var(--ff-sans);
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .section-label::before {
+      content: ''; display: block;
+      width: 40px; height: 1px;
+      background: var(--gold);
+    }
+    .section-title {
+      font-family: var(--ff-serif);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 300;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+    .section-title em { font-style: italic; color: var(--gold-light); }
+    .gold-divider {
+      width: 60px; height: 1px;
+      background: var(--gold);
+      margin: 40px 0;
+    }
+
+    /* ============ ABOUT ============ */
+    #about { background: var(--bg-section); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .about-image {
+      position: relative;
+    }
+    .about-image img {
+      width: 100%;
+      height: 550px;
+      object-fit: cover;
+      display: block;
+    }
+    .about-image::before {
+      content: '';
+      position: absolute;
+      top: -20px; left: -20px;
+      right: 20px; bottom: 20px;
+      border: 1px solid var(--border);
+      z-index: 0;
+    }
+    .about-image img { position: relative; z-index: 1; }
+    .about-badge {
+      position: absolute;
+      bottom: -30px; right: -30px;
+      z-index: 2;
+      width: 120px; height: 120px;
+      background: var(--gold);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: var(--bg-dark);
+    }
+    .about-badge strong {
+      font-family: var(--ff-serif);
+      font-size: 2.5rem;
+      font-weight: 400;
+      line-height: 1;
+    }
+    .about-badge span {
+      font-family: var(--ff-sans);
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .about-text p {
+      font-family: var(--ff-sans);
+      font-size: 0.9rem;
+      font-weight: 300;
+      line-height: 1.9;
+      color: var(--text-light);
+      margin-bottom: 20px;
+    }
+    .about-stats {
+      display: flex; gap: 40px; margin-top: 40px;
+      border-top: 1px solid var(--border);
+      padding-top: 40px;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-family: var(--ff-serif);
+      font-size: 2.5rem;
+      font-weight: 300;
+      color: var(--gold);
+      display: block;
+    }
+    .stat-label {
+      font-family: var(--ff-sans);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ============ MENU ============ */
+    #menu { background: var(--bg-dark); }
+    .menu-tabs {
+      display: flex; gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 60px;
+    }
+    .menu-tab {
+      font-family: var(--ff-sans);
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 16px 32px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.3s;
+    }
+    .menu-tab:hover { color: var(--text-primary); }
+    .menu-tab.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+    .menu-panel { display: none; }
+    .menu-panel.active { display: block; }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+    }
+    .menu-item {
+      display: flex;
+      gap: 20px;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .menu-item:nth-child(odd) { padding-right: 40px; }
+    .menu-item:nth-child(even) { padding-left: 40px; border-left: 1px solid var(--border); }
+    .menu-item-img {
+      width: 80px; height: 80px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .menu-item-info { flex: 1; }
+    .menu-item-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .menu-item-name {
+      font-family: var(--ff-serif);
+      font-size: 1.2rem;
+      font-weight: 400;
+    }
+    .menu-item-price {
+      font-family: var(--ff-serif);
+      font-size: 1.1rem;
+      color: var(--gold);
+      font-weight: 300;
+      white-space: nowrap;
+    }
+    .menu-item-desc {
+      font-family: var(--ff-sans);
+      font-size: 0.78rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* ============ GALLERY ============ */
+    #gallery { background: var(--bg-section); }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto auto;
+      gap: 12px;
+    }
+    .gallery-item {
+      overflow: hidden;
+      position: relative;
+    }
+    .gallery-item:first-child {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+    .gallery-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+      display: block;
+      min-height: 220px;
+    }
+    .gallery-item:first-child img { min-height: 454px; }
+    .gallery-item:hover img { transform: scale(1.06); }
+    .gallery-overlay {
+      position: absolute; inset: 0;
+      background: rgba(13,13,11,0);
+      transition: background 0.4s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .gallery-item:hover .gallery-overlay { background: rgba(13,13,11,0.4); }
+    .gallery-overlay span {
+      font-family: var(--ff-serif);
+      font-size: 1.8rem;
+      font-style: italic;
+      color: white;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s;
+    }
+    .gallery-item:hover .gallery-overlay span { opacity: 1; transform: translateY(0); }
+
+    /* ============ RESERVATION ============ */
+    #reservation {
+      background: 
+        radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 60%),
+        var(--bg-dark);
+    }
+    .reservation-inner {
+      max-width: 780px; margin: 0 auto; text-align: center;
+    }
+    .reservation-form {
+      margin-top: 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .form-group {
+      display: flex; flex-direction: column; gap: 10px;
+      text-align: left;
+    }
+    .form-group.full { grid-column: span 2; }
+    .form-group label {
+      font-family: var(--ff-sans);
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      font-family: var(--ff-sans);
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: var(--text-primary);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 14px 18px;
+      outline: none;
+      transition: border-color 0.3s;
+      width: 100%;
+      -webkit-appearance: none;
+    }
+    .form-group select { cursor: pointer; }
+    .form-group select option { background: var(--bg-card); }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--gold); }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: var(--text-muted); }
+    .btn-submit {
+      grid-column: span 2;
+      font-family: var(--ff-sans);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--bg-dark);
+      background: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+    .btn-submit:hover { background: transparent; color: var(--gold); }
+    .form-note {
+      grid-column: span 2;
+      font-family: var(--ff-sans);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    /* ============ TESTIMONIALS ============ */
+    #testimonials { background: var(--bg-section); }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 60px;
+    }
+    .testi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 40px 32px;
+      position: relative;
+    }
+    .testi-quote {
+      font-family: var(--ff-serif);
+      font-size: 4rem;
+      color: var(--gold);
+      line-height: 0.5;
+      margin-bottom: 24px;
+      opacity: 0.6;
+    }
+    .testi-text {
+      font-family: var(--ff-serif);
+      font-size: 1.05rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text-light);
+      line-height: 1.8;
+      margin-bottom: 28px;
+    }
+    .testi-stars { color: var(--gold); font-size: 0.75rem; margin-bottom: 16px; }
+    .testi-author { display: flex; align-items: center; gap: 14px; }
+    .testi-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--border);
+    }
+    .testi-name {
+      font-family: var(--ff-sans);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .testi-date {
+      font-family: var(--ff-sans);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    /* ============ CONTACT ============ */
+    #contact { background: var(--bg-dark); }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .contact-info { display: flex; flex-direction: column; gap: 40px; }
+    .contact-item h4 {
+      font-family: var(--ff-sans);
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+    .contact-item p, .contact-item a {
+      font-family: var(--ff-sans);
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--text-light);
+      line-height: 1.8;
+      text-decoration: none;
+      display: block;
+    }
+    .contact-item a:hover { color: var(--gold); }
+    .map-placeholder {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      height: 380px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .map-placeholder::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: 
+        linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+    .map-placeholder span {
+      font-family: var(--ff-serif);
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--text-muted);
+      z-index: 1;
+    }
+    .map-pin {
+      position: absolute;
+      font-size: 2rem;
+      animation: pulse 2s ease infinite;
+    }
+
+    /* ============ FOOTER ============ */
+    footer {
+      background: var(--bg-section);
+      border-top: 1px solid var(--border);
+      padding: 60px 0 40px;
+    }
+    .footer-inner {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 60px;
+    }
+    .footer-brand .nav-logo { font-size: 2.2rem; display: block; margin-bottom: 20px; }
+    .footer-brand p {
+      font-family: var(--ff-sans);
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.8;
+      max-width: 280px;
+    }
+    .footer-social { display: flex; gap: 14px; margin-top: 24px; }
+    .social-link {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    .social-link:hover { border-color: var(--gold); color: var(--gold); }
+    .footer-col h5 {
+      font-family: var(--ff-sans);
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-col ul a {
+      font-family: var(--ff-sans);
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-col ul a:hover { color: var(--gold); }
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 30px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-bottom p {
+      font-family: var(--ff-sans);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .footer-bottom span { color: var(--gold); }
+
+    /* ============ ANIMATIONS ============ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-8px); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.7; }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ============ MOBILE ============ */
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      nav.scrolled { padding: 14px 24px; }
+      .nav-links, .nav-reserve { display: none; }
+      .hamburger { display: flex; }
+      .mobile-menu {
+        display: none;
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(13,13,11,0.98);
+        z-index: 99;
+        flex-direction: column;
+        align-items: center; justify-content: center;
+        gap: 32px;
+      }
+      .mobile-menu.open { display: flex; }
+      .mobile-menu a {
+        font-family: var(--ff-serif);
+        font-size: 2.5rem;
+        font-weight: 300;
+        color: var(--text-primary);
+        text-decoration: none;
+        font-style: italic;
+        transition: color 0.3s;
+      }
+      .mobile-menu a:hover { color: var(--gold); }
+      .mobile-close {
+        position: absolute; top: 24px; right: 24px;
+        font-size: 1.5rem; color: var(--text-muted); cursor: pointer;
+        background: none; border: none;
+      }
+      .container { padding: 0 24px; }
+      section { padding: 80px 0; }
+      .about-grid { grid-template-columns: 1fr; gap: 60px; }
+      .about-image { display: none; }
+      .menu-grid { grid-template-columns: 1fr; }
+      .menu-item:nth-child(even) { padding-left: 0; border-left: none; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+      .gallery-item:first-child { grid-column: span 2; grid-row: span 1; }
+      .reservation-form { grid-template-columns: 1fr; }
+      .form-group.full, .btn-submit, .form-note { grid-column: span 1; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; gap: 50px; }
+      .footer-inner { grid-template-columns: 1fr 1fr; gap: 40px; }
+      .footer-brand { grid-column: span 2; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-close" onclick="closeMobileMenu()">✕</button>
+    <a href="#about" onclick="closeMobileMenu()">About</a>
+    <a href="#menu" onclick="closeMobileMenu()">Menu</a>
+    <a href="#gallery" onclick="closeMobileMenu()">Gallery</a>
+    <a href="#testimonials" onclick="closeMobileMenu()">Reviews</a>
+    <a href="#contact" onclick="closeMobileMenu()">Contact</a>
+    <a href="#reservation" onclick="closeMobileMenu()" style="color:var(--gold)">Reserve a Table</a>
+  </div>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <a href="#hero" class="nav-logo">Sa<span>veur</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#testimonials">Reviews</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#reservation" class="nav-reserve">Reserve a Table</a>
+    <div class="hamburger" onclick="openMobileMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-tagline">Est. 2018 &nbsp;·&nbsp; Fine Dining &nbsp;·&nbsp; Mumbai</p>
+      <h1 class="hero-title">Sa<em>veur</em></h1>
+      <p class="hero-subtitle">Where every plate tells a story of passion & provenance</p>
+      <div class="hero-actions">
+        <a href="#reservation" class="btn-primary">Reserve a Table</a>
+        <a href="#menu" class="btn-outline">Explore Menu</a>
+      </div>
+    </div>
+    <div class="hero-scroll">Scroll</div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid reveal">
+        <div class="about-image">
+          <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=700&q=80" alt="Chef at work">
+          <div class="about-badge">
+            <strong>6+</strong>
+            <span>Years of Excellence</span>
+          </div>
+        </div>
+        <div class="about-text">
+          <p class="section-label">Our Story</p>
+          <h2 class="section-title">Crafted with <em>passion</em>, served with soul</h2>
+          <div class="gold-divider"></div>
+          <p>Saveur was born from a simple belief: that exceptional food requires exceptional ingredients, exceptional technique, and exceptional care. Our kitchen is led by Chef Arjun Mehta, a culinary graduate of Le Cordon Bleu Paris with over two decades of experience across Michelin-starred restaurants.</p>
+          <p>Every dish on our menu is a reflection of our commitment to seasonal, locally-sourced ingredients, classical French technique, and the vibrant spice traditions of India — creating a dining experience that is wholly unique.</p>
+          <div class="about-stats">
+            <div class="stat-item">
+              <span class="stat-num">12</span>
+              <span class="stat-label">Awards Won</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">40+</span>
+              <span class="stat-label">Signature Dishes</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-num">98%</span>
+              <span class="stat-label">Guest Satisfaction</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">Culinary Journey</p>
+        <h2 class="section-title">Our <em>Menu</em></h2>
+      </div>
+      <div class="menu-tabs">
+        <button class="menu-tab active" onclick="switchTab(this,'starters')">Starters</button>
+        <button class="menu-tab" onclick="switchTab(this,'mains')">Main Course</button>
+        <button class="menu-tab" onclick="switchTab(this,'desserts')">Desserts</button>
+        <button class="menu-tab" onclick="switchTab(this,'drinks')">Drinks</button>
+      </div>
+
+      <!-- STARTERS -->
+      <div class="menu-panel active" id="tab-starters">
+        <div class="menu-grid">
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1544025162-d76694265947?w=200&q=80" alt="Burrata">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Burrata & Heirloom Tomato</span>
+                <span class="menu-item-price">₹780</span>
+              </div>
+              <p class="menu-item-desc">Creamy burrata, heirloom tomatoes, basil oil, aged balsamic, sea salt flakes</p>
+            </div>
+          </div>
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1534482421-64566f976cfa?w=200&q=80" alt="Scallops">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Pan-Seared Scallops</span>
+                <span class="menu-item-price">₹1,200</span>
+              </div>
+              <p class="menu-item-desc">Diver scallops, cauliflower purée, crispy capers, truffle emulsion</p>
+            </div>
+          </div>
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1547592166-23ac45744acd?w=200&q=80" alt="Soup">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Wild Mushroom Velouté</span>
+                <span class="menu-item-price">₹650</span>
+              </div>
+              <p class="menu-item-desc">Porcini, shiitake, chanterelle, herb crème fraîche, sourdough croutons</p>
+            </div>
+          </div>
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1563245372-f21724e3856d?w=200&q=80" alt="Tartare">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Salmon Tartare</span>
+                <span class="menu-item-price">₹950</span>
+              </div>
+              <p class="menu-item-desc">Norwegian salmon, avocado, cucumber, citrus ponzu, sesame, crispy taro</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAINS -->
+      <div class="menu-panel" id="tab-mains">
+        <div class="menu-grid">
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1558030006-450675393462?w=200&q=80" alt="Steak">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Prime Ribeye Steak</span>
+                <span class="menu-item-price">₹3,200</span>
+              </div>
+              <p class="menu-item-desc">300g Australian grass-fed ribeye, bone marrow butter, truffle fries, red wine jus</p>
+            </div>
+          </div>
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=200&q=80" alt="Salmon">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Roasted Atlantic Salmon</span>
+                <span class="menu-item-price">₹1,850</span>
+              </div>
+              <p class="menu-item-desc">Herb-crusted salmon, lemon beurre blanc, asparagus, quinoa pilaf</p>
+            </div>
+          </div>
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=200&q=80" alt="Duck">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Duck Confit</span>
+                <span class="menu-item-price">₹2,100</span>
+              </div>
+              <p class="menu-item-desc">48-hour duck leg, cherry gastrique, pommes sarladaises, haricots verts</p>
+            </div>
+          </div>
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=200&q=80" alt="Lamb">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Rack of Lamb</span>
+                <span class="menu-item-price">₹2,800</span>
+              </div>
+              <p class="menu-item-desc">Herb-crusted New Zealand lamb, ratatouille, rosemary jus, dauphinoise potato</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DESSERTS -->
+      <div class="menu-panel" id="tab-desserts">
+        <div class="menu-grid">
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=200&q=80" alt="Soufflé">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Chocolate Soufflé</span>
+                <span class="menu-item-price">₹680</span>
+              </div>
+              <p class="menu-item-desc">Warm Valrhona chocolate soufflé, vanilla ice cream, raspberry coulis</p>
+            </div>
+          </div>
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=200&q=80" alt="Crème Brûlée">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Crème Brûlée</span>
+                <span class="menu-item-price">₹520</span>
+              </div>
+              <p class="menu-item-desc">Classic Tahitian vanilla custard, caramelised sugar crust, seasonal berries</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DRINKS -->
+      <div class="menu-panel" id="tab-drinks">
+        <div class="menu-grid">
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=200&q=80" alt="Cocktail">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Saveur Signature</span>
+                <span class="menu-item-price">₹750</span>
+              </div>
+              <p class="menu-item-desc">Gin, elderflower, cucumber, tonic, edible gold flakes</p>
+            </div>
+          </div>
+          <div class="menu-item">
+            <img class="menu-item-img" src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=200&q=80" alt="Wine">
+            <div class="menu-item-info">
+              <div class="menu-item-header">
+                <span class="menu-item-name">Reserve Wine Selection</span>
+                <span class="menu-item-price">From ₹900</span>
+              </div>
+              <p class="menu-item-desc">Curated Old & New World wines. Ask your sommelier for pairing recommendations.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <div class="container">
+      <div class="reveal" style="margin-bottom:50px">
+        <p class="section-label">A Visual Feast</p>
+        <h2 class="section-title">Our <em>Gallery</em></h2>
+      </div>
+      <div class="gallery-grid reveal">
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&q=80" alt="Restaurant ambiance">
+          <div class="gallery-overlay"><span>Ambiance</span></div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&q=80" alt="Dish">
+          <div class="gallery-overlay"><span>Cuisine</span></div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1428515613728-6b4607e44363?w=500&q=80" alt="Bar">
+          <div class="gallery-overlay"><span>Bar</span></div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=500&q=80" alt="Chef">
+          <div class="gallery-overlay"><span>Kitchen</span></div>
+        </div>
+        <div class="gallery-item">
+          <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=500&q=80" alt="Dessert">
+          <div class="gallery-overlay"><span>Desserts</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESERVATION -->
+  <section id="reservation">
+    <div class="container">
+      <div class="reservation-inner reveal">
+        <p class="section-label" style="justify-content:center">Book Your Experience</p>
+        <h2 class="section-title" style="text-align:center">Reserve a <em>Table</em></h2>
+        <p style="font-family:var(--ff-sans);font-size:0.85rem;color:var(--text-muted);font-weight:300;line-height:1.8;text-align:center;max-width:500px;margin:0 auto;">
+          Join us for an unforgettable dining experience. Reservations recommended, especially on weekends.
+        </p>
+        <form class="reservation-form" onsubmit="handleReservation(event)">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" placeholder="Your full name" required>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" placeholder="+91 98765 43210" required>
+          </div>
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" required>
+          </div>
+          <div class="form-group">
+            <label>Time</label>
+            <select required>
+              <option value="">Select time</option>
+              <option>12:00 PM</option>
+              <option>12:30 PM</option>
+              <option>1:00 PM</option>
+              <option>1:30 PM</option>
+              <option>7:00 PM</option>
+              <option>7:30 PM</option>
+              <option>8:00 PM</option>
+              <option>8:30 PM</option>
+              <option>9:00 PM</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Number of Guests</label>
+            <select required>
+              <option value="">Select guests</option>
+              <option>1 Guest</option>
+              <option>2 Guests</option>
+              <option>3 Guests</option>
+              <option>4 Guests</option>
+              <option>5 Guests</option>
+              <option>6+ Guests</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Occasion</label>
+            <select>
+              <option value="">Select occasion</option>
+              <option>Birthday</option>
+              <option>Anniversary</option>
+              <option>Business Dinner</option>
+              <option>Date Night</option>
+              <option>Family Gathering</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Special Requests</label>
+            <textarea placeholder="Dietary requirements, special arrangements, or any other requests..."></textarea>
+          </div>
+          <button type="submit" class="btn-submit">Confirm Reservation</button>
+          <p class="form-note">We will confirm your reservation via phone within 2 hours.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials">
+    <div class="container">
+      <div class="reveal">
+        <p class="section-label">Guest Reviews</p>
+        <h2 class="section-title">What our <em>guests</em> say</h2>
+      </div>
+      <div class="testi-grid reveal">
+        <div class="testi-card">
+          <div class="testi-quote">"</div>
+          <p class="testi-text">An absolutely transcendent dining experience. The duck confit was possibly the finest thing I have eaten in my life. The service was impeccable, attentive without being intrusive.</p>
+          <div class="testi-stars">★★★★★</div>
+          <div class="testi-author">
+            <img class="testi-avatar" src="https://i.pravatar.cc/100?img=11" alt="Priya">
+            <div>
+              <p class="testi-name">Priya Sharma</p>
+              <p class="testi-date">Anniversary Dinner</p>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"</div>
+          <p class="testi-text">I have dined in restaurants across Paris, Tokyo, and New York, and Saveur holds its own against the very best. Chef Mehta's vision is extraordinary and the execution is flawless.</p>
+          <div class="testi-stars">★★★★★</div>
+          <div class="testi-author">
+            <img class="testi-avatar" src="https://i.pravatar.cc/100?img=52" alt="Rahul">
+            <div>
+              <p class="testi-name">Rahul Kapoor</p>
+              <p class="testi-date">Business Dinner</p>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card">
+          <div class="testi-quote">"</div>
+          <p class="testi-text">Every detail, from the amuse-bouche to the petit fours, tells a story of craft and dedication. Saveur has become our family's restaurant for every special occasion. Simply magical.</p>
+          <div class="testi-stars">★★★★★</div>
+          <div class="testi-author">
+            <img class="testi-avatar" src="https://i.pravatar.cc/100?img=32" alt="Ananya">
+            <div>
+              <p class="testi-name">Ananya Patel</p>
+              <p class="testi-date">Birthday Celebration</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-grid reveal">
+        <div>
+          <p class="section-label">Find Us</p>
+          <h2 class="section-title">Visit <em>Saveur</em></h2>
+          <div class="gold-divider"></div>
+          <div class="contact-info">
+            <div class="contact-item">
+              <h4>Address</h4>
+              <p>42, Marine Drive, Nariman Point<br>Mumbai, Maharashtra 400021</p>
+            </div>
+            <div class="contact-item">
+              <h4>Hours</h4>
+              <p>Lunch: Monday – Saturday<br>12:00 PM – 3:00 PM</p>
+              <p>Dinner: Daily<br>7:00 PM – 11:30 PM</p>
+            </div>
+            <div class="contact-item">
+              <h4>Contact</h4>
+              <a href="tel:+912212345678">+91 22 1234 5678</a>
+              <a href="mailto:reservations@saveur.in">reservations@saveur.in</a>
+            </div>
+          </div>
+        </div>
+        <div class="map-placeholder">
+          <div class="map-pin">📍</div>
+          <span>Embed Google Map here</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <a href="#hero" class="nav-logo">Sa<span>veur</span></a>
+          <p>An extraordinary fine dining experience in the heart of Mumbai, where classical French technique meets the bold flavours of India.</p>
+          <div class="footer-social">
+            <a href="#" class="social-link" aria-label="Instagram">IG</a>
+            <a href="#" class="social-link" aria-label="Facebook">FB</a>
+            <a href="#" class="social-link" aria-label="Twitter">TW</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h5>Navigate</h5>
+          <ul>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#menu">Our Menu</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#testimonials">Reviews</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Services</h5>
+          <ul>
+            <li><a href="#">Private Dining</a></li>
+            <li><a href="#">Corporate Events</a></li>
+            <li><a href="#">Chef's Table</a></li>
+            <li><a href="#">Catering</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Policies</h5>
+          <ul>
+            <li><a href="#">Reservations</a></li>
+            <li><a href="#">Cancellation</a></li>
+            <li><a href="#">Dress Code</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 Saveur Fine Dining. All rights reserved. Built by <span>AIWorkflow Agency</span></p>
+        <p>Designed with <span>♥</span> in India</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // NAV SCROLL
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // MOBILE MENU
+    function openMobileMenu() {
+      document.getElementById('mobileMenu').classList.add('open');
+    }
+    function closeMobileMenu() {
+      document.getElementById('mobileMenu').classList.remove('open');
+    }
+
+    // MENU TABS
+    function switchTab(btn, tab) {
+      document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + tab).classList.add('active');
+    }
+
+    // SCROLL REVEAL
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+
+    // RESERVATION FORM
+    function handleReservation(e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('.btn-submit');
+      btn.textContent = '✓ Reservation Sent!';
+      btn.style.background = 'var(--gold)';
+      btn.style.color = 'var(--bg-dark)';
+      setTimeout(() => {
+        btn.textContent = 'Confirm Reservation';
+        e.target.reset();
+      }, 3000);
+    }
+
+    // SET MIN DATE TO TODAY
+    const dateInput = document.querySelector('input[type="date"]');
+    if (dateInput) {
+      const today = new Date().toISOString().split('T')[0];
+      dateInput.setAttribute('min', today);
+    }
+  </script>
+</body>
+</html>

@@ -3,195 +3,447 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Admin — Recharge Approvals</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+<title>Admin Panel — AI Form Filler</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"/>
 <style>
-:root{--accent:#5b4ff5;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;--bg:#f6f6fa;--card:#fff;--ink:#0d0d14;--ink-muted:#6b6b80;}
+:root{
+  --accent:#5b4ff5;--accent-2:#f5724f;--accent-glow:rgba(91,79,245,0.2);
+  --ink:#0d0d14;--ink-muted:#6b6b80;--surface:#f5f4ff;--border:rgba(91,79,245,0.1);
+  --sidebar-w:260px;--green:#22c55e;--red:#ef4444;--yellow:#f59e0b;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#f6f6fa;color:var(--ink);-webkit-font-smoothing:antialiased;}
 
-/* HEADER */
-.hdr{background:linear-gradient(135deg,#1a1535,#2d2060);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.hdr-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;display:flex;align-items:center;gap:10px;}
-.admin-badge{background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.4);color:#fca5a5;border-radius:20px;padding:3px 12px;font-size:.72rem;font-weight:700;}
-.hdr-right{display:flex;align-items:center;gap:12px;}
-.back-btn{color:rgba(255,255,255,.7);text-decoration:none;font-size:.85rem;display:flex;align-items:center;gap:6px;}
-.back-btn:hover{color:#fff;}
-.logout-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;padding:6px 14px;font-size:.82rem;cursor:pointer;}
+/* ── LOADING OVERLAY ── */
+#loading-overlay{
+  position:fixed;inset:0;background:linear-gradient(135deg,#1a1535,#0d0d14);
+  display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:16px;
+}
+.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.1);border-top-color:#8b7fff;border-radius:50%;animation:spin 0.8s linear infinite;}
+.loading-text{font-family:'Outfit',sans-serif;color:rgba(255,255,255,.5);font-size:.9rem;}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* STATS BAR */
-.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px 24px;background:var(--card);border-bottom:1px solid #eee;}
-.stat-box{text-align:center;}
-.stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;line-height:1;}
-.stat-lbl{font-size:.72rem;color:var(--ink-muted);margin-top:2px;text-transform:uppercase;letter-spacing:.5px;}
-.stat-num.pending-c{color:var(--yellow);}
-.stat-num.approved-c{color:var(--green);}
-.stat-num.rejected-c{color:var(--red);}
-.stat-num.total-c{color:var(--accent);}
+/* ── SIDEBAR ── */
+#sidebar{
+  position:fixed;top:0;left:0;height:100vh;width:var(--sidebar-w);
+  background:linear-gradient(160deg,#1a1535 0%,#0d0d14 100%);
+  color:white;padding:0;z-index:200;display:flex;flex-direction:column;
+  box-shadow:4px 0 40px rgba(0,0,0,.25);
+}
+#sidebar::before{
+  content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:22px 22px;pointer-events:none;
+}
+.sidebar-logo{
+  padding:1.8rem 1.5rem 1.2rem;border-bottom:1px solid rgba(255,255,255,.07);
+  margin-bottom:.5rem;position:relative;z-index:1;
+}
+.sidebar-logo-text{font-family:'Outfit',sans-serif;font-weight:800;letter-spacing:-.5px;font-size:1.4rem;color:white;}
+.sidebar-logo-text span{color:#8b7fff;}
+.sidebar-tagline{font-size:.73rem;color:rgba(255,255,255,.35);margin-top:3px;}
+.admin-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:20px;padding:2px 10px;font-size:.65rem;font-weight:700;color:#fca5a5;margin-top:6px;}
+.sidebar-nav{flex:1;padding:.5rem 1rem;position:relative;z-index:1;overflow-y:auto;}
+.nav-item-custom{
+  display:flex;align-items:center;gap:12px;padding:.72rem 1rem;border-radius:12px;
+  text-decoration:none;color:rgba(255,255,255,.55);font-weight:500;font-size:.88rem;
+  margin-bottom:3px;transition:all .2s;cursor:pointer;border:none;background:none;width:100%;
+}
+.nav-item-custom i{width:20px;text-align:center;font-size:1rem;}
+.nav-item-custom:hover{background:rgba(255,255,255,.07);color:white;transform:translateX(3px);}
+.nav-item-custom.active{
+  background:linear-gradient(135deg,rgba(91,79,245,.3),rgba(91,79,245,.15));
+  color:white;border:1px solid rgba(139,127,255,.35);box-shadow:0 4px 12px rgba(91,79,245,.15);
+}
+.nav-item-custom.active i{color:#a29bff;}
+.nav-divider{border:none;border-top:1px solid rgba(255,255,255,.07);margin:.4rem 0;}
+.pending-badge{
+  background:var(--yellow);color:#7c3a0a;border-radius:20px;padding:1px 8px;
+  font-size:.65rem;font-weight:800;margin-left:auto;display:none;
+}
+.sidebar-footer{padding:1rem;border-top:1px solid rgba(255,255,255,.07);position:relative;z-index:1;}
+.user-chip{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;background:rgba(255,255,255,.06);border-radius:12px;margin-bottom:.5rem;}
+.user-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:800;font-size:.9rem;color:white;flex-shrink:0;}
+.user-name{font-size:.85rem;font-weight:600;color:white;}
+.user-email{font-size:.72rem;color:rgba(255,255,255,.4);}
+.btn-logout{display:flex;align-items:center;gap:8px;width:100%;padding:.65rem 1rem;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:rgba(255,255,255,.5);font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;text-align:left;}
+.btn-logout:hover{background:rgba(220,53,69,.15);color:#ff6b7a;border-color:rgba(220,53,69,.3);}
 
-/* MAIN */
-.main{padding:24px;max-width:1100px;margin:0 auto;}
-.section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.badge{border-radius:20px;padding:3px 10px;font-size:.7rem;font-weight:700;}
+/* ── MAIN ── */
+#main{margin-left:var(--sidebar-w);min-height:100vh;padding:2rem;}
+.section-wrap{display:none;}
+.section-wrap.active{display:block;}
+
+/* ── TOP BAR ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;}
+.page-title{font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:800;}
+.page-sub{font-size:.88rem;color:var(--ink-muted);margin-top:2px;}
+
+/* ── STAT CARDS ── */
+.stat-card{border-radius:20px;padding:1.6rem;transition:all .3s;position:relative;overflow:hidden;border:none;color:white;}
+.stat-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.15);}
+.stat-card.c-purple{background:linear-gradient(135deg,#5b4ff5 0%,#7c3aed 100%);}
+.stat-card.c-orange{background:linear-gradient(135deg,#f5724f 0%,#e8470a 100%);}
+.stat-card.c-cyan{background:linear-gradient(135deg,#06b6d4 0%,#0891b2 100%);}
+.stat-card.c-green{background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%);}
+.stat-card.c-yellow{background:linear-gradient(135deg,#f59e0b 0%,#d97706 100%);}
+.stat-card-icon{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:1rem;}
+.stat-num{font-family:'Outfit',sans-serif;font-size:2.4rem;font-weight:800;line-height:1;margin-bottom:.3rem;}
+.stat-label{font-size:.82rem;opacity:.75;font-weight:500;}
+
+/* ── CARD (WHITE) ── */
+.card-w{background:white;border-radius:20px;padding:1.5rem;border:1px solid var(--border);}
+.card-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:1rem;margin-bottom:1rem;display:flex;align-items:center;gap:8px;}
+
+/* ── TABLE ── */
+.tbl-admin{width:100%;border-collapse:collapse;}
+.tbl-admin th{padding:10px 14px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-muted);border-bottom:1.5px solid #f0eeff;white-space:nowrap;}
+.tbl-admin td{padding:11px 14px;font-size:.82rem;border-bottom:1px solid #f4f4fb;vertical-align:middle;}
+.tbl-admin tr:last-child td{border-bottom:none;}
+.tbl-admin tr:hover td{background:#fafaff;}
+.tbl-wrap{overflow-x:auto;}
+
+/* ── STATUS BADGES ── */
+.badge-pill{border-radius:20px;padding:3px 10px;font-size:.7rem;font-weight:700;white-space:nowrap;}
 .badge-pending{background:rgba(245,158,11,.12);color:#92400e;border:1px solid rgba(245,158,11,.3);}
 .badge-approved{background:rgba(34,197,94,.1);color:#166534;border:1px solid rgba(34,197,94,.25);}
 .badge-rejected{background:rgba(239,68,68,.1);color:#991b1b;border:1px solid rgba(239,68,68,.2);}
+.badge-deduction{background:rgba(245,114,79,.1);color:#9a3412;border:1px solid rgba(245,114,79,.25);}
 
-/* PENDING CARDS */
-.pending-list{display:flex;flex-direction:column;gap:12px;margin-bottom:30px;}
-.txn-card{background:var(--card);border:1px solid #e8e8f0;border-radius:14px;padding:16px 18px;}
-.txn-card.is-pending{border-left:4px solid var(--yellow);}
-.txn-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-.txn-user{font-weight:700;font-size:.95rem;}
-.txn-email{font-size:.78rem;color:var(--ink-muted);}
-.txn-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
+/* ── FILTER TABS ── */
+.filter-tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap;}
+.filter-tab{background:#f4f4fb;border:1.5px solid #e8e8f5;border-radius:20px;padding:5px 14px;font-size:.8rem;font-weight:600;color:var(--ink-muted);cursor:pointer;transition:all .2s;}
+.filter-tab.active,.filter-tab:hover{background:var(--accent);border-color:var(--accent);color:white;}
+
+/* ── SEARCH BAR ── */
+.search-wrap{position:relative;margin-bottom:1rem;}
+.search-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-muted);font-size:.95rem;}
+.search-inp{width:100%;padding:.72rem 1rem .72rem 2.6rem;border:1.5px solid #e8e8f5;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;background:#fafaff;outline:none;transition:all .2s;}
+.search-inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,79,245,.1);background:white;}
+
+/* ── PENDING APPROVAL CARDS ── */
+.txn-card{background:white;border:1px solid #e8e8f0;border-left:4px solid var(--yellow);border-radius:14px;padding:16px 18px;margin-bottom:12px;}
+.txn-card.approved{border-left-color:var(--green);}
+.txn-card.rejected{border-left-color:var(--red);}
+.txn-user-name{font-weight:700;font-size:.95rem;}
+.txn-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
 .meta-pill{background:#f4f4fb;border-radius:8px;padding:4px 10px;font-size:.76rem;color:var(--ink-muted);display:flex;align-items:center;gap:5px;}
 .meta-pill strong{color:var(--ink);}
-.txn-id{font-family:monospace;font-size:.8rem;background:#f0f0fb;border-radius:6px;padding:4px 10px;color:var(--accent);margin-top:8px;display:inline-block;}
-.txn-actions{display:flex;gap:8px;margin-top:12px;align-items:center;}
-.btn-approve{background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;border:none;border-radius:9px;padding:8px 18px;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;}
+.txn-upi{font-family:monospace;font-size:.8rem;background:#f0f0fb;border-radius:6px;padding:4px 10px;color:var(--accent);margin-top:8px;display:inline-block;}
+.txn-actions{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap;}
+.btn-approve{background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:9px;padding:8px 18px;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;}
 .btn-approve:hover{opacity:.88;}
-.btn-reject{background:#fff;color:var(--red);border:1.5px solid var(--red);border-radius:9px;padding:8px 18px;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;}
-.btn-reject:hover{background:#fff5f5;}
 .btn-approve:disabled,.btn-reject:disabled{opacity:.5;cursor:not-allowed;}
-.admin-note-inp{flex:1;min-width:180px;padding:8px 12px;border:1.5px solid #e0e0f0;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.82rem;outline:none;}
-.admin-note-inp:focus{border-color:var(--accent);}
-.time-ago{font-size:.72rem;color:var(--ink-muted);}
+.btn-reject{background:white;color:var(--red);border:1.5px solid var(--red);border-radius:9px;padding:8px 18px;font-weight:700;font-size:.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.2s;}
+.btn-reject:hover{background:#fff5f5;}
+.note-inp{flex:1;min-width:160px;padding:8px 12px;border:1.5px solid #e0e0f0;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.82rem;outline:none;}
+.note-inp:focus{border-color:var(--accent);}
 
-/* HISTORY TABLE */
-.tbl-wrap{background:var(--card);border-radius:14px;border:1px solid #e8e8f0;overflow:hidden;}
-.tbl-head{padding:14px 18px;background:#f8f8fc;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between;}
-.tbl-head h3{font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;}
-table{width:100%;border-collapse:collapse;}
-th{background:#f8f8fc;padding:10px 14px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-muted);border-bottom:1px solid #eee;}
-td{padding:11px 14px;font-size:.82rem;border-bottom:1px solid #f4f4fb;vertical-align:middle;}
-tr:last-child td{border-bottom:none;}
-tr:hover td{background:#fafafa;}
+/* ── USER AVATAR SMALL ── */
+.avatar-sm{width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:800;font-size:.82rem;color:white;flex-shrink:0;}
 
-/* EMPTY */
-.empty{text-align:center;padding:40px;color:var(--ink-muted);}
-.empty .ico{font-size:2.5rem;margin-bottom:8px;}
+/* ── ACTION BUTTONS ── */
+.btn-xs{padding:5px 12px;border-radius:8px;font-size:.75rem;font-weight:700;cursor:pointer;border:none;transition:.2s;display:inline-flex;align-items:center;gap:5px;}
+.btn-xs-accent{background:rgba(91,79,245,.1);color:var(--accent);}
+.btn-xs-accent:hover{background:rgba(91,79,245,.2);}
+.btn-xs-outline{background:white;color:var(--ink-muted);border:1.5px solid #e8e8f5;}
+.btn-xs-outline:hover{border-color:var(--accent);color:var(--accent);}
+.btn-xs-danger{background:rgba(239,68,68,.1);color:var(--red);}
+.btn-xs-danger:hover{background:rgba(239,68,68,.2);}
 
-/* TOAST */
-.toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
-.toast{background:#fff;border-radius:10px;padding:12px 16px;box-shadow:0 4px 20px rgba(0,0,0,.12);font-size:.84rem;display:flex;align-items:center;gap:10px;animation:slideIn .3s ease;border-left:4px solid #ccc;max-width:320px;}
-.toast.success{border-left-color:var(--green);}
-.toast.error{border-left-color:var(--red);}
-.toast.warn{border-left-color:var(--yellow);}
-@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+/* ── CHARTS ── */
+.chart-card{background:white;border-radius:20px;padding:1.5rem;border:1px solid var(--border);}
+.chart-title{font-family:'Outfit',sans-serif;font-weight:700;font-size:.9rem;color:var(--ink-muted);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.5px;}
 
-/* MIGRATION PANEL */
-.migration-panel{background:#fff;border:1.5px solid rgba(91,79,245,.25);border-radius:14px;padding:18px 20px;margin-bottom:24px;}
-.migration-panel h3{font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
-.migration-panel p{font-size:.82rem;color:var(--ink-muted);margin-bottom:14px;}
-.btn-migrate{background:linear-gradient(135deg,#5b4ff5,#7c3aed);color:#fff;border:none;border-radius:9px;padding:9px 20px;font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.2s;}
-.btn-migrate:hover{opacity:.88;}
-.btn-migrate:disabled{opacity:.5;cursor:not-allowed;}
-#migrateLog{font-family:monospace;font-size:.75rem;background:#f4f4fb;border-radius:8px;padding:12px;margin-top:12px;max-height:200px;overflow-y:auto;display:none;white-space:pre-wrap;line-height:1.6;}
-.btn-danger{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;border:none;border-radius:9px;padding:9px 20px;font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.2s;}
+/* ── DANGER ZONE ── */
+.danger-card{background:white;border:1.5px solid rgba(239,68,68,.25);border-radius:14px;padding:18px 20px;margin-bottom:1rem;}
+.danger-card h3{font-family:'Outfit',sans-serif;font-weight:800;font-size:.95rem;margin-bottom:6px;display:flex;align-items:center;gap:8px;color:var(--red);}
+.danger-card p{font-size:.82rem;color:var(--ink-muted);margin-bottom:14px;}
+.btn-danger{background:linear-gradient(135deg,#ef4444,#b91c1c);color:white;border:none;border-radius:9px;padding:9px 18px;font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.2s;}
 .btn-danger:hover{opacity:.88;}
 .btn-danger:disabled{opacity:.5;cursor:not-allowed;}
+.btn-migrate{background:linear-gradient(135deg,#5b4ff5,#7c3aed);color:white;border:none;border-radius:9px;padding:9px 18px;font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.2s;}
+.btn-migrate:hover{opacity:.88;}
+.btn-migrate:disabled{opacity:.5;cursor:not-allowed;}
+.btn-refresh{background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;border:none;border-radius:9px;padding:9px 18px;font-weight:700;font-size:.85rem;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.2s;}
+.btn-refresh:hover{opacity:.88;}
+.btn-refresh:disabled{opacity:.5;cursor:not-allowed;}
+.log-console{font-family:monospace;font-size:.75rem;background:#f4f4fb;border-radius:8px;padding:12px;margin-top:12px;max-height:200px;overflow-y:auto;display:none;white-space:pre-wrap;line-height:1.6;}
+.log-console.danger-bg{background:#fff5f5;}
 
-/* LOADING */
-#loading{position:fixed;inset:0;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;z-index:1000;font-size:.9rem;gap:10px;}
+/* ── TOAST ── */
+.toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast-item{background:white;border-radius:10px;padding:12px 16px;box-shadow:0 4px 20px rgba(0,0,0,.12);font-size:.84rem;display:flex;align-items:center;gap:10px;animation:slideIn .3s ease;border-left:4px solid #ccc;max-width:340px;pointer-events:auto;}
+.toast-item.success{border-left-color:var(--green);}
+.toast-item.error{border-left-color:var(--red);}
+.toast-item.warn{border-left-color:var(--yellow);}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
 
-@media(max-width:600px){
-  .stats-bar{grid-template-columns:1fr 1fr;}
-  .txn-top{flex-direction:column;}
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:48px 20px;color:var(--ink-muted);}
+.empty-state .icon{font-size:2.8rem;margin-bottom:12px;}
+
+/* ── MODAL OVERRIDES ── */
+.modal-header-accent{background:linear-gradient(135deg,#5b4ff5,#7c3aed);color:white;border-radius:16px 16px 0 0;padding:1.2rem 1.5rem;}
+.modal-header-accent .btn-close{filter:invert(1) brightness(2);}
+.toggle-group{display:flex;border:1.5px solid #e0e0f0;border-radius:10px;overflow:hidden;margin-bottom:1rem;}
+.toggle-btn{flex:1;padding:.65rem;font-weight:700;font-size:.88rem;cursor:pointer;border:none;background:white;color:var(--ink-muted);transition:.2s;}
+.toggle-btn.active.add{background:rgba(34,197,94,.12);color:#166534;}
+.toggle-btn.active.deduct{background:rgba(239,68,68,.1);color:#991b1b;}
+
+/* ── MOBILE ── */
+@media(max-width:900px){
+  #sidebar{display:none;}
+  #main{margin-left:0;padding:1rem;}
 }
 </style>
 </head>
 <body>
 
-<div id="loading"><div style="width:32px;height:32px;border:3px solid #e0e0f0;border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite"></div> Loading...</div>
-<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-
-<!-- HEADER -->
-<div class="hdr">
-  <div class="hdr-brand">
-    🤖 AI Form Filler
-    <span class="admin-badge">🔐 ADMIN</span>
-  </div>
-  <div class="hdr-right">
-    <a href="dashboard.html" class="back-btn"><i class="bi bi-arrow-left"></i> Dashboard</a>
-    <button class="logout-btn" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</button>
-  </div>
+<!-- LOADING -->
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Loading Admin Panel...</div>
 </div>
 
-<!-- STATS BAR -->
-<div class="stats-bar">
-  <div class="stat-box"><div class="stat-num pending-c" id="statPending">--</div><div class="stat-lbl">⏳ Pending</div></div>
-  <div class="stat-box"><div class="stat-num approved-c" id="statApproved">--</div><div class="stat-lbl">✅ Approved</div></div>
-  <div class="stat-box"><div class="stat-num rejected-c" id="statRejected">--</div><div class="stat-lbl">❌ Rejected</div></div>
-  <div class="stat-box"><div class="stat-num total-c" id="statTotal">--</div><div class="stat-lbl">💰 Total ₹</div></div>
-</div>
-
-<div class="main">
-  <!-- WALLET MIGRATION PANEL -->
-  <div class="migration-panel">
-    <h3>🔄 Migrate Users to Wallet System</h3>
-    <p>Sets <code>walletBalance</code> for all users who don't have it yet. Users with old credits get <strong>credits × ₹4</strong>; users with 0 credits get <strong>₹100 free</strong>. Safe to run multiple times — already-migrated users are skipped.</p>
-    <button class="btn-migrate" id="migrateBtn" onclick="migrateAllUsers()">
-      <i class="bi bi-arrow-repeat"></i> Run Migration
-    </button>
-    <div id="migrateLog"></div>
-  </div>
-
-  <!-- DANGER ZONE -->
-  <div class="migration-panel" style="border-color:rgba(239,68,68,.3);margin-bottom:24px;">
-    <h3 style="color:var(--red);">⚠️ Danger Zone</h3>
-    <p>Permanently deletes all transactions and resets all user wallet balances to ₹100. <strong>Cannot be undone.</strong></p>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-      <button class="btn-danger" id="clearTxnBtn" onclick="clearAllTransactions()">
-        <i class="bi bi-trash3-fill"></i> Delete All Transactions
-      </button>
-      <button class="btn-danger" id="deleteUsersBtn" onclick="deleteAllFirestoreUsers()">
-        <i class="bi bi-person-x-fill"></i> Delete All Users (Firestore)
-      </button>
-      <button class="btn-danger" id="resetWalletBtn" onclick="resetAllWallets()" style="background:linear-gradient(135deg,#f59e0b,#d97706);">
-        <i class="bi bi-wallet2"></i> Reset All Wallets to ₹100
-      </button>
-    </div>
-    <p style="font-size:.75rem;color:var(--red);margin-top:10px;margin-bottom:0;">⚠️ To also delete Firebase Auth login credentials, go to <strong>Firebase Console → Authentication → Users → Select All → Delete</strong></p>
-    <div id="dangerLog" style="font-family:monospace;font-size:.75rem;background:#fff5f5;border-radius:8px;padding:12px;margin-top:12px;max-height:160px;overflow-y:auto;display:none;white-space:pre-wrap;line-height:1.6;"></div>
-  </div>
-
-  <!-- PENDING -->
-  <div class="section-title">⏳ Pending Approvals <span class="badge badge-pending" id="pendingCount">0</span></div>
-  <div class="pending-list" id="pendingList">
-    <div class="empty"><div class="ico">🎉</div>No pending requests</div>
-  </div>
-
-  <!-- HISTORY -->
-  <div class="section-title" style="margin-top:8px;">📋 All Transactions</div>
-  <div class="tbl-wrap">
-    <div class="tbl-head">
-      <h3>Transaction History</h3>
-      <span style="font-size:.78rem;color:var(--ink-muted)" id="histCount"></span>
-    </div>
-    <div style="overflow-x:auto">
-      <table>
-        <thead>
-          <tr>
-            <th>User</th><th>Package</th><th>Amount</th><th>TXN ID</th><th>Status</th><th>Time</th>
-          </tr>
-        </thead>
-        <tbody id="histBody">
-          <tr><td colspan="6" class="empty">Loading...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
+<!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- ══ SIDEBAR ══ -->
+<div id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-text">AI<span>Form</span>Filler</div>
+    <div class="sidebar-tagline">Control Panel</div>
+    <div class="admin-pill"><i class="bi bi-shield-lock-fill"></i> ADMIN</div>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item-custom active" data-section="overview">
+      <i class="bi bi-speedometer2"></i> Overview
+    </button>
+    <button class="nav-item-custom" data-section="approvals">
+      <i class="bi bi-check2-circle"></i> Approvals
+      <span class="pending-badge" id="navPendingBadge">0</span>
+    </button>
+    <button class="nav-item-custom" data-section="users">
+      <i class="bi bi-people-fill"></i> Users
+    </button>
+    <button class="nav-item-custom" data-section="formlogs">
+      <i class="bi bi-journal-text"></i> Usage & Margin
+    </button>
+    <hr class="nav-divider"/>
+    <a href="dashboard.html" class="nav-item-custom">
+      <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar" id="sidebarAvatar">A</div>
+      <div>
+        <div class="user-name" id="sidebarName">Admin</div>
+        <div class="user-email" id="sidebarEmail">loading...</div>
+      </div>
+    </div>
+    <button class="btn-logout" id="logoutBtn"><i class="bi bi-box-arrow-left"></i> Logout</button>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div id="main">
+
+  <!-- ── SECTION: OVERVIEW ── -->
+  <div class="section-wrap active" id="section-overview">
+    <div class="top-bar">
+      <div>
+        <div class="page-title">📊 Overview</div>
+        <div class="page-sub">Recharge operations plus real usage revenue, AI cost, and margin</div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-refresh" id="refreshAllBtnTop" onclick="refreshAllData()">
+          <i class="bi bi-arrow-clockwise"></i> Refresh Data
+        </button>
+        <button class="btn-migrate" id="approveAllBtn" onclick="approveAllPending()">
+          <i class="bi bi-check-all"></i> Approve All Pending
+        </button>
+      </div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3"><div class="stat-card c-purple h-100"><div class="stat-card-icon"><i class="bi bi-people-fill"></i></div><div class="stat-num" id="ovUsers">--</div><div class="stat-label">Total Users</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card c-green h-100"><div class="stat-card-icon"><i class="bi bi-cash-coin"></i></div><div class="stat-num" id="ovRevenue">--</div><div class="stat-label">Usage Revenue</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card c-yellow h-100"><div class="stat-card-icon"><i class="bi bi-hourglass-split"></i></div><div class="stat-num" id="ovPending">--</div><div class="stat-label">Pending Approvals</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card c-orange h-100"><div class="stat-card-icon"><i class="bi bi-graph-up-arrow"></i></div><div class="stat-num" id="ovMargin">--</div><div class="stat-label">Gross Margin</div></div></div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3"><div class="stat-card c-cyan h-100"><div class="stat-card-icon"><i class="bi bi-cpu-fill"></i></div><div class="stat-num" id="ovAiCost">--</div><div class="stat-label">AI Cost</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card c-purple h-100"><div class="stat-card-icon"><i class="bi bi-file-earmark-text-fill"></i></div><div class="stat-num" id="ovForms">--</div><div class="stat-label">Total Forms Filled</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card c-green h-100"><div class="stat-card-icon"><i class="bi bi-input-cursor-text"></i></div><div class="stat-num" id="ovFields">--</div><div class="stat-label">Fields Filled</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card c-yellow h-100"><div class="stat-card-icon"><i class="bi bi-percent"></i></div><div class="stat-num" id="ovMarginPct">--</div><div class="stat-label">Margin %</div></div></div>
+    </div>
+    <div class="card-w">
+      <div class="card-title"><i class="bi bi-clock-history text-secondary"></i> Recent Activity</div>
+      <div class="tbl-wrap">
+        <table class="tbl-admin">
+          <thead><tr><th>User</th><th>Type</th><th>Revenue ₹</th><th>AI Cost ₹</th><th>Margin ₹</th><th>Status</th><th>Time</th></tr></thead>
+          <tbody id="ovRecentTbody"><tr><td colspan="7" class="empty-state">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION: APPROVALS ── -->
+  <div class="section-wrap" id="section-approvals">
+    <div class="top-bar">
+      <div>
+        <div class="page-title">✅ Recharge Approvals</div>
+        <div class="page-sub">Review wallet top-up requests only</div>
+      </div>
+    </div>
+    <div id="approvalsPendingList" class="mb-4">
+      <div class="empty-state"><div class="icon">🎉</div>No pending requests</div>
+    </div>
+    <div class="card-w">
+      <div class="card-title"><i class="bi bi-list-ul text-secondary"></i> Recharge History</div>
+      <div class="filter-tabs" id="approvalFilterTabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="pending">⏳ Pending</button>
+        <button class="filter-tab" data-filter="approved">✅ Approved</button>
+        <button class="filter-tab" data-filter="rejected">❌ Rejected</button>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl-admin">
+          <thead><tr><th>User</th><th>Amount</th><th>UPI TXN ID</th><th>Note</th><th>Status</th><th>Time</th></tr></thead>
+          <tbody id="approvalsHistBody"><tr><td colspan="6" class="empty-state">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION: USERS ── -->
+  <div class="section-wrap" id="section-users">
+    <div class="top-bar">
+      <div>
+        <div class="page-title">👥 Users</div>
+        <div class="page-sub" id="usersCount">Loading users...</div>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input class="search-inp" id="userSearchInput" placeholder="Search by name, email, or phone..."/>
+    </div>
+    <div class="card-w">
+      <div class="tbl-wrap">
+        <table class="tbl-admin">
+          <thead><tr><th>User</th><th>Email</th><th>Wallet ₹</th><th>Forms</th><th>Revenue ₹</th><th>Margin ₹</th><th>Actions</th></tr></thead>
+          <tbody id="usersTableBody"><tr><td colspan="7" class="empty-state">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION: FORM LOGS ── -->
+  <div class="section-wrap" id="section-formlogs">
+    <div class="top-bar">
+      <div>
+        <div class="page-title">📋 Usage & Margin</div>
+        <div class="page-sub" id="formLogCount">All form fill activity with revenue, AI cost, and actual margin</div>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <i class="bi bi-search"></i>
+      <input class="search-inp" id="formLogSearch" placeholder="Search by user name or portal..."/>
+    </div>
+    <div class="card-w">
+      <div class="tbl-wrap">
+        <table class="tbl-admin">
+          <thead><tr><th>User</th><th>Portal</th><th>Page Title</th><th>Fields</th><th>Revenue ₹</th><th>AI Cost ₹</th><th>Margin ₹</th><th>Margin/Field ₹</th><th>Time</th></tr></thead>
+          <tbody id="formLogsTbody"><tr><td colspan="9" class="empty-state">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- #main -->
+
+<!-- ══ ADJUST WALLET MODAL ══ -->
+<div class="modal fade" id="modalAdjustWallet" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden;">
+      <div class="modal-header-accent">
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:1.1rem;">Adjust Wallet Balance</div>
+          <div style="font-size:.8rem;opacity:.75;margin-top:2px;" id="adjustModalUser">—</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div style="background:#f5f4ff;border-radius:12px;padding:12px 16px;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:.82rem;color:var(--ink-muted);">Current Balance</span>
+          <span style="font-family:'Outfit',sans-serif;font-weight:800;font-size:1.2rem;color:var(--accent);" id="adjustModalBalance">₹0</span>
+        </div>
+        <div class="toggle-group" id="adjustToggleGroup">
+          <button class="toggle-btn add active" id="adjustAddBtn" onclick="setAdjustMode('add')">➕ Add</button>
+          <button class="toggle-btn deduct" id="adjustDeductBtn" onclick="setAdjustMode('deduct')">➖ Deduct</button>
+        </div>
+        <label style="font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555570;display:block;margin-bottom:5px;">Amount (₹)</label>
+        <input type="number" min="1" id="adjustAmount" placeholder="Enter amount in ₹" style="width:100%;padding:.8rem 1rem;border:1.5px solid #e8e8f5;border-radius:11px;font-size:.94rem;outline:none;margin-bottom:1rem;font-family:'Plus Jakarta Sans',sans-serif;"/>
+        <label style="font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#555570;display:block;margin-bottom:5px;">Reason / Note (optional)</label>
+        <textarea id="adjustNote" rows="2" placeholder="e.g. Promotional credit, manual correction..." style="width:100%;padding:.8rem 1rem;border:1.5px solid #e8e8f5;border-radius:11px;font-size:.88rem;outline:none;resize:none;font-family:'Plus Jakarta Sans',sans-serif;"></textarea>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid #f0eeff;padding:.8rem 1.2rem;">
+        <button class="btn" data-bs-dismiss="modal" style="border:1.5px solid #e8e8f5;border-radius:10px;font-weight:600;font-size:.88rem;">Cancel</button>
+        <button class="btn" id="adjustConfirmBtn" onclick="confirmAdjustWallet()" style="background:linear-gradient(135deg,#5b4ff5,#7c3aed);color:white;border:none;border-radius:10px;font-weight:700;font-size:.88rem;padding:.6rem 1.4rem;">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ USER HISTORY MODAL ══ -->
+<div class="modal fade" id="modalUserHistory" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content" style="border-radius:20px;border:none;overflow:hidden;">
+      <div class="modal-header-accent">
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:1.1rem;" id="histModalTitle">User History</div>
+          <div style="font-size:.8rem;opacity:.75;margin-top:2px;" id="histModalSub">—</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-0">
+        <ul class="nav nav-tabs px-3 pt-3" id="histTabs">
+          <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#histTabTxns">💳 Transactions</a></li>
+          <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#histTabLogs">📋 Fill Activity</a></li>
+        </ul>
+        <div class="tab-content p-3">
+          <div class="tab-pane fade show active" id="histTabTxns">
+            <div class="tbl-wrap">
+              <table class="tbl-admin">
+                <thead><tr><th>Type</th><th>Revenue ₹</th><th>AI Cost ₹</th><th>Margin ₹</th><th>Description</th><th>Status</th><th>Time</th></tr></thead>
+                <tbody id="histTxnsTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tab-pane fade" id="histTabLogs">
+            <div class="tbl-wrap">
+              <table class="tbl-admin">
+                <thead><tr><th>Portal</th><th>Page Title</th><th>Fields</th><th>Revenue ₹</th><th>AI Cost ₹</th><th>Margin ₹</th><th>Time</th></tr></thead>
+                <tbody id="histLogsTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <script>
-// ── ADMIN EMAIL — change this to YOUR email ────────────────────────────
+// ── CONFIG ─────────────────────────────────────────────────────────────
 const ADMIN_EMAIL = 'ashokkumar1112.ch@gmail.com';
 
 firebase.initializeApp({
@@ -205,106 +457,343 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
-let currentAdmin = null;
-let allTxns = [];
+// ── STATE ──────────────────────────────────────────────────────────────
+let currentAdmin  = null;
+let allUsers      = [];
+let allTxns       = [];
+let allLogs       = [];
+let pendingListener = null;
+let recentTxnListener = null;
+let chartRevenue  = null, chartForms = null, chartPortals = null;
+let lastLogDoc    = null;
+let _adjustUid    = null;
+let _adjustMode   = 'add';
+const _userCache  = {};
+let _searchDebounce = null;
 
-// ── AUTH CHECK ────────────────────────────────────────────────────────
+// ── AUTH ───────────────────────────────────────────────────────────────
 auth.onAuthStateChanged(async user => {
   if (!user) { window.location.href = 'login.html'; return; }
   if (user.email !== ADMIN_EMAIL) {
-    alert('⛔ Access denied. Admin only.');
     window.location.href = 'dashboard.html';
     return;
   }
   currentAdmin = user;
-  document.getElementById('loading').style.display = 'none';
-  loadAll();
-  // Live listener for new pending requests (catch both old 'pending' and new 'pending_verification')
-  db.collection('transactions')
-    .where('status','in',['pending_verification','pending'])
-    .onSnapshot(() => loadAll());
+  document.getElementById('sidebarAvatar').textContent = (user.displayName || user.email || 'A').charAt(0).toUpperCase();
+  document.getElementById('sidebarName').textContent   = user.displayName || 'Admin';
+  document.getElementById('sidebarEmail').textContent  = user.email;
+  try {
+    await Promise.all([loadUsers(), loadTransactions(), loadFormLogs(false)]);
+    enrichUsersFromTransactions();
+    computeAndRenderOverview();
+    startRecentTransactionsListener();
+    startPendingListener();
+  } catch(e) {
+    showToast('Error loading data: ' + e.message, 'error');
+  } finally {
+    document.getElementById('loading-overlay').style.display = 'none';
+  }
 });
 
-document.getElementById('logoutBtn').onclick = () => auth.signOut().then(() => window.location.href = 'login.html');
+document.getElementById('logoutBtn').onclick = () =>
+  auth.signOut().then(() => window.location.href = 'login.html');
 
-// ── LOAD ALL TRANSACTIONS ─────────────────────────────────────────────
-async function loadAll() {
+// ── DATA LOADING ───────────────────────────────────────────────────────
+async function loadUsers() {
+  const snap = await db.collection('users').limit(300).get();
+  allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  allUsers.sort((a, b) => {
+    const ta = tsToMs(a.registeredAt || a.createdAt);
+    const tb = tsToMs(b.registeredAt || b.createdAt);
+    return tb - ta;
+  });
+}
+
+async function loadTransactions() {
+  const snap = await db.collection('transactions').orderBy('timestamp','desc').limit(500).get();
+  allTxns = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+async function loadFormLogs(append) {
+  let q = db.collection('formLogs').orderBy('timestamp','desc').limit(100);
+  if (append && lastLogDoc) q = q.startAfter(lastLogDoc);
+  const snap = await q.get();
+  lastLogDoc = snap.docs[snap.docs.length - 1] || lastLogDoc;
+  const newLogs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  if (append) allLogs = [...allLogs, ...newLogs];
+  else allLogs = newLogs;
+}
+
+// For users whose Firestore doc lacks name/email, recover it from stored transaction records
+function enrichUsersFromTransactions() {
+  allUsers.forEach(u => {
+    if (u.name && u.email) return; // already complete
+    const txn = allTxns.find(t => t.userId === u.id && (t.userName || t.userEmail));
+    if (txn) {
+      u.name  = u.name  || txn.userName  || '';
+      u.email = u.email || txn.userEmail || '';
+    }
+    // Also try formLogs
+    if (!u.email) {
+      const log = allLogs.find(l => l.userId === u.id && l.userEmail);
+      if (log) u.email = log.userEmail || '';
+    }
+  });
+}
+
+function upsertTransactions(items) {
+  items.forEach(obj => {
+    const idx = allTxns.findIndex(t => t.id === obj.id);
+    if (idx >= 0) allTxns[idx] = obj;
+    else allTxns.unshift(obj);
+  });
+  allTxns.sort((a, b) => tsToMs(b.timestamp) - tsToMs(a.timestamp));
+  allTxns = allTxns.slice(0, 500);
+}
+
+function startRecentTransactionsListener() {
+  if (recentTxnListener) recentTxnListener();
+  recentTxnListener = db.collection('transactions')
+    .orderBy('timestamp', 'desc')
+    .limit(100)
+    .onSnapshot(snap => {
+      const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      upsertTransactions(items);
+      computeAndRenderOverview();
+      renderCurrentSection();
+    });
+}
+
+function startPendingListener() {
+  if (pendingListener) pendingListener();
+  pendingListener = db.collection('transactions')
+    .where('status','in',['pending_verification','pending'])
+    .onSnapshot(snap => {
+      const count = snap.size;
+      const badge = document.getElementById('navPendingBadge');
+      badge.textContent = count;
+      badge.style.display = count > 0 ? 'inline-flex' : 'none';
+      upsertTransactions(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      document.getElementById('ovPending').textContent = count;
+      if (document.getElementById('section-approvals').classList.contains('active')) {
+        renderApprovalsPending();
+      }
+    });
+}
+
+async function refreshAllData() {
+  const btn = document.getElementById('refreshAllBtnTop');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Refreshing...';
   try {
-    const snap = await db.collection('transactions')
-      .orderBy('timestamp','desc')
-      .limit(200)
-      .get();
-
-    allTxns = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-    // Stats
-    const pending  = allTxns.filter(t => t.status === 'pending_verification' || t.status === 'pending');
-    const approved = allTxns.filter(t => t.status === 'approved');
-    const rejected = allTxns.filter(t => t.status === 'rejected');
-    const totalRs  = approved.reduce((s, t) => s + (t.amount || 0), 0);
-
-    document.getElementById('statPending').textContent  = pending.length;
-    document.getElementById('statApproved').textContent = approved.length;
-    document.getElementById('statRejected').textContent = rejected.length;
-    document.getElementById('statTotal').textContent    = '₹' + totalRs;
-    document.getElementById('pendingCount').textContent = pending.length;
-
-    renderPending(pending);
-    renderHistory(allTxns);
+    lastLogDoc = null;
+    await Promise.all([loadUsers(), loadTransactions(), loadFormLogs(false)]);
+    enrichUsersFromTransactions();
+    computeAndRenderOverview();
+    renderCurrentSection();
+    showToast('All data refreshed from Firestore.', 'success');
   } catch(e) {
-    console.error('Load error:', e);
-    showToast('Error loading data: ' + e.message, 'error');
+    showToast('Refresh failed: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Refresh All Data';
   }
 }
 
-// ── RENDER PENDING ────────────────────────────────────────────────────
-async function renderPending(list) {
-  const el = document.getElementById('pendingList');
-  if (!list.length) {
-    el.innerHTML = '<div class="empty"><div class="ico">🎉</div>No pending requests — all clear!</div>';
+// ── NAVIGATION ─────────────────────────────────────────────────────────
+document.querySelectorAll('.nav-item-custom[data-section]').forEach(el => {
+  el.addEventListener('click', () => switchSection(el.dataset.section));
+});
+
+function switchSection(name) {
+  document.querySelectorAll('.section-wrap').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item-custom[data-section]').forEach(el => {
+    el.classList.toggle('active', el.dataset.section === name);
+  });
+  document.getElementById('section-' + name).classList.add('active');
+  if (name === 'overview')  computeAndRenderOverview();
+  if (name === 'approvals') { renderApprovalsPending(); renderApprovalsHistory('all'); }
+  if (name === 'users')     renderUsersTable(allUsers);
+  if (name === 'formlogs')  renderFormLogs();
+}
+
+function renderCurrentSection() {
+  const active = document.querySelector('.section-wrap.active');
+  if (active) switchSection(active.id.replace('section-', ''));
+}
+
+function hasMarginData(item) {
+  return item?.aiCostKnown !== undefined || item?.aiCostRs !== undefined || item?.grossMarginRs !== undefined;
+}
+
+function shouldAssumeZeroAiCost(item) {
+  return isUsageTransaction(item) && !hasMarginData(item);
+}
+
+function parseUsageFieldsCount(item) {
+  const raw = Number(item?.fieldsCount ?? 0);
+  if (raw > 0) return raw;
+  const match = String(item?.description || '').match(/\((\d+)\s+fields?\b/i);
+  return match ? Number(match[1]) : 0;
+}
+
+function isUsageTransaction(item) {
+  if (item?.type !== 'deduction') return false;
+  if (item?.fillMode || item?.sessionSource || item?.pageTitle || item?.pageUrl || item?.portalName) return true;
+  if (parseUsageFieldsCount(item) > 0) return true;
+  return /^Form filled\b/i.test(String(item?.description || ''));
+}
+
+function getUsageEntries() {
+  return allTxns
+    .filter(isUsageTransaction)
+    .map(t => ({
+      ...t,
+      fieldsCount: parseUsageFieldsCount(t),
+      usageSource: 'transaction'
+    }));
+}
+
+function usageRevenue(item) {
+  return Number(item?.revenueRs ?? item?.cost ?? item?.amount ?? 0);
+}
+
+function usageAiCost(item) {
+  if (shouldAssumeZeroAiCost(item)) return 0;
+  if (!hasMarginData(item)) return null;
+  if (item.aiCostKnown === false) return null;
+  return Number(item?.aiCostRs ?? 0);
+}
+
+function usageMargin(item) {
+  if (shouldAssumeZeroAiCost(item)) return usageRevenue(item);
+  if (!hasMarginData(item)) return null;
+  if (item.aiCostKnown === false) return null;
+  return Number(item?.grossMarginRs ?? (usageRevenue(item) - Number(item?.aiCostRs ?? 0)));
+}
+
+function usageMarginPerField(item) {
+  if (!hasMarginData(item)) return null;
+  if (item.aiCostKnown === false) return null;
+  const fields = parseUsageFieldsCount(item);
+  if (fields <= 0) return null;
+  return Number(item?.grossMarginPerFieldRs ?? (usageMargin(item) / fields));
+}
+
+function userUsageSummary(userId) {
+  const entries = getUsageEntries().filter(l => l.userId === userId);
+  const forms = entries.length;
+  const revenue = entries.reduce((s, l) => s + usageRevenue(l), 0);
+  const marginLogs = entries.filter(l => usageMargin(l) !== null);
+  const margin = marginLogs.reduce((s, l) => s + (usageMargin(l) || 0), 0);
+  return { forms, revenue, margin, marginKnownCount: marginLogs.length };
+}
+
+// ── OVERVIEW ───────────────────────────────────────────────────────────
+function computeAndRenderOverview() {
+  const usageEntries = getUsageEntries();
+  const pending = allTxns.filter(t => isPending(t) && t.type === 'recharge');
+  const totalRevenue = usageEntries.reduce((s, l) => s + usageRevenue(l), 0);
+  const aiCostLogs = usageEntries.filter(l => usageAiCost(l) !== null);
+  const totalAiCost = aiCostLogs.reduce((s, l) => s + (usageAiCost(l) || 0), 0);
+  const totalMargin = aiCostLogs.reduce((s, l) => s + (usageMargin(l) || 0), 0);
+  const totalForms = usageEntries.length;
+  const totalFields = usageEntries.reduce((s, l) => s + parseUsageFieldsCount(l), 0);
+  const marginPct = totalRevenue > 0 ? ((totalMargin / totalRevenue) * 100) : 0;
+
+  document.getElementById('ovUsers').textContent   = allUsers.length;
+  document.getElementById('ovRevenue').textContent = '₹' + totalRevenue.toFixed(0);
+  document.getElementById('ovPending').textContent = pending.length;
+  document.getElementById('ovAiCost').textContent  = '₹' + totalAiCost.toFixed(0);
+  document.getElementById('ovMargin').textContent  = '₹' + totalMargin.toFixed(0);
+  document.getElementById('ovForms').textContent   = totalForms;
+  document.getElementById('ovFields').textContent  = totalFields;
+  document.getElementById('ovMarginPct').textContent = marginPct.toFixed(1) + '%';
+
+  const recent = allTxns.slice(0, 10);
+  const tbody = document.getElementById('ovRecentTbody');
+  if (!recent.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No transactions yet</td></tr>';
     return;
   }
+  tbody.innerHTML = recent.map(t => {
+    const ts   = toDate(t.timestamp);
+    const bdg  = statusBadge(t.type === 'deduction' && !t.status ? 'approved' : t.status);
+    const type = t.type === 'recharge' ? '<span style="color:#0891b2;font-weight:600">Recharge</span>' : '<span style="color:#f5724f;font-weight:600">Deduction</span>';
+    const {name, email} = uInfo(t.userId, t.userName, t.userEmail);
+    const revenue = t.type === 'deduction' ? usageRevenue(t) : Number(t.amount || 0);
+    const aiCost = t.type === 'deduction' ? usageAiCost(t) : null;
+    const margin = t.type === 'deduction' ? usageMargin(t) : null;
+    return `<tr>
+      ${nameEmailCell(name, email)}
+      <td>${type}</td>
+      <td style="font-weight:700;color:var(--accent)">₹${Number(revenue || 0).toFixed(2)}</td>
+      <td>${aiCost === null ? '—' : `₹${aiCost.toFixed(2)}`}</td>
+      <td>${margin === null ? '—' : `₹${margin.toFixed(2)}`}</td>
+      <td>${bdg}</td>
+      <td style="font-size:.75rem;color:var(--ink-muted)">${ts ? ts.toLocaleString('en-IN') : '—'}</td>
+    </tr>`;
+  }).join('');
+}
 
-  // For old transactions missing userName, fetch user info from users collection
+async function approveAllPending() {
+  const pending = allTxns.filter(t => isPending(t) && t.type === 'recharge');
+  if (!pending.length) { showToast('No pending approvals.', 'warn'); return; }
+  if (!confirm(`Approve all ${pending.length} pending recharge requests?`)) return;
+  const btn = document.getElementById('approveAllBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+  for (const t of pending) {
+    try { await approveRecharge(t.id, t.userId, t.amount, true); } catch(_) {}
+  }
+  await loadTransactions();
+  computeAndRenderOverview();
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-check-all"></i> Approve All Pending';
+  showToast(`All ${pending.length} recharges approved!`, 'success');
+}
+
+// ── APPROVALS ──────────────────────────────────────────────────────────
+async function renderApprovalsPending() {
+  const list = allTxns.filter(t => t.type === 'recharge' && isPending(t));
+  const el = document.getElementById('approvalsPendingList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="icon">🎉</div>No pending requests — all clear!</div>';
+    return;
+  }
   const enriched = await Promise.all(list.map(async t => {
     if (!t.userName && t.userId) {
-      try {
-        const uSnap = await db.collection('users').doc(t.userId).get();
-        if (uSnap.exists) {
-          const ud = uSnap.data();
-          t.userName  = ud.name  || t.userId;
-          t.userEmail = ud.email || t.userEmail || '';
-          t.userPhone = ud.phone || '';
-        }
-      } catch(_) {}
+      const info = await getUserInfo(t.userId);
+      t.userName  = t.userName  || info.name;
+      t.userEmail = t.userEmail || info.email;
+      t.userPhone = t.userPhone || info.phone;
     }
     return t;
   }));
-
   el.innerHTML = enriched.map(t => {
-    const tsRaw = t.timestamp;
-    const ts  = tsRaw?.toDate ? tsRaw.toDate() : tsRaw?.seconds ? new Date(tsRaw.seconds * 1000) : tsRaw ? new Date(tsRaw) : new Date();
+    const ts  = toDate(t.timestamp);
     const amt = t.amount || 0;
     return `
-    <div class="txn-card is-pending" id="card-${t.id}">
-      <div class="txn-top">
+    <div class="txn-card" id="card-${t.id}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <div>
-          <div class="txn-user">👤 ${t.userName || t.userId || 'Unknown'}</div>
-          <div class="txn-email">${t.userEmail || t.userPhone || ''}</div>
+          <div class="txn-user-name">👤 ${t.userName || t.userId || 'Unknown'}</div>
+          <div style="font-size:.78rem;color:var(--ink-muted)">${t.userEmail || ''}</div>
+          ${t.userPhone ? `<div style="font-size:.75rem;color:var(--ink-muted)">📱 ${t.userPhone}</div>` : ''}
           <div class="txn-meta">
             <div class="meta-pill">💰 Add to Wallet: <strong>₹${amt}</strong></div>
             <div class="meta-pill">📦 ${t.description || 'Wallet recharge'}</div>
           </div>
-          <div class="txn-id">UPI TXN: ${t.userUpiTransactionId || 'Not provided'}</div>
-          ${t.adminNote ? `<div style="font-size:.78rem;color:var(--ink-muted);margin-top:6px;">💬 Note: ${t.adminNote}</div>` : ''}
-          <div class="time-ago" style="margin-top:6px;">🕐 ${timeAgo(ts)}</div>
+          <div class="txn-upi">UPI TXN: ${t.userUpiTransactionId || 'Not provided'}</div>
+          ${t.adminNote ? `<div style="font-size:.78rem;color:var(--ink-muted);margin-top:6px;">💬 ${t.adminNote}</div>` : ''}
+          <div style="font-size:.72rem;color:var(--ink-muted);margin-top:6px;">${ts ? timeAgo(ts) : ''}</div>
         </div>
-        <span class="badge badge-pending">⏳ Pending</span>
+        <span class="badge-pill badge-pending">⏳ Pending</span>
       </div>
       <div class="txn-actions">
-        <input class="admin-note-inp" id="note-${t.id}" placeholder="Admin note (optional)..."/>
-        <button class="btn-approve" id="approve-${t.id}" onclick="approveRecharge('${t.id}','${t.userId}',${t.credits||0},${amt})">
-          <i class="bi bi-check-circle-fill"></i> Approve +₹${amt} to Wallet
+        <input class="note-inp" id="note-${t.id}" placeholder="Admin note (optional)..."/>
+        <button class="btn-approve" id="approve-${t.id}" onclick="approveRecharge('${t.id}','${t.userId}',${amt})">
+          <i class="bi bi-check-circle-fill"></i> Approve +₹${amt}
         </button>
         <button class="btn-reject" id="reject-${t.id}" onclick="rejectRecharge('${t.id}')">
           <i class="bi bi-x-circle"></i> Reject
@@ -314,147 +803,389 @@ async function renderPending(list) {
   }).join('');
 }
 
-// ── APPROVE ───────────────────────────────────────────────────────────
-async function approveRecharge(txnId, userId, credits, amount) {
-  const note    = document.getElementById('note-' + txnId)?.value.trim() || '';
-  const appBtn  = document.getElementById('approve-' + txnId);
-  const rejBtn  = document.getElementById('reject-'  + txnId);
-  appBtn.disabled = rejBtn.disabled = true;
-  appBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+function renderApprovalsHistory(filter) {
+  let list = allTxns.filter(t => t.type === 'recharge');
+  if (filter === 'pending') list = allTxns.filter(t => t.type === 'recharge' && isPending(t));
+  else if (filter === 'approved') list = allTxns.filter(t => t.type === 'recharge' && t.status === 'approved');
+  else if (filter === 'rejected') list = allTxns.filter(t => t.type === 'recharge' && t.status === 'rejected');
 
+  const tbody = document.getElementById('approvalsHistBody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No transactions found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(t => {
+    const ts = toDate(t.timestamp);
+    const {name, email} = uInfo(t.userId, t.userName, t.userEmail);
+    return `<tr>
+      ${nameEmailCell(name, email)}
+      <td style="font-weight:700;color:var(--accent)">₹${t.amount || '—'}</td>
+      <td><span style="font-family:monospace;font-size:.75rem">${t.userUpiTransactionId || '—'}</span></td>
+      <td style="font-size:.75rem;color:var(--ink-muted)">${t.adminNote || '—'}</td>
+      <td>${statusBadge(t.status)}</td>
+      <td style="font-size:.75rem;color:var(--ink-muted)">${ts ? ts.toLocaleString('en-IN') : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+document.querySelectorAll('#approvalFilterTabs .filter-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#approvalFilterTabs .filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderApprovalsHistory(btn.dataset.filter);
+  });
+});
+
+async function approveRecharge(txnId, userId, amount, silent) {
+  const note   = document.getElementById('note-' + txnId)?.value.trim() || '';
+  const appBtn = document.getElementById('approve-' + txnId);
+  const rejBtn = document.getElementById('reject-'  + txnId);
+  if (appBtn) { appBtn.disabled = true; appBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...'; }
+  if (rejBtn) rejBtn.disabled = true;
   try {
     const batch = db.batch();
-
-    // 1. Add rupee amount to walletBalance
-    const userRef = db.collection('users').doc(userId);
-    batch.update(userRef, {
+    batch.update(db.collection('users').doc(userId), {
       walletBalance: firebase.firestore.FieldValue.increment(amount)
     });
-
-    // 2. Update transaction status
-    const txnRef = db.collection('transactions').doc(txnId);
-    batch.update(txnRef, {
-      status:       'approved',
-      approvedBy:   currentAdmin.email,
-      approvedAt:   firebase.firestore.FieldValue.serverTimestamp(),
-      adminNote:    note
+    batch.update(db.collection('transactions').doc(txnId), {
+      status: 'approved',
+      approvedBy: currentAdmin.email,
+      approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      adminNote: note
     });
-
     await batch.commit();
-
-    // WhatsApp: notify user that credits were added
     try {
-      const userSnap = await db.collection('users').doc(userId).get();
-      const ud = userSnap.data() || {};
+      const uSnap = await db.collection('users').doc(userId).get();
+      const ud = uSnap.data() || {};
       if (ud.phone) {
         fetch('/whatsapp.php', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            action: 'credits_added',
-            phone: ud.phone,
-            name: ud.name || '',
-            added: String(credits),
-            total: String(ud.credits || credits)
-          })
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ action:'credits_added', phone:ud.phone, name:ud.name||'', added:String(amount), total:String((ud.walletBalance||0) + amount) })
         });
       }
     } catch(_) {}
-
-    showToast(`✅ Approved! +₹${amount} added to user wallet.`, 'success');
+    if (!silent) showToast(`✅ Approved! +₹${amount} added to wallet.`, 'success');
     document.getElementById('card-' + txnId)?.remove();
-    loadAll();
-
+    // Update local state
+    const idx = allTxns.findIndex(t => t.id === txnId);
+    if (idx >= 0) allTxns[idx].status = 'approved';
+    const uIdx = allUsers.findIndex(u => u.id === userId);
+    if (uIdx >= 0) allUsers[uIdx].walletBalance = (allUsers[uIdx].walletBalance || 0) + amount;
   } catch(e) {
-    console.error('Approve error:', e);
     showToast('Error: ' + e.message, 'error');
-    appBtn.disabled = rejBtn.disabled = false;
-    appBtn.innerHTML = `<i class="bi bi-check-circle-fill"></i> Approve +${credits} Credits`;
+    if (appBtn) { appBtn.disabled = false; appBtn.innerHTML = `<i class="bi bi-check-circle-fill"></i> Approve +₹${amount}`; }
+    if (rejBtn) rejBtn.disabled = false;
   }
 }
 
-// ── REJECT ────────────────────────────────────────────────────────────
 async function rejectRecharge(txnId) {
   if (!confirm('Reject this recharge request?')) return;
   const note   = document.getElementById('note-' + txnId)?.value.trim() || '';
   const appBtn = document.getElementById('approve-' + txnId);
   const rejBtn = document.getElementById('reject-'  + txnId);
-  appBtn.disabled = rejBtn.disabled = true;
-
+  if (appBtn) appBtn.disabled = true;
+  if (rejBtn) rejBtn.disabled = true;
   try {
     await db.collection('transactions').doc(txnId).update({
-      status:     'rejected',
-      rejectedBy: currentAdmin.email,
-      rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      adminNote:  note
+      status: 'rejected', rejectedBy: currentAdmin.email,
+      rejectedAt: firebase.firestore.FieldValue.serverTimestamp(), adminNote: note
     });
-    showToast('❌ Request rejected.', 'warn');
+    showToast('Request rejected.', 'warn');
     document.getElementById('card-' + txnId)?.remove();
-    loadAll();
+    const idx = allTxns.findIndex(t => t.id === txnId);
+    if (idx >= 0) allTxns[idx].status = 'rejected';
   } catch(e) {
     showToast('Error: ' + e.message, 'error');
-    appBtn.disabled = rejBtn.disabled = false;
+    if (appBtn) appBtn.disabled = false;
+    if (rejBtn) rejBtn.disabled = false;
   }
 }
 
-// ── RENDER HISTORY ────────────────────────────────────────────────────
-// Cache user lookups so we don't re-fetch the same userId multiple times
-const _userCache = {};
-async function getUserInfo(userId) {
-  if (!userId) return {};
-  if (_userCache[userId]) return _userCache[userId];
-  try {
-    const s = await db.collection('users').doc(userId).get();
-    const d = s.exists ? s.data() : {};
-    _userCache[userId] = { name: d.name || userId, email: d.email || '' };
-  } catch(_) { _userCache[userId] = { name: userId, email: '' }; }
-  return _userCache[userId];
-}
-
-async function renderHistory(list) {
-  const tbody = document.getElementById('histBody');
-  document.getElementById('histCount').textContent = list.length + ' transactions';
-  if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="empty">No transactions yet</td></tr>';
+// ── USERS ──────────────────────────────────────────────────────────────
+function renderUsersTable(users) {
+  document.getElementById('usersCount').textContent = users.length + ' users';
+  const tbody = document.getElementById('usersTableBody');
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No users found</td></tr>';
     return;
   }
-
-  // Enrich missing names in parallel
-  const enriched = await Promise.all(list.map(async t => {
-    if (!t.userName && t.userId) {
-      const info = await getUserInfo(t.userId);
-      t.userName  = t.userName  || info.name;
-      t.userEmail = t.userEmail || info.email;
-    }
-    return t;
-  }));
-
-  tbody.innerHTML = enriched.map(t => {
-    const tsRaw2 = t.timestamp;
-    const ts    = tsRaw2?.toDate ? tsRaw2.toDate() : tsRaw2?.seconds ? new Date(tsRaw2.seconds * 1000) : tsRaw2 ? new Date(tsRaw2) : null;
-    const badge = t.status === 'approved' ? 'badge-approved' : t.status === 'rejected' ? 'badge-rejected' : 'badge-pending';
-    const label = t.status === 'approved' ? '✅ Approved' : t.status === 'rejected' ? '❌ Rejected' : '⏳ Pending';
+  tbody.innerHTML = users.map(u => {
+    const init = (u.name || u.email || '?').charAt(0).toUpperCase();
+    const usage = userUsageSummary(u.id);
     return `<tr>
-      <td><strong>${t.userName||t.userId||'?'}</strong><br><span style="font-size:.72rem;color:var(--ink-muted)">${t.userEmail||''}</span></td>
-      <td>${t.description||'-'}</td>
-      <td style="font-weight:700;color:var(--accent)">₹${t.amount||'-'}</td>
-      <td><span style="font-family:monospace;font-size:.75rem">${t.userUpiTransactionId||'-'}</span></td>
-      <td><span class="badge ${badge}">${label}</span></td>
-      <td style="font-size:.75rem;color:var(--ink-muted)">${ts ? ts.toLocaleString('en-IN') : '-'}</td>
+      <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar-sm">${init}</div><strong>${u.name || 'Unknown'}</strong></div></td>
+      <td style="color:var(--ink-muted)">${u.email || '—'}</td>
+      <td><span style="font-family:'Outfit',sans-serif;font-weight:800;font-size:1rem;color:var(--accent)">₹${(u.walletBalance || 0).toFixed(2)}</span></td>
+      <td>${usage.forms}</td>
+      <td style="font-weight:700;color:#166534">₹${usage.revenue.toFixed(2)}</td>
+      <td style="font-weight:700;color:#6d28d9">${usage.marginKnownCount ? `₹${usage.margin.toFixed(2)}` : '—'}</td>
+      <td>
+        <button class="btn-xs btn-xs-accent" onclick="openAdjustWallet('${u.id}')"><i class="bi bi-wallet2"></i> Adjust</button>
+        <button class="btn-xs btn-xs-outline ms-1" onclick="openUserHistory('${u.id}')"><i class="bi bi-clock-history"></i> History</button>
+      </td>
     </tr>`;
   }).join('');
 }
 
-// ── HELPERS ───────────────────────────────────────────────────────────
-function timeAgo(date) {
-  const diff = Math.floor((Date.now() - date) / 1000);
-  if (diff < 60)    return diff + 's ago';
-  if (diff < 3600)  return Math.floor(diff/60) + 'm ago';
-  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
-  return Math.floor(diff/86400) + 'd ago';
+document.getElementById('userSearchInput').addEventListener('input', e => {
+  clearTimeout(_searchDebounce);
+  _searchDebounce = setTimeout(() => {
+    const q = e.target.value.toLowerCase().trim();
+    if (!q) { renderUsersTable(allUsers); return; }
+    const f = allUsers.filter(u =>
+      (u.name || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q) ||
+      (u.phone || '').includes(q)
+    );
+    renderUsersTable(f);
+  }, 150);
+});
+
+function openAdjustWallet(uid) {
+  const u = allUsers.find(u => u.id === uid);
+  if (!u) return;
+  _adjustUid  = uid;
+  _adjustMode = 'add';
+  document.getElementById('adjustModalUser').textContent    = (u.name || 'User') + ' — ' + (u.email || '');
+  document.getElementById('adjustModalBalance').textContent = '₹' + (u.walletBalance || 0).toFixed(2);
+  document.getElementById('adjustAmount').value = '';
+  document.getElementById('adjustNote').value   = '';
+  document.getElementById('adjustAddBtn').classList.add('active');
+  document.getElementById('adjustDeductBtn').classList.remove('active');
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAdjustWallet')).show();
 }
 
-// ── BULK WALLET MIGRATION ────────────────────────────────────────────
+function setAdjustMode(mode) {
+  _adjustMode = mode;
+  document.getElementById('adjustAddBtn').classList.toggle('active', mode === 'add');
+  document.getElementById('adjustDeductBtn').classList.toggle('active', mode === 'deduct');
+}
+
+async function confirmAdjustWallet() {
+  const amount = parseFloat(document.getElementById('adjustAmount').value);
+  const note   = document.getElementById('adjustNote').value.trim();
+  if (!_adjustUid || isNaN(amount) || amount <= 0) { showToast('Enter a valid amount.', 'warn'); return; }
+  const delta = _adjustMode === 'add' ? amount : -amount;
+  const btn = document.getElementById('adjustConfirmBtn');
+  btn.disabled = true;
+  try {
+    const u = allUsers.find(u => u.id === _adjustUid);
+    const batch = db.batch();
+    batch.update(db.collection('users').doc(_adjustUid), {
+      walletBalance: firebase.firestore.FieldValue.increment(delta)
+    });
+    const txnRef = db.collection('transactions').doc();
+    batch.set(txnRef, {
+      userId: _adjustUid, userName: u?.name || '', userEmail: u?.email || '',
+      type: _adjustMode === 'add' ? 'recharge' : 'deduction',
+      amount: amount, status: 'approved',
+      adminNote: note || `Admin manual ${_adjustMode} — ₹${amount}`,
+      approvedBy: currentAdmin.email,
+      approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      timestamp:  firebase.firestore.FieldValue.serverTimestamp(),
+      description: `Admin wallet ${_adjustMode}: ₹${amount}`
+    });
+    await batch.commit();
+    if (u) u.walletBalance = (u.walletBalance || 0) + delta;
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAdjustWallet')).hide();
+    showToast(`Wallet ${_adjustMode === 'add' ? 'credited' : 'debited'} ₹${amount}.`, 'success');
+    renderUsersTable(allUsers);
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function openUserHistory(uid) {
+  const u = allUsers.find(u => u.id === uid);
+  document.getElementById('histModalTitle').textContent = (u?.name || 'User') + "'s History";
+  document.getElementById('histModalSub').textContent   = u?.email || '';
+
+  // Transactions
+  const userTxns = allTxns.filter(t => t.userId === uid);
+  const txnTbody = document.getElementById('histTxnsTbody');
+  if (!userTxns.length) {
+    txnTbody.innerHTML = '<tr><td colspan="7" class="empty-state">No transactions</td></tr>';
+  } else {
+    txnTbody.innerHTML = userTxns.map(t => {
+      const ts = toDate(t.timestamp);
+      const revenue = t.type === 'deduction' ? usageRevenue(t) : Number(t.amount || 0);
+      const aiCost = t.type === 'deduction' ? usageAiCost(t) : null;
+      const margin = t.type === 'deduction' ? usageMargin(t) : null;
+      return `<tr>
+        <td>${t.type === 'recharge' ? '<span style="color:#0891b2;font-weight:600">Recharge</span>' : '<span style="color:#f5724f;font-weight:600">Deduction</span>'}</td>
+        <td style="font-weight:700;color:var(--accent)">₹${Number(revenue || 0).toFixed(2)}</td>
+        <td>${aiCost === null ? '—' : `₹${aiCost.toFixed(2)}`}</td>
+        <td>${margin === null ? '—' : `₹${margin.toFixed(2)}`}</td>
+        <td style="font-size:.78rem;color:var(--ink-muted)">${t.description || '—'}</td>
+        <td>${statusBadge(t.type === 'deduction' && !t.status ? 'approved' : t.status)}</td>
+        <td style="font-size:.75rem;color:var(--ink-muted)">${ts ? ts.toLocaleString('en-IN') : '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Fill activity
+  let userLogs = getUsageEntries().filter(l => l.userId === uid);
+  const logTbody = document.getElementById('histLogsTbody');
+  if (!userLogs.length) {
+    logTbody.innerHTML = '<tr><td colspan="7" class="empty-state">No fill activity</td></tr>';
+  } else {
+    logTbody.innerHTML = userLogs.map(l => {
+      const ts = toDate(l.timestamp);
+      const revenue = usageRevenue(l);
+      const aiCost = usageAiCost(l);
+      const margin = usageMargin(l);
+      return `<tr>
+        <td>${l.portalName || '—'}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8rem">${l.pageTitle || '—'}</td>
+        <td>${parseUsageFieldsCount(l)}</td>
+        <td style="font-weight:700;color:#166534">₹${revenue.toFixed(2)}</td>
+        <td>${aiCost === null ? '—' : `₹${aiCost.toFixed(2)}`}</td>
+        <td>${margin === null ? '—' : `₹${margin.toFixed(2)}`}</td>
+        <td style="font-size:.75rem;color:var(--ink-muted)">${ts ? ts.toLocaleString('en-IN') : '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+  bootstrap.Modal.getOrCreateInstance(document.getElementById('modalUserHistory')).show();
+}
+
+// ── FORM LOGS ─────────────────────────────────────────────────────────
+function renderFormLogs() {
+  const q = (document.getElementById('formLogSearch')?.value || '').toLowerCase().trim();
+  let list = getUsageEntries();
+  if (q) list = list.filter(l =>
+    (allUsers.find(u => u.id === l.userId)?.name || l.userId || '').toLowerCase().includes(q) ||
+    (l.portalName || '').toLowerCase().includes(q) ||
+    (l.pageTitle || '').toLowerCase().includes(q)
+  );
+  document.getElementById('formLogCount').textContent = list.length + ' usage records';
+  const tbody = document.getElementById('formLogsTbody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No form activity found</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(l => {
+    const {name, email} = uInfo(l.userId, '', '');
+    const ts = toDate(l.timestamp);
+    const revenue = usageRevenue(l);
+    const aiCost = usageAiCost(l);
+    const margin = usageMargin(l);
+    const marginPerField = usageMarginPerField(l);
+    return `<tr>
+      ${nameEmailCell(name, email)}
+      <td>${l.portalName || '—'}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8rem;color:var(--ink-muted)">${l.pageTitle || '—'}</td>
+      <td>${parseUsageFieldsCount(l)}</td>
+      <td style="font-weight:700;color:#166534">₹${revenue.toFixed(2)}</td>
+      <td>${aiCost === null ? '—' : `₹${aiCost.toFixed(2)}`}</td>
+      <td style="font-weight:700;color:#6d28d9">${margin === null ? '—' : `₹${margin.toFixed(2)}`}</td>
+      <td>${marginPerField === null ? '—' : `₹${marginPerField.toFixed(2)}`}</td>
+      <td style="font-size:.75rem;color:var(--ink-muted)">${ts ? ts.toLocaleString('en-IN') : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+document.getElementById('formLogSearch').addEventListener('input', () => {
+  clearTimeout(_searchDebounce);
+  _searchDebounce = setTimeout(renderFormLogs, 150);
+});
+
+// ── DANGER ZONE ────────────────────────────────────────────────────────
+async function syncMissingEmails() {
+  const btn = document.getElementById('syncEmailsBtn');
+  const log = document.getElementById('syncEmailsLog');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Syncing...';
+  log.style.display = 'block';
+  log.textContent = 'Step 1: Scanning transactions for name/email...\n';
+
+  // Step 1 — recover from transactions (recharge docs DO store userEmail)
+  const recovered = {};
+  const buildRecovered = (docs) => docs.forEach(t => {
+    if (!t.userId) return;
+    if (!recovered[t.userId]) recovered[t.userId] = {name:'', email:''};
+    if (t.userName  && !recovered[t.userId].name)  recovered[t.userId].name  = t.userName;
+    if (t.userEmail && !recovered[t.userId].email) recovered[t.userId].email = t.userEmail;
+  });
+  buildRecovered(allTxns);
+  buildRecovered(allLogs);
+
+  // Fetch extra transactions not in the 300-limit cache
+  try {
+    const snap = await db.collection('transactions').where('userEmail','>','').limit(500).get();
+    buildRecovered(snap.docs.map(d => d.data()));
+  } catch(_) {}
+
+  // Step 2 — for UIDs still missing, call Firebase Auth REST API
+  const toFix = allUsers.filter(u => !u.name || !u.email);
+  const stillMissing = toFix.filter(u => !recovered[u.id]?.email);
+
+  if (stillMissing.length) {
+    log.textContent += `Step 2: Querying Firebase Auth for ${stillMissing.length} UIDs...\n`;
+    try {
+      const idToken = await currentAdmin.getIdToken(true);
+      const FB_API_KEY = 'AIzaSyCGnA0-2QiSQ2Dg8n3xhzBxjvVKcXKf9P0';
+      // batch in groups of 100 (API limit)
+      const chunks = [];
+      for (let i = 0; i < stillMissing.length; i += 100)
+        chunks.push(stillMissing.slice(i, i + 100));
+
+      for (const chunk of chunks) {
+        const res = await fetch(
+          `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FB_API_KEY}`,
+          { method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ idToken, localId: chunk.map(u => u.id) }) }
+        );
+        const data = await res.json();
+        if (data.users) {
+          data.users.forEach(au => {
+            if (!recovered[au.localId]) recovered[au.localId] = {name:'', email:''};
+            if (au.displayName && !recovered[au.localId].name)  recovered[au.localId].name  = au.displayName;
+            if (au.email       && !recovered[au.localId].email) recovered[au.localId].email = au.email;
+          });
+          log.textContent += `  → Got ${data.users.length} profiles from Firebase Auth.\n`;
+        } else if (data.error) {
+          log.textContent += `  ⚠️ Auth API: ${data.error.message}\n`;
+        }
+      }
+    } catch(e) {
+      log.textContent += `  ⚠️ Auth API call failed: ${e.message}\n`;
+    }
+  }
+
+  log.textContent += `\nStep 3: Writing to Firestore...\n`;
+  let fixed = 0, skipped = 0;
+  for (const u of toFix) {
+    const info = recovered[u.id];
+    const updates = {};
+    if (!u.name  && info?.name)  updates.name  = info.name;
+    if (!u.email && info?.email) updates.email = info.email;
+
+    if (!Object.keys(updates).length) {
+      skipped++;
+      log.textContent += `⏭️  ${u.id.slice(0,16)}... — no data found\n`;
+    } else {
+      try {
+        await db.collection('users').doc(u.id).update(updates);
+        Object.assign(u, updates);
+        fixed++;
+        log.textContent += `✅ ${u.id.slice(0,16)}... → ${updates.name||u.name} | ${updates.email||u.email}\n`;
+      } catch(e) {
+        log.textContent += `❌ ${u.id.slice(0,12)}: ${e.message}\n`;
+      }
+    }
+    log.scrollTop = log.scrollHeight;
+  }
+
+  log.textContent += `\n── Done ──\nFixed: ${fixed}  |  No data: ${skipped}\n`;
+  if (skipped > 0) log.textContent += `ℹ️  Users with no data must sign in via Google to save their email.\n`;
+  if (fixed > 0) { renderUsersTable(allUsers); computeAndRenderOverview(); }
+  showToast(`Synced ${fixed} user records.`, fixed > 0 ? 'success' : 'warn');
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi bi-envelope-check-fill"></i> Sync Missing Emails';
+}
+
 async function migrateAllUsers() {
   const btn = document.getElementById('migrateBtn');
   const log = document.getElementById('migrateLog');
@@ -462,43 +1193,30 @@ async function migrateAllUsers() {
   btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Migrating...';
   log.style.display = 'block';
   log.textContent = 'Fetching all users...\n';
-
-  const RUPEES_PER_CREDIT = 4;
-  const FREE_BALANCE      = 100.0;
-
+  const RUPEES_PER_CREDIT = 4, FREE_BALANCE = 100.0;
   let updated = 0, skipped = 0, failed = 0;
-
   try {
     const snap = await db.collection('users').get();
     log.textContent += `Found ${snap.size} users.\n\n`;
-
     for (const docSnap of snap.docs) {
-      const uid  = docSnap.id;
-      const data = docSnap.data();
-
+      const uid = docSnap.id, data = docSnap.data();
       if (data.walletBalance !== undefined && data.walletBalance !== null) {
         skipped++;
-        log.textContent += `⏭️  SKIP  ${uid} — already ₹${data.walletBalance}\n`;
-        log.scrollTop = log.scrollHeight;
-        continue;
+        log.textContent += `⏭️  SKIP  ${data.name || uid} — already ₹${data.walletBalance}\n`;
+        log.scrollTop = log.scrollHeight; continue;
       }
-
       const oldCredits    = parseInt(data.credits ?? 0, 10);
-      const walletBalance = oldCredits > 0
-        ? Math.round(oldCredits * RUPEES_PER_CREDIT * 100) / 100
-        : FREE_BALANCE;
-
+      const walletBalance = oldCredits > 0 ? Math.round(oldCredits * RUPEES_PER_CREDIT * 100) / 100 : FREE_BALANCE;
       try {
         await db.collection('users').doc(uid).update({ walletBalance });
         updated++;
-        log.textContent += `✅ ${uid} (${data.name || 'unknown'}) — ${oldCredits} credits → ₹${walletBalance}\n`;
+        log.textContent += `✅ ${data.name || uid} — ${oldCredits} credits → ₹${walletBalance}\n`;
       } catch(e) {
         failed++;
         log.textContent += `❌ FAILED ${uid}: ${e.message}\n`;
       }
       log.scrollTop = log.scrollHeight;
     }
-
     log.textContent += `\n── Done ──\nUpdated: ${updated}  |  Skipped: ${skipped}  |  Failed: ${failed}\n`;
     showToast(`Migration complete — ${updated} updated, ${skipped} skipped`, 'success', 6000);
   } catch(e) {
@@ -511,142 +1229,163 @@ async function migrateAllUsers() {
   }
 }
 
-// ── DELETE ALL TRANSACTIONS ──────────────────────────────────────────
 async function clearAllTransactions() {
-  if (!confirm('⚠️ DELETE ALL TRANSACTIONS?\n\nThis will permanently remove every transaction record. Type "DELETE" to confirm.')) return;
+  if (!confirm('⚠️ DELETE ALL TRANSACTIONS?\n\nThis permanently removes every transaction record.')) return;
   const input = prompt('Type DELETE to confirm:');
   if (input !== 'DELETE') { showToast('Cancelled.', 'warn'); return; }
-
   const btn = document.getElementById('clearTxnBtn');
   const log = document.getElementById('dangerLog');
-  btn.disabled = true;
-  log.style.display = 'block';
+  btn.disabled = true; log.style.display = 'block';
   log.textContent = 'Deleting all transactions...\n';
-
   try {
     const snap = await db.collection('transactions').get();
     log.textContent += `Found ${snap.size} transactions.\n`;
-
-    // Firestore batch max 500
-    let batch = db.batch();
-    let count = 0;
-    let deleted = 0;
+    let batch = db.batch(), count = 0, deleted = 0;
     for (const doc of snap.docs) {
-      batch.delete(doc.ref);
-      count++;
-      if (count === 500) {
-        await batch.commit();
-        deleted += count;
-        log.textContent += `Deleted ${deleted}...\n`;
-        batch = db.batch();
-        count = 0;
-      }
+      batch.delete(doc.ref); count++;
+      if (count === 500) { await batch.commit(); deleted += count; log.textContent += `Deleted ${deleted}...\n`; batch = db.batch(); count = 0; }
     }
     if (count > 0) { await batch.commit(); deleted += count; }
-
     log.textContent += `\n✅ Done — ${deleted} transactions deleted.\n`;
+    allTxns = [];
+    computeAndRenderOverview();
     showToast(`All ${deleted} transactions deleted.`, 'success', 6000);
-    loadAll();
   } catch(e) {
     log.textContent += `\nERROR: ${e.message}\n`;
     showToast('Failed: ' + e.message, 'error');
   } finally {
-    btn.disabled = false;
-    log.scrollTop = log.scrollHeight;
+    btn.disabled = false; log.scrollTop = log.scrollHeight;
   }
 }
 
-// ── DELETE ALL FIRESTORE USERS ───────────────────────────────────────
 async function deleteAllFirestoreUsers() {
-  if (!confirm('⚠️ DELETE ALL USER DATA?\n\nThis removes all user documents from Firestore (profiles, wallets). Firebase Auth logins must be deleted separately in Firebase Console. Type "DELETEUSERS" to confirm.')) return;
+  if (!confirm('⚠️ DELETE ALL USER DATA?\n\nThis removes all Firestore user documents. Firebase Auth logins must be deleted separately.')) return;
   const input = prompt('Type DELETEUSERS to confirm:');
   if (input !== 'DELETEUSERS') { showToast('Cancelled.', 'warn'); return; }
-
   const btn = document.getElementById('deleteUsersBtn');
   const log = document.getElementById('dangerLog');
-  btn.disabled = true;
-  log.style.display = 'block';
+  btn.disabled = true; log.style.display = 'block';
   log.textContent = 'Deleting all user documents...\n';
-
   try {
     const snap = await db.collection('users').get();
     log.textContent += `Found ${snap.size} users.\n`;
-
-    let batch = db.batch();
-    let count = 0, deleted = 0;
+    let batch = db.batch(), count = 0, deleted = 0;
     for (const doc of snap.docs) {
-      batch.delete(doc.ref);
-      count++;
-      if (count === 500) {
-        await batch.commit();
-        deleted += count;
-        log.textContent += `Deleted ${deleted}...\n`;
-        batch = db.batch();
-        count = 0;
-      }
+      batch.delete(doc.ref); count++;
+      if (count === 500) { await batch.commit(); deleted += count; log.textContent += `Deleted ${deleted}...\n`; batch = db.batch(); count = 0; }
     }
     if (count > 0) { await batch.commit(); deleted += count; }
-
-    log.textContent += `\n✅ Done — ${deleted} user documents deleted.\n`;
-    log.textContent += `\n⚠️ Go to Firebase Console → Authentication → Users to delete login credentials.\n`;
-    showToast(`${deleted} user documents deleted. Delete Auth users in Firebase Console.`, 'warn', 8000);
+    log.textContent += `\n✅ Done — ${deleted} user documents deleted.\n⚠️ Go to Firebase Console → Authentication → Users to delete login credentials.\n`;
+    showToast(`${deleted} user docs deleted. Delete Auth users in Firebase Console.`, 'warn', 8000);
   } catch(e) {
     log.textContent += `\nERROR: ${e.message}\n`;
     showToast('Failed: ' + e.message, 'error');
   } finally {
-    btn.disabled = false;
-    log.scrollTop = log.scrollHeight;
+    btn.disabled = false; log.scrollTop = log.scrollHeight;
   }
 }
 
-// ── RESET ALL WALLETS TO ₹100 ────────────────────────────────────────
 async function resetAllWallets() {
-  if (!confirm('⚠️ RESET ALL USER WALLETS TO ₹100?\n\nEvery user\'s walletBalance will be set to ₹100. Type "RESET" to confirm.')) return;
+  if (!confirm('⚠️ RESET ALL USER WALLETS TO ₹100?\n\nEvery user\'s balance will be set to ₹100.')) return;
   const input = prompt('Type RESET to confirm:');
   if (input !== 'RESET') { showToast('Cancelled.', 'warn'); return; }
-
   const btn = document.getElementById('resetWalletBtn');
   const log = document.getElementById('dangerLog');
-  btn.disabled = true;
-  log.style.display = 'block';
+  btn.disabled = true; log.style.display = 'block';
   log.textContent = 'Resetting all user wallets to ₹100...\n';
-
   try {
     const snap = await db.collection('users').get();
     log.textContent += `Found ${snap.size} users.\n`;
-
-    let batch = db.batch();
-    let count = 0, updated = 0;
+    let batch = db.batch(), count = 0, updated = 0;
     for (const doc of snap.docs) {
-      batch.update(doc.ref, { walletBalance: 100.0, totalFormsFilledCount: 0 });
-      count++;
-      if (count === 500) {
-        await batch.commit();
-        updated += count;
-        log.textContent += `Reset ${updated}...\n`;
-        batch = db.batch();
-        count = 0;
-      }
+      batch.update(doc.ref, { walletBalance: 100.0, totalFormsFilledCount: 0 }); count++;
+      if (count === 500) { await batch.commit(); updated += count; log.textContent += `Reset ${updated}...\n`; batch = db.batch(); count = 0; }
     }
     if (count > 0) { await batch.commit(); updated += count; }
-
     log.textContent += `\n✅ Done — ${updated} users reset to ₹100.\n`;
+    allUsers.forEach(u => { u.walletBalance = 100.0; u.totalFormsFilledCount = 0; });
     showToast(`${updated} users reset to ₹100 wallet.`, 'success', 6000);
   } catch(e) {
     log.textContent += `\nERROR: ${e.message}\n`;
     showToast('Failed: ' + e.message, 'error');
   } finally {
-    btn.disabled = false;
-    log.scrollTop = log.scrollHeight;
+    btn.disabled = false; log.scrollTop = log.scrollHeight;
   }
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────
+// Look up user name + email from allUsers cache, fallback to transaction fields
+function uInfo(userId, txnName, txnEmail) {
+  const u = allUsers.find(u => u.id === userId);
+  return {
+    name:  u?.name  || txnName  || userId || '?',
+    email: u?.email || txnEmail || ''
+  };
+}
+function nameEmailCell(name, email) {
+  return `<td><strong>${name}</strong>${email ? `<br><span style="font-size:.72rem;color:var(--ink-muted)">${email}</span>` : ''}</td>`;
+}
+
+function isPending(t) { return t.status === 'pending_verification' || t.status === 'pending'; }
+
+function toDate(ts) {
+  if (!ts) return null;
+  if (ts.toDate) return ts.toDate();
+  if (ts.seconds) return new Date(ts.seconds * 1000);
+  const d = new Date(ts);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function tsToMs(ts) {
+  const d = toDate(ts);
+  return d ? d.getTime() : 0;
+}
+
+function toDateStr(ts) {
+  const d = toDate(ts);
+  return d ? d.toISOString().split('T')[0] : '0000-00-00';
+}
+
+function buildLast30() {
+  const arr = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    arr.push(d.toISOString().split('T')[0]);
+  }
+  return arr;
+}
+
+function timeAgo(date) {
+  const diff = Math.floor((Date.now() - date) / 1000);
+  if (diff < 60)    return diff + 's ago';
+  if (diff < 3600)  return Math.floor(diff/60) + 'm ago';
+  if (diff < 86400) return Math.floor(diff/3600) + 'h ago';
+  return Math.floor(diff/86400) + 'd ago';
+}
+
+function statusBadge(status) {
+  if (status === 'approved') return '<span class="badge-pill badge-approved">✅ Approved</span>';
+  if (status === 'rejected') return '<span class="badge-pill badge-rejected">❌ Rejected</span>';
+  return '<span class="badge-pill badge-pending">⏳ Pending</span>';
+}
+
+async function getUserInfo(userId) {
+  if (!userId) return {};
+  if (_userCache[userId]) return _userCache[userId];
+  try {
+    const s = await db.collection('users').doc(userId).get();
+    const d = s.exists ? s.data() : {};
+    _userCache[userId] = { name: d.name || userId, email: d.email || '', phone: d.phone || '' };
+  } catch(_) { _userCache[userId] = { name: userId, email: '', phone: '' }; }
+  return _userCache[userId];
 }
 
 function showToast(msg, type='success', dur=4000) {
   const tc = document.getElementById('toastContainer');
   const t  = document.createElement('div');
-  t.className = `toast ${type}`;
+  t.className = `toast-item ${type}`;
   const icons = {success:'✅', error:'❌', warn:'⚠️'};
-  t.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  t.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${msg}</span>`;
   tc.appendChild(t);
   setTimeout(() => t.remove(), dur);
 }

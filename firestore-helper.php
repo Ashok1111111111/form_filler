@@ -1,13 +1,54 @@
 <?php
 // Firestore REST API helper — no gRPC required, uses Firebase anonymous auth + curl
 
+// Load .env file
+$envFile = __DIR__ . '/.env';
+if (file_exists($envFile)) {
+    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        if (strpos(trim($line), '#') === 0) continue;
+        [$k, $v] = array_map('trim', explode('=', $line, 2));
+        putenv("$k=$v");
+    }
+}
+
 const FIREBASE_PROJECT   = 'form-filling-service-5a261';
-define('FIREBASE_API_KEY', getenv('FIREBASE_API_KEY'));
+const FIREBASE_WEB_API_KEY_FALLBACK = 'AIzaSyCGnA0-2QiSQ2Dg8n3xhzBxjvVKcXKf9P0';
+define('FIREBASE_API_KEY', getenv('FIREBASE_API_KEY') ?: FIREBASE_WEB_API_KEY_FALLBACK);
 const FIRESTORE_BASE     = 'https://firestore.googleapis.com/v1/projects/' . FIREBASE_PROJECT . '/databases/(default)/documents';
 const TOKEN_CACHE_FILE   = '/tmp/fb_anon_token.json';
 
+function getRequestBearerToken(): ?string {
+    static $resolved = false;
+    static $token = null;
+
+    if ($resolved) return $token;
+    $resolved = true;
+
+    $headers = [];
+    if (function_exists('getallheaders')) {
+        $headers = getallheaders();
+    } elseif (function_exists('apache_request_headers')) {
+        $headers = apache_request_headers();
+    }
+
+    $authHeader = $headers['Authorization']
+        ?? $headers['authorization']
+        ?? $_SERVER['HTTP_AUTHORIZATION']
+        ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+        ?? '';
+
+    if (preg_match('/Bearer\s+(.+)/i', trim((string)$authHeader), $matches)) {
+        $token = trim($matches[1]);
+    }
+
+    return $token;
+}
+
 // ── GET AUTH TOKEN (anonymous sign-in, cached 55 min) ──────────────────────
 function getFirebaseToken(): ?string {
+    $requestToken = getRequestBearerToken();
+    if ($requestToken) return $requestToken;
+
     // Check cache
     if (file_exists(TOKEN_CACHE_FILE)) {
         $cached = json_decode(file_get_contents(TOKEN_CACHE_FILE), true);
@@ -52,9 +93,16 @@ function fsRequest(string $method, string $url, ?array $body = null): array {
     if ($body !== null) curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
 
     $res  = curl_exec($ch);
+    $curlErr = curl_error($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    return ['code' => $code, 'body' => json_decode($res, true) ?? []];
+    return [
+        'code' => $code,
+        'body' => json_decode($res, true) ?? [],
+        'raw' => $res,
+        'curl_error' => $curlErr,
+        'token_present' => (bool)$token,
+    ];
 }
 
 // ── PARSE FIRESTORE FIELD VALUE ──────────────────────────────────────────────
@@ -115,11 +163,27 @@ function updateDoc(string $collection, string $docId, array $data): bool {
     return $res['code'] === 200;
 }
 
+function updateDocDetailed(string $collection, string $docId, array $data): array {
+    $fields    = encodeFields($data);
+    $maskNames = implode('&updateMask.fieldPaths=', array_map('urlencode', array_keys($data)));
+    $url       = FIRESTORE_BASE . "/$collection/$docId?updateMask.fieldPaths=$maskNames";
+    $res       = fsRequest('PATCH', $url, ['fields' => $fields]);
+    $res['success'] = ($res['code'] === 200);
+    return $res;
+}
+
 // ── SET DOCUMENT (known ID, creates or overwrites) ──────────────────────────
 function addDocWithId(string $collection, string $docId, array $data): bool {
     $fields = encodeFields($data);
     $res    = fsRequest('PATCH', FIRESTORE_BASE . "/$collection/$docId", ['fields' => $fields]);
     return $res['code'] === 200;
+}
+
+function addDocWithIdDetailed(string $collection, string $docId, array $data): array {
+    $fields = encodeFields($data);
+    $res    = fsRequest('PATCH', FIRESTORE_BASE . "/$collection/$docId", ['fields' => $fields]);
+    $res['success'] = ($res['code'] === 200);
+    return $res;
 }
 
 // ── ADD DOCUMENT (auto-ID) ───────────────────────────────────────────────────
@@ -128,6 +192,14 @@ function addDoc(string $collection, array $data): bool {
     $fields = encodeFields($data);
     $res    = fsRequest('POST', FIRESTORE_BASE . "/$collection", ['fields' => $fields]);
     return $res['code'] === 200;
+}
+
+function addDocDetailed(string $collection, array $data): array {
+    $data['timestamp'] = date('Y-m-d\TH:i:s\Z', time());
+    $fields = encodeFields($data);
+    $res    = fsRequest('POST', FIRESTORE_BASE . "/$collection", ['fields' => $fields]);
+    $res['success'] = ($res['code'] === 200);
+    return $res;
 }
 
 // ── QUERY (structured query) ─────────────────────────────────────────────────

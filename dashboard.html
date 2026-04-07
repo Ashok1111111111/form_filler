@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard – AI Form Filler</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -21,7 +21,7 @@
         }
         * { box-sizing: border-box; }
         body {
-            font-family: 'DM Sans', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
             background: #f6f6fa;
             margin: 0;
             color: var(--ink);
@@ -29,52 +29,47 @@
 
         /* SIDEBAR */
         #sidebar {
-            position: fixed;
-            top: 0; left: 0;
-            height: 100vh;
+            position: fixed; top: 0; left: 0; height: 100vh;
             width: var(--sidebar-w);
             background: linear-gradient(160deg, #1a1535 0%, #0d0d14 100%);
-            color: white;
-            padding: 0;
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 4px 0 30px rgba(0,0,0,0.15);
+            color: white; padding: 0; z-index: 200;
+            display: flex; flex-direction: column;
+            box-shadow: 4px 0 40px rgba(0,0,0,0.25);
+        }
+        #sidebar::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 22px 22px; pointer-events: none;
         }
         .sidebar-logo {
             padding: 1.8rem 1.5rem 1.2rem;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            margin-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            margin-bottom: 0.5rem; position: relative; z-index: 1;
         }
         .sidebar-logo-text {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1.4rem;
-            color: white;
+            font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px;
+            font-size: 1.4rem; color: white;
         }
         .sidebar-logo-text span { color: #8b7fff; }
-        .sidebar-tagline { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 3px; }
-        .sidebar-nav { flex: 1; padding: 0.5rem 1rem; }
+        .sidebar-tagline { font-size: 0.73rem; color: rgba(255,255,255,0.35); margin-top: 3px; }
+        .sidebar-nav { flex: 1; padding: 0.5rem 1rem; position: relative; z-index: 1; }
         .nav-item-custom {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
-            text-decoration: none;
-            color: rgba(255,255,255,0.6);
-            font-weight: 500;
-            font-size: 0.9rem;
-            margin-bottom: 4px;
-            transition: all 0.2s;
+            display: flex; align-items: center; gap: 12px;
+            padding: 0.72rem 1rem; border-radius: 12px;
+            text-decoration: none; color: rgba(255,255,255,0.55);
+            font-weight: 500; font-size: 0.88rem; margin-bottom: 3px; transition: all 0.2s;
         }
         .nav-item-custom i { width: 20px; text-align: center; font-size: 1rem; }
-        .nav-item-custom:hover { background: rgba(255,255,255,0.08); color: white; }
-        .nav-item-custom.active { background: rgba(139,127,255,0.2); color: white; border: 1px solid rgba(139,127,255,0.3); }
-        .nav-item-custom.active i { color: #8b7fff; }
+        .nav-item-custom:hover { background: rgba(255,255,255,0.07); color: white; transform: translateX(3px); }
+        .nav-item-custom.active {
+            background: linear-gradient(135deg, rgba(91,79,245,0.3), rgba(91,79,245,0.15));
+            color: white; border: 1px solid rgba(139,127,255,0.35);
+            box-shadow: 0 4px 12px rgba(91,79,245,0.15);
+        }
+        .nav-item-custom.active i { color: #a29bff; }
         .sidebar-footer {
-            padding: 1rem;
-            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 1rem; border-top: 1px solid rgba(255,255,255,0.07);
+            position: relative; z-index: 1;
         }
         .user-chip {
             display: flex;
@@ -92,7 +87,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Syne', sans-serif;
+            font-family: 'Outfit', sans-serif;
             font-weight: 800;
             font-size: 0.9rem;
             color: white;
@@ -131,7 +126,7 @@
             margin-bottom: 2rem;
         }
         .page-title {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Outfit', sans-serif;
             font-size: 1.8rem;
             font-weight: 800;
         }
@@ -139,131 +134,493 @@
 
         /* STAT CARDS */
         .stat-card {
-            background: white;
-            border-radius: 18px;
-            padding: 1.5rem;
-            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.6rem;
             transition: all 0.3s;
             position: relative;
             overflow: hidden;
-        }
-        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(91,79,245,0.1); }
-        .stat-card.accent-card {
-            background: linear-gradient(135deg, #5b4ff5 0%, #7c3aed 100%);
-            color: white;
             border: none;
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.15); }
+        .stat-card.wallet-card {
+            background: linear-gradient(135deg, #5b4ff5 0%, #7c3aed 60%, #9333ea 100%);
+            color: white;
+        }
+        .stat-card.wallet-card::after {
+            content: '₹';
+            position: absolute; right: -10px; bottom: -15px;
+            font-size: 7rem; font-weight: 900; opacity: .06;
+            font-family: 'Outfit', sans-serif; line-height: 1;
+        }
+        .stat-card.forms-card {
+            background: linear-gradient(135deg, #f5724f 0%, #e8470a 100%);
+            color: white;
+        }
+        .stat-card.forms-card::after {
+            content: '📄';
+            position: absolute; right: 10px; bottom: -5px;
+            font-size: 5rem; opacity: .12; line-height: 1;
+        }
+        .stat-card.customers-card {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+        }
+        .stat-card.customers-card::after {
+            content: '👥';
+            position: absolute; right: 10px; bottom: -5px;
+            font-size: 5rem; opacity: .12; line-height: 1;
         }
         .stat-card-icon {
             width: 46px; height: 46px;
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
+            background: rgba(255,255,255,0.18);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; margin-bottom: 1rem; color: white;
         }
-        .stat-card.accent-card .stat-card-icon { background: rgba(255,255,255,0.15); color: white; }
         .stat-num {
-            font-family: 'Syne', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 800;
-            line-height: 1;
-            margin-bottom: 0.3rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.6rem; font-weight: 800; line-height: 1;
+            margin-bottom: 0.3rem; color: white;
         }
-        .stat-label { font-size: 0.85rem; opacity: 0.8; }
+        .stat-label { font-size: 0.82rem; opacity: 0.75; color: white; font-weight: 500; }
         .low-credit-warn {
-            position: absolute;
-            top: 1rem; right: 1rem;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50px;
-            padding: 3px 10px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: white;
-            display: none;
+            position: absolute; top: 1rem; right: 1rem;
+            background: rgba(255,255,255,0.22);
+            border-radius: 50px; padding: 3px 10px;
+            font-size: 0.72rem; font-weight: 700; color: white; display: none;
         }
 
         /* ACTION CARDS */
         .action-card {
             background: white;
-            border-radius: 18px;
+            border-radius: 20px;
             padding: 1.8rem;
-            border: 1px solid var(--border);
+            border: 1.5px solid #f0eeff;
             height: 100%;
             transition: all 0.3s;
+            position: relative; overflow: hidden;
         }
-        .action-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(91,79,245,0.1); }
+        .action-card::before {
+            content: ''; position: absolute; inset: 0;
+            border-radius: 20px; opacity: 0; transition: opacity 0.3s;
+            background: linear-gradient(135deg, rgba(91,79,245,0.04), rgba(91,79,245,0.01));
+            pointer-events: none;
+        }
+        .action-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(91,79,245,0.12); border-color: rgba(91,79,245,0.25); }
+        .action-card:hover::before { opacity: 1; }
         .action-card-icon {
-            width: 52px; height: 52px;
+            width: 56px; height: 56px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 1.2rem;
+        }
+        .action-card h5 { font-family: 'Outfit', sans-serif; font-weight: 700; margin-bottom: 0.5rem; font-size: 1rem; }
+        .action-card p { font-size: 0.86rem; color: var(--ink-muted); margin-bottom: 1.2rem; line-height: 1.6; }
+        .btn-action {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 0.6rem 1.3rem; border-radius: 50px;
+            font-weight: 600; font-size: 0.86rem; text-decoration: none; transition: all 0.2s;
+        }
+        .btn-action:hover { transform: translateX(3px); }
+        .actions-layout { margin-bottom: 1.5rem; }
+        .featured-action-card {
+            background:
+                radial-gradient(circle at top right, rgba(255,255,255,0.16), transparent 35%),
+                linear-gradient(135deg, #0f9f55 0%, #15803d 55%, #0f5f31 100%);
+            color: white;
+            border-radius: 26px;
+            padding: 1.8rem;
+            min-height: 100%;
+            border: 1px solid rgba(255,255,255,0.14);
+            box-shadow: 0 24px 60px rgba(21,128,61,0.22);
+            position: relative;
+            overflow: hidden;
+        }
+        .featured-action-card::after {
+            content: '';
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            right: -120px;
+            bottom: -150px;
+            background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%);
+            pointer-events: none;
+        }
+        .featured-action-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        .featured-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            border-radius: 999px;
+            padding: 0.38rem 0.78rem;
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.18);
+            font-size: 0.74rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .featured-action-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+        }
+        .featured-action-card h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.65rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.55rem;
+            position: relative;
+            z-index: 1;
+        }
+        .featured-action-card p {
+            color: rgba(255,255,255,0.84);
+            font-size: 0.97rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+            max-width: 680px;
+            position: relative;
+            z-index: 1;
+        }
+        .featured-action-points {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.25rem;
+            position: relative;
+            z-index: 1;
+        }
+        .featured-action-points span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.48rem 0.8rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.15);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+        .btn-action-primary-lg {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            min-height: 58px;
+            padding: 0.95rem 1.65rem;
+            border-radius: 18px;
+            border: none;
+            background: linear-gradient(135deg, #ffffff, #eafff1);
+            color: #106b35;
+            font-size: 1rem;
+            font-weight: 800;
+            text-decoration: none;
+            box-shadow: 0 16px 30px rgba(8, 45, 22, 0.22);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            z-index: 1;
+        }
+        .btn-action-primary-lg:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 36px rgba(8, 45, 22, 0.24);
+        }
+        .support-actions {
+            display: grid;
+            gap: 1rem;
+            height: 100%;
+        }
+        .support-action-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.25rem;
+            border: 1.5px solid #f0eeff;
+            min-height: 0;
+        }
+        .support-action-head {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            margin-bottom: 0.7rem;
+        }
+        .support-action-icon {
+            width: 46px;
+            height: 46px;
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
-            margin-bottom: 1.2rem;
+            flex-shrink: 0;
         }
-        .action-card h5 {
-            font-family: 'Syne', sans-serif;
+        .support-action-card h5 {
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            font-size: 1rem;
         }
-        .action-card p { font-size: 0.88rem; color: var(--ink-muted); margin-bottom: 1.2rem; }
-        .btn-action {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 0.6rem 1.3rem;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.88rem;
-            text-decoration: none;
-            transition: all 0.2s;
+        .support-action-card p {
+            margin-bottom: 1rem;
+            font-size: 0.84rem;
+            color: var(--ink-muted);
+            line-height: 1.6;
         }
 
         /* SECTION TITLE */
         .section-head {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 1.1rem;
-            margin-bottom: 1.2rem;
-            color: var(--ink);
+            font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px;
+            font-size: 1rem; margin-bottom: 1.2rem; color: var(--ink);
+            display: flex; align-items: center; gap: 8px;
         }
+        .section-head::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+        /* HOW TO USE — STEPS */
+        .how-card {
+            background: linear-gradient(135deg, #0d0b1e, #1a1535);
+            border-radius: 20px; padding: 2rem; position: relative; overflow: hidden;
+        }
+        .how-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse 70% 80% at 20% 50%, rgba(91,79,245,0.2), transparent 70%);
+        }
+        .step-bubble {
+            position: relative; z-index: 1; text-align: center; padding: 1rem 0.5rem;
+        }
+        .step-circle {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: rgba(139,127,255,0.2); border: 2px solid rgba(139,127,255,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; margin: 0 auto 0.7rem;
+        }
+        .step-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.85rem; color: white; margin-bottom: 3px; }
+        .step-sub { font-size: 0.75rem; color: rgba(255,255,255,0.45); }
+        .step-arrow-dash { color: rgba(255,255,255,0.2); font-size: 1.4rem; padding-top: 1.5rem; }
+
+        /* PORTALS STRIP */
+        .portals-strip {
+            background: white; border-radius: 16px; padding: 1.2rem 1.5rem;
+            border: 1px solid var(--border); display: flex; align-items: center;
+            gap: 0.7rem; flex-wrap: wrap;
+        }
+        .portal-lbl { font-size: 0.75rem; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+        .portal-tag {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 4px 12px;
+            font-size: 0.78rem; font-weight: 600; color: var(--ink-muted);
+            transition: all 0.2s;
+        }
+        .portal-tag:hover { background: rgba(91,79,245,0.08); color: var(--accent); border-color: rgba(91,79,245,0.2); }
+
+        /* TOP BAR */
+        .top-bar {
+            display: flex; align-items: center;
+            justify-content: space-between; margin-bottom: 2rem;
+            background: white; border-radius: 16px; padding: 1.2rem 1.5rem;
+            border: 1px solid var(--border);
+        }
+        .page-title { font-family: 'Outfit', sans-serif; font-size: 1.5rem; font-weight: 800; }
+        .greeting { font-size: 0.85rem; color: var(--ink-muted); margin-top: 2px; }
 
         /* LOADING */
         #loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
+            position: fixed; inset: 0;
+            background: linear-gradient(135deg, #0d0b1e, #1a1535);
+            display: flex; align-items: center; justify-content: center; z-index: 9999;
         }
         .loading-inner { text-align: center; }
         .loading-inner .spinner {
-            width: 44px; height: 44px;
-            border: 3px solid #f0f0f0;
-            border-top-color: var(--accent);
+            width: 48px; height: 48px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #8b7fff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             margin: 0 auto 1rem;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-inner p { font-size: 0.9rem; color: var(--ink-muted); }
+        /* ── PAGE TRANSITIONS ── */
+        #main,#loading-overlay{filter:blur(4px);transition:filter .35s ease-out,opacity .35s ease-out;}
+        #sidebar{transition:filter .2s ease-out,opacity .2s ease-out;}
+        body.page-ready #main,body.page-ready #loading-overlay{filter:blur(0);}
+        body.page-exit #main,body.page-exit #sidebar{filter:blur(4px);opacity:0.3;transition-duration:.2s;}
+        @keyframes navPulse{0%{box-shadow:0 0 0 0 rgba(139,127,255,.5);background:rgba(91,79,245,.45);}60%{box-shadow:0 0 0 6px rgba(139,127,255,0);}100%{box-shadow:0 0 0 0 rgba(139,127,255,0);background:inherit;}}
+        .nav-item-custom.active.pulse{animation:navPulse .5s ease forwards;}
+        .loading-inner p { font-size: 0.9rem; color: rgba(255,255,255,0.5); }
+        .loading-brand { font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px; font-size: 1.4rem; color: white; margin-bottom: 1.5rem; }
+        .loading-brand span { color: #8b7fff; }
 
         /* ALERT */
         .alert-custom {
-            border-radius: 14px;
-            border: none;
-            padding: 1rem 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
+            border-radius: 14px; border: none; padding: 1rem 1.2rem;
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 1.5rem; font-size: 0.9rem;
         }
-        .alert-warn { background: #fff8e1; color: #92400e; }
-        .alert-success { background: #f0fdf4; color: #166534; }
+        .alert-warn { background: #fff8e1; color: #92400e; border-left: 4px solid #f59e0b; }
+        .alert-success { background: #f0fdf4; color: #166534; border-left: 4px solid #22c55e; }
+        .alert-info { background: #eff6ff; color: #1d4ed8; border-left: 4px solid #3b82f6; }
+
+        /* SESSION SCAN MODAL */
+        .scan-modal-backdrop {
+            position: fixed; inset: 0; background: rgba(9, 11, 28, 0.62);
+            display: none; align-items: center; justify-content: center;
+            z-index: 5000; padding: 1rem;
+        }
+        .scan-modal-backdrop.open { display: flex; }
+        .scan-modal {
+            width: min(980px, 100%);
+            max-height: 88vh;
+            overflow: hidden;
+            border-radius: 24px;
+            background: white;
+            border: 1px solid rgba(91,79,245,0.12);
+            box-shadow: 0 30px 80px rgba(16, 24, 40, 0.28);
+            display: flex; flex-direction: column;
+        }
+        .scan-modal-head {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #ece9ff;
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+        }
+        .scan-modal-title {
+            font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.1rem;
+        }
+        .scan-modal-sub {
+            font-size: 0.82rem; color: var(--ink-muted); margin-top: 2px;
+        }
+        .scan-close-btn {
+            border: none; background: #f4f2ff; width: 40px; height: 40px; border-radius: 12px;
+            color: var(--accent); font-size: 1rem; cursor: pointer;
+        }
+        .scan-modal-body {
+            padding: 1.4rem 1.5rem 1.2rem;
+            overflow-y: auto;
+        }
+        .scan-steps {
+            display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem;
+        }
+        .scan-step-pill {
+            border-radius: 999px; padding: 0.42rem 0.85rem; font-size: 0.78rem; font-weight: 700;
+            background: #f3f1ff; color: #6d5efc; border: 1px solid rgba(91,79,245,0.12);
+        }
+        .scan-panel {
+            border: 1px solid #ede9fe; border-radius: 18px; background: #fbfaff; padding: 1.1rem;
+        }
+        .scan-dropzone {
+            border: 2px dashed rgba(91,79,245,0.28);
+            border-radius: 18px; background: white;
+            padding: 2rem 1.2rem; text-align: center; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .scan-dropzone.drag-over { border-color: var(--accent); background: #f7f5ff; }
+        .scan-drop-icon {
+            width: 64px; height: 64px; border-radius: 18px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, rgba(91,79,245,0.14), rgba(91,79,245,0.05));
+            color: var(--accent); font-size: 1.5rem; margin-bottom: 0.85rem;
+        }
+        .scan-drop-title {
+            font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem;
+        }
+        .scan-drop-sub { font-size: 0.83rem; color: var(--ink-muted); }
+        .scan-queue { margin-top: 1rem; display: none; }
+        .scan-queue-row {
+            display: flex; align-items: center; gap: 0.75rem; justify-content: space-between;
+            background: white; border: 1px solid #ece9ff; border-radius: 12px; padding: 0.8rem 0.9rem;
+            margin-bottom: 0.55rem;
+        }
+        .scan-file-meta { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+        .scan-file-icon {
+            width: 38px; height: 38px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            background: #f3f1ff; color: var(--accent); font-weight: 800; font-size: 0.78rem; flex-shrink: 0;
+        }
+        .scan-file-name {
+            font-size: 0.86rem; font-weight: 600; color: var(--ink);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 430px;
+        }
+        .scan-file-status { font-size: 0.75rem; color: var(--ink-muted); }
+        .scan-remove-btn {
+            border: none; background: transparent; color: #dc2626; font-size: 0.95rem; cursor: pointer;
+        }
+        .scan-progress-note {
+            font-size: 0.83rem; color: var(--ink-muted); margin-bottom: 0.85rem;
+        }
+        .review-summary {
+            background: white; border: 1px solid #ece9ff; border-radius: 14px;
+            padding: 0.9rem 1rem; margin-bottom: 1rem; font-size: 0.86rem; color: var(--ink-muted);
+        }
+        .review-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.7rem 1rem;
+        }
+        .review-group-title {
+            grid-column: 1 / -1;
+            font-size: 0.76rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--accent); border-bottom: 2px solid #ece9ff; padding-bottom: 0.3rem; margin-top: 0.5rem;
+        }
+        .review-field label {
+            display: block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.4px; color: #6b6b80; margin-bottom: 0.3rem;
+        }
+        .review-field input {
+            width: 100%; border: 1.5px solid #dfdaf9; border-radius: 10px;
+            padding: 0.62rem 0.78rem; font-size: 0.88rem; outline: none;
+        }
+        .review-field input:focus { border-color: var(--accent); }
+        .review-source { margin-top: 0.28rem; font-size: 0.72rem; color: var(--ink-muted); }
+        .review-conflict {
+            margin-top: 0.4rem; font-size: 0.74rem; color: #b91c1c;
+            background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; padding: 0.48rem 0.55rem;
+        }
+        .review-alt {
+            display: inline-block; margin: 0.35rem 0.28rem 0 0; padding: 0.24rem 0.55rem;
+            border-radius: 999px; background: white; border: 1px solid #fca5a5;
+            color: #b91c1c; font-size: 0.72rem; font-weight: 700; cursor: pointer;
+        }
+        .scan-modal-footer {
+            border-top: 1px solid #ece9ff; padding: 1rem 1.5rem;
+            display: flex; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;
+        }
+        .scan-footer-note { font-size: 0.78rem; color: var(--ink-muted); }
+        .scan-btn {
+            border: none; border-radius: 999px; padding: 0.72rem 1.2rem;
+            font-size: 0.86rem; font-weight: 700; cursor: pointer;
+        }
+        .scan-btn-primary { background: linear-gradient(135deg, var(--accent), #7c6fff); color: white; }
+        .scan-btn-secondary { background: #f3f1ff; color: var(--accent); }
+        .scan-btn-danger { background: #fff1f2; color: #be123c; }
+        .scan-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+        .scan-status-box {
+            display: none; margin-bottom: 1rem; border-radius: 14px; padding: 0.9rem 1rem;
+            font-size: 0.86rem; font-weight: 600;
+        }
+        .scan-status-box.info { display: block; background: #eff6ff; color: #1d4ed8; }
+        .scan-status-box.success { display: block; background: #f0fdf4; color: #166534; }
+        .scan-status-box.error { display: block; background: #fef2f2; color: #b91c1c; }
+
+        @media (max-width: 900px) {
+            #main { margin-left: 0; padding: 1rem; }
+            #sidebar { position: static; width: 100%; height: auto; }
+            .scan-modal { max-height: 94vh; }
+            .featured-action-card { padding: 1.35rem; }
+            .featured-action-card h4 { font-size: 1.35rem; }
+            .featured-action-top { align-items: center; }
+            .featured-action-icon { width: 54px; height: 54px; font-size: 1.35rem; }
+            .btn-action-primary-lg { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -271,6 +628,7 @@
 <!-- LOADING OVERLAY -->
 <div id="loading-overlay">
     <div class="loading-inner">
+        <div class="loading-brand">AI<span>Form</span>Filler</div>
         <div class="spinner"></div>
         <p>Loading your dashboard...</p>
     </div>
@@ -286,14 +644,11 @@
         <a href="dashboard.html" class="nav-item-custom active">
             <i class="bi bi-speedometer2"></i> Dashboard
         </a>
-        <a href="customer-profile.html" class="nav-item-custom">
-            <i class="bi bi-person-fill-add"></i> Create Profile
-        </a>
-        <a href="my-customers.html" class="nav-item-custom">
-            <i class="bi bi-people-fill"></i> My Customers
-        </a>
         <a href="recharge.html" class="nav-item-custom">
             <i class="bi bi-wallet-fill"></i> Add Money
+        </a>
+        <a href="form-logs.html" class="nav-item-custom">
+            <i class="bi bi-clock-history"></i> Fill History
         </a>
         <a href="download-extension.html" class="nav-item-custom">
             <i class="bi bi-puzzle-fill"></i> Chrome Extension
@@ -334,95 +689,200 @@
 
     <!-- Stats Row -->
     <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="stat-card accent-card">
-                <div class="stat-card-icon"><i class="bi bi-coin"></i></div>
+        <div class="col-md-3">
+            <div class="stat-card wallet-card">
+                <div class="stat-card-icon"><i class="bi bi-wallet2"></i></div>
                 <div class="stat-num" id="creditsDisplay">--</div>
-                <div class="stat-label">Wallet Balance</div>
+                <div class="stat-label">Wallet Balance · <a href="recharge.html" style="color:rgba(255,255,255,0.7);font-size:0.78rem;">Add money →</a></div>
                 <span class="low-credit-warn" id="lowCreditBadge">⚠ Low!</span>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="stat-card">
-                <div class="stat-card-icon" style="background:rgba(245,114,79,0.1);color:#f5724f">
-                    <i class="bi bi-file-earmark-check-fill"></i>
-                </div>
-                <div class="stat-num" id="formsFilledDisplay">--</div>
-                <div class="stat-label" style="color:var(--ink-muted)">Total Forms Filled</div>
+        <div class="col-md-3">
+            <div class="stat-card forms-card">
+                <div class="stat-card-icon"><i class="bi bi-file-earmark-check-fill"></i></div>
+                <div class="stat-num" id="formsTodayDisplay">--</div>
+                <div class="stat-label">Forms Filled Today</div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="stat-card">
-                <div class="stat-card-icon" style="background:rgba(34,197,94,0.1);color:#22c55e">
-                    <i class="bi bi-people-fill"></i>
-                </div>
-                <div class="stat-num" id="customersDisplay">--</div>
-                <div class="stat-label" style="color:var(--ink-muted)">Customers Saved</div>
+        <div class="col-md-3">
+            <div class="stat-card customers-card">
+                <div class="stat-card-icon"><i class="bi bi-cash-stack"></i></div>
+                <div class="stat-num" id="amountSpentDisplay">--</div>
+                <div class="stat-label">Amount Spent Today</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card customers-card">
+                <div class="stat-card-icon"><i class="bi bi-bar-chart-fill"></i></div>
+                <div class="stat-num" id="formsFilledDisplay">--</div>
+                <div class="stat-label">Total Forms Filled</div>
             </div>
         </div>
     </div>
 
     <!-- Quick Actions -->
     <div class="section-head">Quick Actions</div>
-    <div class="row g-3 mb-4">
-        <div class="col-md-4">
-            <div class="action-card">
-                <div class="action-card-icon" style="background:rgba(91,79,245,0.1);color:var(--accent)">
-                    <i class="bi bi-person-fill-add"></i>
+    <div class="row g-3 actions-layout">
+        <div class="col-lg-8">
+            <div class="featured-action-card">
+                <div class="featured-action-top">
+                    <div class="featured-badge">
+                        <i class="bi bi-lightning-charge-fill"></i> Most Used Workflow
+                    </div>
+                    <div class="featured-action-icon">
+                        <i class="bi bi-camera-fill"></i>
+                    </div>
                 </div>
-                <h5>Create Customer Profile</h5>
-                <p>Add a new customer with all their details — 112 fields for complete form coverage.</p>
-                <a href="customer-profile.html" class="btn-action" style="background:rgba(91,79,245,0.1);color:var(--accent);">
-                    <i class="bi bi-plus-circle"></i> Add Customer
-                </a>
+                <h4>Scan documents and preview fields before filling</h4>
+                <p>Use this first for daily work. Upload Aadhaar, marksheets, certificates, salary slips, or PDFs, check the extracted values, then send only the reviewed session to the extension.</p>
+                <div class="featured-action-points">
+                    <span><i class="bi bi-file-earmark-image"></i> Images + PDFs</span>
+                    <span><i class="bi bi-eye-fill"></i> Review before fill</span>
+                    <span><i class="bi bi-shield-check"></i> Session only, not saved as profile</span>
+                </div>
+                <button type="button" class="btn-action-primary-lg" onclick="openScanToFillModal()">
+                    <i class="bi bi-stars"></i> Open Scan & Preview
+                </button>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="action-card">
-                <div class="action-card-icon" style="background:rgba(245,114,79,0.1);color:#f5724f">
-                    <i class="bi bi-people-fill"></i>
+        <div class="col-lg-4">
+            <div class="support-actions">
+                <div class="support-action-card">
+                    <div class="support-action-head">
+                        <div class="support-action-icon" style="background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(6,182,212,0.05));">
+                            <i class="bi bi-puzzle-fill" style="color:#06b6d4"></i>
+                        </div>
+                        <h5>Chrome Extension</h5>
+                    </div>
+                    <p>Keep the extension ready in the browser where you fill forms so reviewed scan sessions can be used instantly.</p>
+                    <a href="download-extension.html" class="btn-action" style="background:linear-gradient(135deg,#06b6d4,#0891b2);color:white;box-shadow:0 4px 14px rgba(6,182,212,0.3);">
+                        <i class="bi bi-download"></i> Manage Extension
+                    </a>
                 </div>
-                <h5>View All Customers</h5>
-                <p>Browse, search, and manage all your saved customer profiles in one place.</p>
-                <a href="my-customers.html" class="btn-action" style="background:rgba(245,114,79,0.1);color:#f5724f">
-                    <i class="bi bi-arrow-right-circle"></i> View Customers
-                </a>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="action-card">
-                <div class="action-card-icon" style="background:rgba(34,197,94,0.1);color:#22c55e">
-                    <i class="bi bi-puzzle-fill"></i>
+                <div class="support-action-card">
+                    <div class="support-action-head">
+                        <div class="support-action-icon" style="background:linear-gradient(135deg,rgba(245,114,79,0.15),rgba(245,114,79,0.05));">
+                            <i class="bi bi-clock-history" style="color:#f5724f"></i>
+                        </div>
+                        <h5>View Fill History</h5>
+                    </div>
+                    <p>Check recent fills, costs, and usage when you need to verify work or reconcile today’s activity.</p>
+                    <a href="form-logs.html" class="btn-action" style="background:linear-gradient(135deg,#f5724f,#e8470a);color:white;box-shadow:0 4px 14px rgba(245,114,79,0.3);">
+                        <i class="bi bi-arrow-right-circle"></i> Open History
+                    </a>
                 </div>
-                <h5>Chrome Extension</h5>
-                <p>Download and install the Chrome extension to start auto-filling forms instantly.</p>
-                <a href="download-extension.html" class="btn-action" style="background:rgba(34,197,94,0.1);color:#16a34a">
-                    <i class="bi bi-download"></i> Download
-                </a>
             </div>
         </div>
     </div>
 
     <!-- How to Use -->
-    <div class="section-head">How to Use</div>
-    <div class="action-card mb-4">
-        <div class="row g-0 text-center">
-            <div class="col-md-3 p-3">
-                <div style="font-size:2rem;margin-bottom:8px;">👤</div>
-                <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem">1. Create Profile</div>
-                <div style="font-size:0.82rem;color:var(--ink-muted)">Add customer with all details</div>
+    <div class="section-head">How It Works</div>
+    <div class="how-card mb-4">
+        <div class="row g-0 text-center position-relative" style="z-index:1;">
+            <div class="col-md-3">
+                <div class="step-bubble">
+                    <div class="step-circle">📄</div>
+                    <div class="step-title">1. Scan Documents</div>
+                    <div class="step-sub">Upload images or PDFs for the current customer</div>
+                </div>
             </div>
-            <div class="col-md-1 d-flex align-items-center justify-content-center" style="color:var(--ink-muted);font-size:1.2rem;">→</div>
-            <div class="col-md-3 p-3">
-                <div style="font-size:2rem;margin-bottom:8px;">🔑</div>
-                <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem">2. Get Customer ID</div>
-                <div style="font-size:0.82rem;color:var(--ink-muted)">Copy from customer list</div>
+            <div class="col-md-1 d-flex align-items-center justify-content-center">
+                <div class="step-arrow-dash">→</div>
             </div>
-            <div class="col-md-1 d-flex align-items-center justify-content-center" style="color:var(--ink-muted);font-size:1.2rem;">→</div>
-            <div class="col-md-3 p-3">
-                <div style="font-size:2rem;margin-bottom:8px;">🤖</div>
-                <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.9rem">3. Auto-fill Form</div>
-                <div style="font-size:0.82rem;color:var(--ink-muted)">Open extension on any form</div>
+            <div class="col-md-3">
+                <div class="step-bubble">
+                    <div class="step-circle">👀</div>
+                    <div class="step-title">2. Review Fields</div>
+                    <div class="step-sub">Preview extracted data before sending it anywhere</div>
+                </div>
+            </div>
+            <div class="col-md-1 d-flex align-items-center justify-content-center">
+                <div class="step-arrow-dash">→</div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-bubble">
+                    <div class="step-circle">🤖</div>
+                    <div class="step-title">3. Fill with Extension</div>
+                    <div class="step-sub">Send session data to the extension, fill, deduct, and clear</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supported Portals -->
+    <div class="section-head">Works on 200+ Portals</div>
+    <div class="portals-strip mb-4">
+        <span class="portal-lbl">Supports →</span>
+        <span class="portal-tag">BPSC</span>
+        <span class="portal-tag">UPSC</span>
+        <span class="portal-tag">SSC</span>
+        <span class="portal-tag">IRCTC</span>
+        <span class="portal-tag">PM-KISAN</span>
+        <span class="portal-tag">Domicile</span>
+        <span class="portal-tag">Caste Certificate</span>
+        <span class="portal-tag">Income Certificate</span>
+        <span class="portal-tag">E-Shram</span>
+        <span class="portal-tag">Ayushman Bharat</span>
+        <span class="portal-tag">Ration Card</span>
+        <span class="portal-tag">Railways</span>
+        <span class="portal-tag">+ 190 more</span>
+    </div>
+</div>
+
+<div id="scanToFillModal" class="scan-modal-backdrop">
+    <div class="scan-modal" role="dialog" aria-modal="true" aria-labelledby="scanModalTitle">
+        <div class="scan-modal-head">
+            <div>
+                <div class="scan-modal-title" id="scanModalTitle">Scan, Review, and Send to Extension</div>
+                <div class="scan-modal-sub">Session-only extraction for the current customer. Nothing is saved as a customer profile.</div>
+            </div>
+            <button type="button" class="scan-close-btn" onclick="closeScanToFillModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="scan-modal-body">
+            <div class="scan-steps">
+                <div class="scan-step-pill">1. Upload</div>
+                <div class="scan-step-pill">2. Scan</div>
+                <div class="scan-step-pill">3. Review</div>
+                <div class="scan-step-pill">4. Send to Extension</div>
+            </div>
+
+            <div id="scanStatusBox" class="scan-status-box"></div>
+
+            <div id="scanUploadPanel" class="scan-panel">
+                <div class="scan-dropzone" id="scanDropzone">
+                    <div class="scan-drop-icon"><i class="bi bi-cloud-arrow-up-fill"></i></div>
+                    <div class="scan-drop-title">Drop images or PDFs here</div>
+                    <div class="scan-drop-sub">Supports Aadhaar, PAN, certificates, marksheets, salary slips, and multi-page PDFs up to 10 MB each.</div>
+                    <button type="button" class="scan-btn scan-btn-secondary" style="margin-top:1rem;" onclick="document.getElementById('scanFileInput').click()">Choose Files</button>
+                    <input type="file" id="scanFileInput" accept="image/*,application/pdf" multiple hidden>
+                </div>
+                <div id="scanQueue" class="scan-queue">
+                    <div class="scan-progress-note" id="scanFileCount">No files selected</div>
+                    <div id="scanQueueList"></div>
+                </div>
+            </div>
+
+            <div id="scanReviewPanel" class="scan-panel" style="display:none;">
+                <div class="review-summary" id="scanReviewSummary"></div>
+                <div class="review-toolbar" id="scanReviewToolbar" style="display:none;align-items:center;justify-content:space-between;gap:0.8rem;flex-wrap:wrap;margin-bottom:1rem;">
+                    <div style="font-size:.84rem;color:var(--ink-muted);">
+                        <strong id="scanSelectedCount">0</strong> field(s) selected for form filling
+                    </div>
+                    <div style="display:flex;gap:.55rem;flex-wrap:wrap;">
+                        <button type="button" class="scan-btn scan-btn-secondary" onclick="setAllReviewSelections(true)">Select All</button>
+                        <button type="button" class="scan-btn scan-btn-secondary" onclick="setAllReviewSelections(false)">Clear All</button>
+                    </div>
+                </div>
+                <div class="review-grid" id="scanReviewGrid"></div>
+            </div>
+        </div>
+        <div class="scan-modal-footer">
+            <div class="scan-footer-note" id="scanFooterNote">Upload one or more documents, then scan and review the extracted fields before filling.</div>
+            <div style="display:flex;gap:0.65rem;flex-wrap:wrap;">
+                <button type="button" class="scan-btn scan-btn-danger" onclick="resetScanSession()">Reset</button>
+                <button type="button" class="scan-btn scan-btn-secondary" id="scanBackBtn" onclick="backToScanUpload()" style="display:none;">Back to Upload</button>
+                <button type="button" class="scan-btn scan-btn-primary" id="scanNowBtn" onclick="scanSelectedDocs()" disabled>Scan Documents</button>
+                <button type="button" class="scan-btn scan-btn-primary" id="sendToExtensionBtn" onclick="sendSessionToExtension()" style="display:none;">Send to Extension</button>
             </div>
         </div>
     </div>
@@ -450,6 +910,614 @@
     // Greeting based on time
     const hours = new Date().getHours();
     const greetWord = hours < 12 ? 'Good morning' : hours < 17 ? 'Good afternoon' : 'Good evening';
+    const SCAN_LABELS = {
+        fullName:'Full Name',fatherName:"Father's Name",motherName:"Mother's Name",husbandName:"Husband's Name",
+        dob:'Date of Birth',gender:'Gender',category:'Category/Caste',religion:'Religion',nationality:'Nationality',
+        maritalStatus:'Marital Status',mobileNumber:'Mobile Number',altMobile:'Alternate Mobile',emailId:'Email ID',
+        permAddr1:'Perm Addr Line 1',permAddr2:'Perm Addr Line 2',permPO:'Post Office',permPS:'Police Station',
+        permDistrict:'District',permState:'State',permPin:'PIN Code',
+        corrAddr1:'Corr Addr Line 1',corrAddr2:'Corr Addr Line 2',corrPO:'Corr Post Office',corrPS:'Corr Police Station',
+        corrDistrict:'Corr District',corrState:'Corr State',corrPin:'Corr PIN',
+        aadhaarNumber:'Aadhaar Number',panNumber:'PAN Number',voterId:'Voter ID',passportNumber:'Passport No',
+        dlNumber:'Driving Licence',bankAcc:'Bank Account No',bankIFSC:'IFSC Code',bankName:'Bank Name',bankBranch:'Branch Name',
+        tenthBoard:'10th Board',tenthYear:'10th Year',tenthRoll:'10th Roll No',tenthPercent:'10th Percentage',
+        twelfthBoard:'12th Board',twelfthYear:'12th Year',twelfthRoll:'12th Roll No',twelfthPercent:'12th Percentage',
+        enrollmentNumber:'Enrollment No',applicationName:'Application',studentType:'Student Type',academicSession:'Session',
+        semester:'Semester',stream:'Stream',universityRollNumber:'University Roll No',registrationNumber:'Registration No',
+        rollNumber:'Roll No',mjcSubject:'MJC',micSubject:'MIC',mdcSubject:'MDC',aecSubject:'AEC',secSubject:'SEC',vacSubject:'VAC',
+        gradDegree:'Degree',gradUniv:'University',gradYear:'Grad Year',gradPercent:'Graduation %',
+        casteCertNo:'Caste Cert No',domicileCertNo:'Domicile Cert No',incomeCertNo:'Income Cert No',
+        annualIncome:'Annual Income',employeeId:'Employee ID',designation:'Designation',orgName:'Organisation',
+        grossSalary:'Gross Salary',netSalary:'Net Salary',salaryMonth:'Salary Month',salaryYear:'Salary Year'
+    };
+    const SCAN_GROUPS = {
+        'Personal Info':['fullName','fatherName','motherName','husbandName','dob','gender','category','religion','nationality','maritalStatus'],
+        'Contact':['mobileNumber','altMobile','emailId'],
+        'Permanent Address':['permAddr1','permAddr2','permPO','permPS','permDistrict','permState','permPin'],
+        'Correspondence Address':['corrAddr1','corrAddr2','corrPO','corrPS','corrDistrict','corrState','corrPin'],
+        'Identity Documents':['aadhaarNumber','panNumber','voterId','passportNumber','dlNumber'],
+        'Bank Details':['bankAcc','bankIFSC','bankName','bankBranch'],
+        'Education':['tenthBoard','tenthYear','tenthRoll','tenthPercent','twelfthBoard','twelfthYear','twelfthRoll','twelfthPercent','gradDegree','gradUniv','gradYear','gradPercent'],
+        'Academic / Exam Details':['enrollmentNumber','applicationName','studentType','academicSession','semester','stream','universityRollNumber','registrationNumber','rollNumber','mjcSubject','micSubject','mdcSubject','aecSubject','secSubject','vacSubject'],
+        'Certificates':['casteCertNo','domicileCertNo','incomeCertNo','annualIncome'],
+        'Employment':['employeeId','designation','orgName','grossSalary','netSalary','salaryMonth','salaryYear']
+    };
+
+    let scanSessionFiles = [];
+    let scanMergedFields = {};
+    let scanFieldSources = {};
+    let scanFieldConflicts = {};
+    let scanSelectedFields = {};
+    let scanSessionMetrics = null;
+    let scanInProgress = false;
+    let userStatsUnsubscribe = null;
+
+    document.getElementById('formsTodayDisplay').textContent = '0';
+    document.getElementById('amountSpentDisplay').textContent = '₹0.00';
+
+    function showDashboardAlert(type, html) {
+        document.getElementById('alertArea').innerHTML = `
+            <div class="alert-custom alert-${type}">
+                <i class="bi bi-info-circle-fill" style="font-size:1.15rem;flex-shrink:0"></i>
+                <div>${html}</div>
+            </div>`;
+    }
+
+    function formatCurrency(value) {
+        return '₹' + Number(value || 0).toFixed(2);
+    }
+
+    function getServerAuthHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+        const fbIdToken = localStorage.getItem('fbIdToken');
+        if (fbIdToken) headers.Authorization = `Bearer ${fbIdToken}`;
+        return headers;
+    }
+
+    function getDashboardBusinessDayKeyClient() {
+        const parts = new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).formatToParts(new Date());
+        const year = parts.find((part) => part.type === 'year')?.value || '0000';
+        const month = parts.find((part) => part.type === 'month')?.value || '00';
+        const day = parts.find((part) => part.type === 'day')?.value || '00';
+        return `${year}-${month}-${day}`;
+    }
+
+    function applyDashboardStats(data = {}) {
+        const todayKey = getDashboardBusinessDayKeyClient();
+        const dailyKey = String(data.dailyStatsDate ?? '');
+        const walletBalance = Number(data.walletBalance ?? 0);
+        const totalFormsFilledCount = Number(data.totalFormsFilledCount ?? 0);
+        const formsToday = Number(
+            dailyKey === todayKey
+                ? (data.dailyFormsFilledCount ?? data.formsToday ?? 0)
+                : (data.formsToday ?? 0)
+        );
+        const amountSpentToday = Number(
+            dailyKey === todayKey
+                ? (data.dailyAmountSpent ?? data.amountSpentToday ?? 0)
+                : (data.amountSpentToday ?? 0)
+        );
+
+        document.getElementById('creditsDisplay').textContent = formatCurrency(walletBalance);
+        document.getElementById('formsFilledDisplay').textContent = String(totalFormsFilledCount);
+        document.getElementById('formsTodayDisplay').textContent = String(formsToday);
+        document.getElementById('amountSpentDisplay').textContent = formatCurrency(amountSpentToday);
+        document.getElementById('lowCreditBadge').style.display = walletBalance < 10 ? 'block' : 'none';
+    }
+
+    function subscribeToDashboardStats(userId) {
+        if (userStatsUnsubscribe) {
+            userStatsUnsubscribe();
+            userStatsUnsubscribe = null;
+        }
+        if (!userId) return;
+
+        userStatsUnsubscribe = db.collection('users').doc(userId).onSnapshot((doc) => {
+            if (!doc.exists) return;
+            applyDashboardStats(doc.data() || {});
+        }, (error) => {
+            console.warn('Dashboard stats snapshot failed:', error);
+        });
+    }
+
+    async function loadTodayAnalytics(userId) {
+        return refreshDashboardStats(userId);
+    }
+
+    async function refreshDashboardStats(userId) {
+        if (!userId) return;
+        try {
+            const r = await fetch('/get-dashboard-stats.php', {
+                method: 'POST',
+                headers: getServerAuthHeaders(),
+                body: JSON.stringify({ userId })
+            });
+            const cr = await r.json();
+            if (!cr || cr.success === false) {
+                throw new Error(cr?.error || 'Dashboard stats unavailable');
+            }
+            applyDashboardStats(cr);
+        } catch (error) {
+            console.warn('Dashboard stats refresh failed:', error);
+        }
+    }
+
+    function setScanStatus(message, type = 'info') {
+        const box = document.getElementById('scanStatusBox');
+        box.className = `scan-status-box ${type}`;
+        box.textContent = message;
+    }
+
+    function clearScanStatus() {
+        const box = document.getElementById('scanStatusBox');
+        box.className = 'scan-status-box';
+        box.textContent = '';
+    }
+
+    function resetScanSession() {
+        if (scanInProgress) return;
+        scanSessionFiles = [];
+        scanMergedFields = {};
+        scanFieldSources = {};
+        scanFieldConflicts = {};
+        scanSelectedFields = {};
+        scanSessionMetrics = null;
+        document.getElementById('scanFileInput').value = '';
+        document.getElementById('scanUploadPanel').style.display = 'block';
+        document.getElementById('scanReviewPanel').style.display = 'none';
+        document.getElementById('scanReviewToolbar').style.display = 'none';
+        document.getElementById('scanBackBtn').style.display = 'none';
+        document.getElementById('sendToExtensionBtn').style.display = 'none';
+        document.getElementById('scanNowBtn').style.display = 'inline-flex';
+        document.getElementById('scanFooterNote').textContent = 'Upload one or more documents, then scan and review the extracted fields before filling.';
+        clearScanStatus();
+        renderScanQueue();
+    }
+
+    function openScanToFillModal() {
+        resetScanSession();
+        document.getElementById('scanToFillModal').classList.add('open');
+    }
+
+    function closeScanToFillModal() {
+        if (scanInProgress) return;
+        document.getElementById('scanToFillModal').classList.remove('open');
+    }
+
+    function renderScanQueue() {
+        const queue = document.getElementById('scanQueue');
+        const list = document.getElementById('scanQueueList');
+        const count = document.getElementById('scanFileCount');
+        const scanBtn = document.getElementById('scanNowBtn');
+
+        if (!scanSessionFiles.length) {
+            queue.style.display = 'none';
+            count.textContent = 'No files selected';
+            list.innerHTML = '';
+            scanBtn.disabled = true;
+            return;
+        }
+
+        queue.style.display = 'block';
+        count.textContent = `${scanSessionFiles.length} file${scanSessionFiles.length !== 1 ? 's' : ''} selected`;
+        scanBtn.disabled = false;
+        list.innerHTML = scanSessionFiles.map((item, idx) => {
+            const ext = item.file.name.split('.').pop().toUpperCase().slice(0, 4);
+            const status = item.status === 'done' ? `${item.fieldCount} fields found`
+                : item.status === 'error' ? (item.error || 'Scan failed')
+                : item.status === 'scanning' ? 'Scanning...'
+                : 'Ready';
+            return `
+                <div class="scan-queue-row">
+                    <div class="scan-file-meta">
+                        <div class="scan-file-icon">${ext}</div>
+                        <div style="min-width:0;">
+                            <div class="scan-file-name" title="${item.file.name}">${item.file.name}</div>
+                            <div class="scan-file-status">${status}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="scan-remove-btn" onclick="removeScanFile(${idx})"><i class="bi bi-x-lg"></i></button>
+                </div>`;
+        }).join('');
+    }
+
+    function removeScanFile(index) {
+        if (scanInProgress) return;
+        scanSessionFiles.splice(index, 1);
+        renderScanQueue();
+    }
+
+    function addScanFiles(fileList) {
+        for (const file of Array.from(fileList || [])) {
+            if (!file.type.startsWith('image/') && file.type !== 'application/pdf') continue;
+            if (file.size > 10 * 1024 * 1024) {
+                setScanStatus(`${file.name} is larger than 10 MB and was skipped.`, 'error');
+                continue;
+            }
+            scanSessionFiles.push({ file, status: 'pending', fieldCount: 0, error: '' });
+        }
+        renderScanQueue();
+    }
+
+    async function compressImage(file, quality = 0.86) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = reject;
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onerror = reject;
+                img.onload = () => {
+                    const maxSide = 1800;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxSide || h > maxSide) {
+                        const scale = maxSide / Math.max(w, h);
+                        w = Math.round(w * scale);
+                        h = Math.round(h * scale);
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function fileToDataPayload(file) {
+        if (file.type === 'application/pdf') {
+            const dataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = reject;
+                reader.onload = (event) => resolve(event.target.result);
+                reader.readAsDataURL(file);
+            });
+            return { image: dataUrl, isPdf: true };
+        }
+        return { image: await compressImage(file), isPdf: false };
+    }
+
+    function smartMergeFields(fields, sourceName) {
+        for (const [key, value] of Object.entries(fields || {})) {
+            if (key === '_detectedType') continue;
+            if (value === null || value === undefined) continue;
+            const clean = String(value).trim();
+            if (!clean) continue;
+
+            if (!scanMergedFields[key]) {
+                scanMergedFields[key] = clean;
+                scanFieldSources[key] = sourceName;
+                continue;
+            }
+
+            const existing = String(scanMergedFields[key]).trim().toLowerCase();
+            const incoming = clean.toLowerCase();
+            if (existing !== incoming) {
+                if (!scanFieldConflicts[key]) scanFieldConflicts[key] = [];
+                const already = scanFieldConflicts[key].some((entry) => entry.value.toLowerCase() === incoming);
+                if (!already) scanFieldConflicts[key].push({ source: sourceName, value: clean });
+            }
+        }
+    }
+
+    function mergeUsageMetrics(current, next) {
+        if (!next) return current;
+        if (!current) {
+            return JSON.parse(JSON.stringify(next));
+        }
+
+        const merged = {
+            callCount: Number(current.callCount || 0) + Number(next.callCount || 0),
+            promptTokens: Number(current.promptTokens || 0) + Number(next.promptTokens || 0),
+            completionTokens: Number(current.completionTokens || 0) + Number(next.completionTokens || 0),
+            totalTokens: Number(current.totalTokens || 0) + Number(next.totalTokens || 0),
+            cachedPromptTokens: Number(current.cachedPromptTokens || 0) + Number(next.cachedPromptTokens || 0),
+            uncachedPromptTokens: Number(current.uncachedPromptTokens || 0) + Number(next.uncachedPromptTokens || 0),
+            costKnown: Boolean(current.costKnown) && Boolean(next.costKnown),
+            costUsd: null,
+            costRs: null,
+            models: { ...(current.models || {}) },
+            pricingSources: { ...(current.pricingSources || {}) },
+        };
+
+        if (merged.costKnown) {
+            merged.costUsd = Number((Number(current.costUsd || 0) + Number(next.costUsd || 0)).toFixed(6));
+            merged.costRs = Number((Number(current.costRs || 0) + Number(next.costRs || 0)).toFixed(4));
+        }
+
+        Object.entries(next.models || {}).forEach(([model, count]) => {
+            merged.models[model] = Number(merged.models[model] || 0) + Number(count || 0);
+        });
+        Object.entries(next.pricingSources || {}).forEach(([source, count]) => {
+            merged.pricingSources[source] = Number(merged.pricingSources[source] || 0) + Number(count || 0);
+        });
+
+        return merged;
+    }
+
+    function escapeAttr(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;');
+    }
+
+    function getReviewSelectionCount() {
+        return Object.keys(scanSelectedFields).filter((key) => scanSelectedFields[key]).length;
+    }
+
+    function updateReviewSelectionUi() {
+        const selectedCount = getReviewSelectionCount();
+        const selectedCountEl = document.getElementById('scanSelectedCount');
+        const sendBtn = document.getElementById('sendToExtensionBtn');
+        if (selectedCountEl) selectedCountEl.textContent = selectedCount;
+        if (sendBtn) {
+            sendBtn.textContent = selectedCount > 0
+                ? `Send ${selectedCount} Field${selectedCount !== 1 ? 's' : ''} to Extension`
+                : 'Send to Extension';
+            sendBtn.disabled = selectedCount === 0;
+        }
+    }
+
+    function initializeReviewSelections() {
+        for (const key of Object.keys(scanMergedFields)) {
+            if (scanSelectedFields[key] === undefined) scanSelectedFields[key] = true;
+        }
+    }
+
+    function setAllReviewSelections(selected) {
+        Object.keys(scanMergedFields).forEach((key) => {
+            scanSelectedFields[key] = selected;
+        });
+        document.querySelectorAll('#scanReviewGrid input.scan-include-toggle').forEach((checkbox) => {
+            checkbox.checked = selected;
+        });
+        updateReviewSelectionUi();
+    }
+
+    function renderScanReview() {
+        const reviewGrid = document.getElementById('scanReviewGrid');
+        const reviewSummary = document.getElementById('scanReviewSummary');
+        const keys = Object.keys(scanMergedFields);
+        const conflicts = Object.keys(scanFieldConflicts).length;
+        const scannedDocs = scanSessionFiles.filter((item) => item.status === 'done').length;
+
+        reviewSummary.innerHTML = `
+            <strong>${keys.length}</strong> fields extracted from <strong>${scannedDocs}</strong> document${scannedDocs !== 1 ? 's' : ''}.
+            ${conflicts ? `<span style="color:#b91c1c;font-weight:700;"> ${conflicts} conflict${conflicts !== 1 ? 's' : ''} need review.</span>` : 'Review and adjust anything before sending it to the extension.'}
+        `;
+        initializeReviewSelections();
+
+        const groupedKeys = Object.values(SCAN_GROUPS).flat();
+        const fragments = [];
+
+        for (const [groupName, groupFields] of Object.entries(SCAN_GROUPS)) {
+            const present = groupFields.filter((key) => scanMergedFields[key] || scanFieldConflicts[key]);
+            if (!present.length) continue;
+            fragments.push(`<div class="review-group-title">${groupName}</div>`);
+            present.forEach((key) => {
+                const value = scanMergedFields[key] || '';
+                const source = scanFieldSources[key] || '';
+                const conflictsForKey = scanFieldConflicts[key] || [];
+                fragments.push(`
+                    <div class="review-field">
+                        <label style="display:flex;align-items:center;justify-content:space-between;gap:.65rem;">
+                            <span>${SCAN_LABELS[key] || key}</span>
+                            <span style="display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:600;color:var(--ink-muted);">
+                                <input type="checkbox" class="scan-include-toggle" data-key="${escapeAttr(key)}" ${scanSelectedFields[key] ? 'checked' : ''}>
+                                Include
+                            </span>
+                        </label>
+                        <input type="text" data-key="${escapeAttr(key)}" value="${escapeAttr(value)}">
+                        ${source ? `<div class="review-source">Primary source: ${source}</div>` : ''}
+                        ${conflictsForKey.length ? `<div class="review-conflict">Conflict values: ${conflictsForKey.map((entry) => `<span class="review-alt" onclick="pickReviewConflict('${key}', '${entry.value.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/</g, '&lt;')}', this)">${entry.value}</span>`).join('')}</div>` : ''}
+                    </div>`);
+            });
+        }
+
+        const ungrouped = Object.keys(scanMergedFields).filter((key) => !groupedKeys.includes(key));
+        if (ungrouped.length) {
+            fragments.push('<div class="review-group-title">Other Fields</div>');
+            ungrouped.forEach((key) => {
+                fragments.push(`
+                    <div class="review-field">
+                        <label style="display:flex;align-items:center;justify-content:space-between;gap:.65rem;">
+                            <span>${SCAN_LABELS[key] || key}</span>
+                            <span style="display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:600;color:var(--ink-muted);">
+                                <input type="checkbox" class="scan-include-toggle" data-key="${escapeAttr(key)}" ${scanSelectedFields[key] ? 'checked' : ''}>
+                                Include
+                            </span>
+                        </label>
+                        <input type="text" data-key="${escapeAttr(key)}" value="${escapeAttr(scanMergedFields[key])}">
+                    </div>`);
+            });
+        }
+
+        reviewGrid.innerHTML = fragments.join('');
+        document.getElementById('scanUploadPanel').style.display = 'none';
+        document.getElementById('scanReviewPanel').style.display = 'block';
+        document.getElementById('scanReviewToolbar').style.display = 'flex';
+        document.getElementById('scanBackBtn').style.display = 'inline-flex';
+        document.getElementById('sendToExtensionBtn').style.display = 'inline-flex';
+        document.getElementById('scanNowBtn').style.display = 'none';
+        document.getElementById('scanFooterNote').textContent = 'The extension will keep this data only until the current fill is completed.';
+        updateReviewSelectionUi();
+    }
+
+    function backToScanUpload() {
+        if (scanInProgress) return;
+        document.getElementById('scanUploadPanel').style.display = 'block';
+        document.getElementById('scanReviewPanel').style.display = 'none';
+        document.getElementById('scanReviewToolbar').style.display = 'none';
+        document.getElementById('scanBackBtn').style.display = 'none';
+        document.getElementById('sendToExtensionBtn').style.display = 'none';
+        document.getElementById('scanNowBtn').style.display = 'inline-flex';
+        document.getElementById('scanFooterNote').textContent = 'Upload one or more documents, then scan and review the extracted fields before filling.';
+    }
+
+    async function scanSelectedDocs() {
+        if (!scanSessionFiles.length || scanInProgress) return;
+        scanMergedFields = {};
+        scanFieldSources = {};
+        scanFieldConflicts = {};
+        scanSelectedFields = {};
+        scanSessionMetrics = null;
+        scanInProgress = true;
+        clearScanStatus();
+        setScanStatus('Scanning documents and extracting fields...', 'info');
+        document.getElementById('scanNowBtn').disabled = true;
+
+        try {
+            for (let i = 0; i < scanSessionFiles.length; i++) {
+                const item = scanSessionFiles[i];
+                item.status = 'scanning';
+                item.error = '';
+                renderScanQueue();
+
+                const payload = await fileToDataPayload(item.file);
+                const response = await fetch('scan-document.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: payload.image,
+                        isPdf: payload.isPdf,
+                        docType: 'all_in_one'
+                    })
+                });
+                const data = await response.json();
+                if (!data.success || !data.fields) {
+                    throw new Error(data.error || `Scan failed for ${item.file.name}`);
+                }
+
+                item.status = 'done';
+                item.fieldCount = Object.keys(data.fields).filter((key) => key !== '_detectedType' && data.fields[key]).length;
+                scanSessionMetrics = mergeUsageMetrics(scanSessionMetrics, data.metrics?.scanAi || null);
+                smartMergeFields(data.fields, item.file.name);
+                renderScanQueue();
+            }
+
+            renderScanReview();
+            setScanStatus('Review the extracted data, then send it to the extension.', 'success');
+        } catch (error) {
+            const activeItem = scanSessionFiles.find((item) => item.status === 'scanning');
+            if (activeItem) {
+                activeItem.status = 'error';
+                activeItem.error = error.message || 'Scan failed';
+                renderScanQueue();
+            }
+            console.error('Scan flow error:', error);
+            setScanStatus(error.message || 'Document scan failed.', 'error');
+        } finally {
+            scanInProgress = false;
+            document.getElementById('scanNowBtn').disabled = scanSessionFiles.length === 0;
+        }
+    }
+
+    function pickReviewConflict(key, value, element) {
+        const input = document.querySelector(`#scanReviewGrid input[type="text"][data-key="${key}"]`);
+        if (input) input.value = value;
+        scanMergedFields[key] = value;
+        scanSelectedFields[key] = true;
+        const checkbox = document.querySelector(`#scanReviewGrid input.scan-include-toggle[data-key="${key}"]`);
+        if (checkbox) checkbox.checked = true;
+        const wrap = element.parentElement;
+        if (wrap) {
+            wrap.querySelectorAll('.review-alt').forEach((chip) => chip.style.background = 'white');
+        }
+        element.style.background = '#fee2e2';
+        updateReviewSelectionUi();
+    }
+
+    function collectReviewedFields() {
+        const fields = {};
+        document.querySelectorAll('#scanReviewGrid input[type="text"][data-key]').forEach((input) => {
+            const value = input.value.trim();
+            if (!scanSelectedFields[input.dataset.key]) return;
+            if (value) fields[input.dataset.key] = value;
+        });
+        return fields;
+    }
+
+    function sendSessionToExtension() {
+        const fields = collectReviewedFields();
+        const fieldCount = Object.keys(fields).length;
+        if (!fieldCount) {
+            setScanStatus('There is no reviewed data to send to the extension.', 'error');
+            return;
+        }
+
+        const payload = {
+            type: 'AIFF_SET_SESSION_SCAN',
+            payload: {
+                source: 'dashboard_scan',
+                fieldCount,
+                fileCount: scanSessionFiles.length,
+                createdAt: new Date().toISOString(),
+                fields,
+                metrics: {
+                    scanAi: scanSessionMetrics
+                }
+            }
+        };
+
+        setScanStatus('Sending reviewed data to extension...', 'info');
+        window.postMessage(payload, '*');
+
+        const verifyDelayMs = 700;
+        setTimeout(() => {
+            try {
+                const stored = localStorage.getItem('ai_form_filler_last_session_sent');
+                const parsed = stored ? JSON.parse(stored) : null;
+                const verified = parsed
+                    && parsed.fieldCount === fieldCount
+                    && parsed.createdAt === payload.payload.createdAt;
+
+                if (verified) {
+                    setScanStatus('Session sent to extension successfully. Open the target government form and click "Fill Form" in the extension popup.', 'success');
+                    showDashboardAlert('info', `<strong>Session sent to extension successfully.</strong> ${fieldCount} fields are ready in the extension for this session.`);
+                    setTimeout(() => closeScanToFillModal(), 800);
+                    return;
+                }
+
+                setScanStatus('Session was sent, but extension confirmation was not detected. Refresh the dashboard tab once and try again.', 'error');
+            } catch (error) {
+                console.error('Extension confirmation check failed:', error);
+                setScanStatus('Session was sent, but confirmation check failed. Please reopen the extension popup and verify the fields.', 'error');
+            }
+        }, verifyDelayMs);
+    }
+
+    document.getElementById('scanReviewGrid').addEventListener('change', (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) return;
+        if (!target.classList.contains('scan-include-toggle')) return;
+        scanSelectedFields[target.dataset.key] = target.checked;
+        updateReviewSelectionUi();
+    });
+
+    document.getElementById('scanToFillModal').addEventListener('click', (event) => {
+        if (event.target === event.currentTarget) closeScanToFillModal();
+    });
+    document.getElementById('scanFileInput').addEventListener('change', (event) => addScanFiles(event.target.files));
+    const dropzone = document.getElementById('scanDropzone');
+    dropzone.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropzone.classList.add('drag-over');
+    });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+    dropzone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        dropzone.classList.remove('drag-over');
+        addScanFiles(event.dataTransfer.files);
+    });
 
     // Single auth state listener — NO DUPLICATES
     auth.onAuthStateChanged(async (user) => {
@@ -466,7 +1534,14 @@
                 localStorage.setItem('fbIdToken', idToken);
             } catch(e) { console.warn('Token fetch failed:', e); }
             // Notify extension content script about logged-in user
-            try{ window.postMessage({type:'AIFF_SET_USER',userId:user.uid,name:user.displayName||''},'*'); }catch(_){}
+            try{
+                window.postMessage({
+                    type:'AIFF_SET_USER',
+                    userId:user.uid,
+                    name:user.displayName||'',
+                    idToken: localStorage.getItem('fbIdToken') || ''
+                },'*');
+            }catch(_){}
 
             // Load user data
             // Get user doc — retry up to 3x for new users
@@ -488,6 +1563,7 @@
             document.getElementById('sidebarName').textContent = displayName;
             document.getElementById('sidebarEmail').textContent = user.email;
             document.getElementById('greeting').textContent = `${greetWord}, ${displayName.split(' ')[0]}! 👋`;
+            subscribeToDashboardStats(user.uid);
 
             if (userDoc.exists) {
                 let data = userDoc.data();
@@ -497,7 +1573,7 @@
                 try {
                     const r = await fetch('/get-credits.php', {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: getServerAuthHeaders(),
                         body: JSON.stringify({userId: user.uid})
                     });
                     const cr = await r.json();
@@ -506,11 +1582,9 @@
                 } catch(_) {}
 
                 const walletBalance = (data.walletBalance ?? 0);
-                const formsFilled = data.totalFormsFilledCount ?? 0;
 
                 // Update stats
-                document.getElementById('creditsDisplay').textContent = '₹' + walletBalance.toFixed(2);
-                document.getElementById('formsFilledDisplay').textContent = formsFilled;
+                applyDashboardStats(data);
 
                 // Low balance warning (< ₹10)
                 const credits = walletBalance; // alias for warning logic below
@@ -547,27 +1621,60 @@
                 }
             }
 
-            // Count customers
-            const customersSnap = await db.collection('customers')
-                .where('userId', '==', user.uid)
-                .get();
-            document.getElementById('customersDisplay').textContent = customersSnap.size;
+            await refreshDashboardStats(user.uid);
 
         } catch (err) {
             console.error('Dashboard load error:', err);
         } finally {
             // Hide loading
-            document.getElementById('loading-overlay').style.display = 'none';
+            hideLoader();
         }
     });
 
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', async () => {
         if (confirm('Are you sure you want to logout?')) {
+            if (userStatsUnsubscribe) {
+                userStatsUnsubscribe();
+                userStatsUnsubscribe = null;
+            }
             await auth.signOut();
             window.location.href = 'login.html';
         }
     });
+
+    window.addEventListener('focus', () => {
+        const userId = localStorage.getItem('userId');
+        if (userId) refreshDashboardStats(userId);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'visible') return;
+        const userId = localStorage.getItem('userId');
+        if (userId) refreshDashboardStats(userId);
+    });
+
+// ── PAGE TRANSITION HELPERS ───────────────────────────────────────────────
+function hideLoader(){
+    const el=document.getElementById('loading-overlay')||document.getElementById('ldo');
+    document.body.classList.add('page-ready');
+    const activeNav=document.querySelector('.ni.active,.nav-item-custom.active');
+    if(activeNav){activeNav.classList.add('pulse');setTimeout(()=>activeNav.classList.remove('pulse'),550);}
+    if(!el)return;
+    el.style.pointerEvents='none';
+    el.style.opacity='0';
+    setTimeout(()=>{el.style.display='none';},360);
+}
+document.querySelectorAll('a.ni,a.nav-item-custom,a.nav-link,a.btn-action').forEach(link=>{
+    const href=link.getAttribute('href');
+    if(!href||href.startsWith('#')||href.startsWith('javascript'))return;
+    link.addEventListener('click',e=>{
+        e.preventDefault();
+        document.body.classList.remove('page-ready');
+        document.body.classList.add('page-exit');
+        setTimeout(()=>{window.location.href=href;},200);
+    });
+});
 </script>
 </body>
 </html>

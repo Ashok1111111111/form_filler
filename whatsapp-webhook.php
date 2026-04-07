@@ -1,7 +1,7 @@
 <?php
 /**
  * WhatsApp Cloud API Chatbot — AI Workflows / Er. Ashok Kumar
- * https://ai-workflows.cloud
+ * https://formfiller.ai-workflows.cloud
  */
 
 // ── CONFIG ──────────────────────────────────────────────────────────────────
@@ -126,7 +126,7 @@ function replyAbout(): string {
          . "   • AI Automation & Workflows\n"
          . "   • Chrome Extension Development\n"
          . "   • Android App Development\n\n"
-         . "🌐 *Website:* ai-workflows.cloud\n"
+         . "🌐 *Website:* formfiller.ai-workflows.cloud\n"
          . "📞 *WhatsApp:* +91 92969 14511\n\n"
          . "\"Er.\" title Engineers ke liye hota hai, jaise doctors ke liye \"Dr.\" 😊\n\n"
          . "─────────────────\n"
@@ -170,14 +170,14 @@ function replyProducts(): string {
          . "   Chrome extension — government form auto-fill\n"
          . "   SSC, UPSC, Railways, IBPS portals\n"
          . "   ₹5 per form | Cyber cafe ke liye perfect\n"
-         . "   👉 ai-workflows.cloud\n\n"
+         . "   👉 formfiller.ai-workflows.cloud\n\n"
          . "🖼️ *3. Photo Editor*\n"
          . "   Online browser-based image editing tool\n"
          . "   Crop, resize, filters — no software needed\n\n"
          . "📄 *4. PDF & Document Editor*\n"
          . "   Browser-based PDF editing & merging tool\n"
          . "   No installation required\n\n"
-         . "🌐 Full portfolio: *ai-workflows.cloud*\n\n"
+         . "🌐 Full portfolio: *formfiller.ai-workflows.cloud*\n\n"
          . "─────────────────\n"
          . "🔄 Main menu: *menu* likhein";
 }
@@ -197,7 +197,7 @@ function replySupportMenu(): string {
 function replyInstall(): string {
     return "📥 *Extension Install Guide*\n\n"
          . "*Step 1:* Link kholein:\n"
-         . "👉 ai-workflows.cloud/download-extension.html\n\n"
+         . "👉 formfiller.ai-workflows.cloud/download-extension.html\n\n"
          . "*Step 2:* \"Download Extension\" click karein\n\n"
          . "*Step 3:* Chrome mein:\n"
          . "chrome://extensions/ kholein\n\n"
@@ -221,7 +221,7 @@ function replyFormFill(): string {
          . "3. Customer ID dobara enter karein\n\n"
          . "*403 error?*\n"
          . "Latest version download karein:\n"
-         . "👉 ai-workflows.cloud/download-extension.html\n\n"
+         . "👉 formfiller.ai-workflows.cloud/download-extension.html\n\n"
          . "─────────────────\n"
          . "🔄 Main menu: *menu* likhein";
 }
@@ -231,11 +231,11 @@ function replyRecharge(): string {
          . "*Step 1:* UPI payment karein:\n"
          . "📲 *UPI ID:* 9296914511@pthdfc\n\n"
          . "*Packages:*\n"
-         . "• ₹10 = 2 credits\n"
-         . "• ₹25 = 6 credits\n"
-         . "• ₹50 = 14 credits\n\n"
+         . "• ₹10 wallet = 50 fields\n"
+         . "• ₹25 wallet = 125 fields\n"
+         . "• ₹50 wallet = 250 fields\n\n"
          . "*Step 2:* Screenshot upload karein:\n"
-         . "👉 ai-workflows.cloud/recharge.html\n\n"
+         . "👉 formfiller.ai-workflows.cloud/recharge.html\n\n"
          . "*Step 3:* 15–30 min mein credits add ✅\n\n"
          . "Payment ki lekin credits nahi aaye?\n"
          . "Screenshot is chat mein bhejein 📸\n\n"
@@ -246,7 +246,7 @@ function replyRecharge(): string {
 function replyCustomerId(): string {
     return "🆔 *Customer ID Guide*\n\n"
          . "*Step 1:* Dashboard login karein:\n"
-         . "👉 ai-workflows.cloud/dashboard.html\n\n"
+         . "👉 formfiller.ai-workflows.cloud/dashboard.html\n\n"
          . "*Step 2:* \"My Customers\" section\n\n"
          . "*Step 3:* \"Add New Customer\" → form fill → Save\n\n"
          . "*Step 4:* ID generate hogi: *CUS-XXXXXXXXXX*\n\n"
@@ -267,7 +267,7 @@ function replyQuote(): string {
          . "5️⃣ Final delivery + support\n\n"
          . "📞 *Direct call/WhatsApp:*\n"
          . "*+91 92969 14511*\n\n"
-         . "🌐 More info: ai-workflows.cloud\n\n"
+         . "🌐 More info: formfiller.ai-workflows.cloud\n\n"
          . "Apna project briefly describe karein — main same din reply karunga! 🙏\n\n"
          . "─────────────────\n"
          . "🔄 Main menu: *menu* likhein";
@@ -276,7 +276,7 @@ function replyQuote(): string {
 function replyThanks(): string {
     return "Bahut shukriya! 🙏 Khushi hui ki help kar paya.\n\n"
          . "Koi bhi kaam ho — website, app, automation — kabhi bhi contact karein!\n\n"
-         . "🌐 ai-workflows.cloud\n"
+         . "🌐 formfiller.ai-workflows.cloud\n"
          . "📞 +91 92969 14511\n\n"
          . "— *Er. Ashok Kumar | AI Workflows* 😊";
 }

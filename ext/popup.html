@@ -41,6 +41,14 @@
             background: #4caf50;
             color: white;
         }
+        .mode-note {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.86);
+        }
         .form-label {
             color: rgba(255, 255, 255, 0.8);
             font-size: 0.9em;
@@ -116,12 +124,6 @@
             text-align: center;
             margin-top: 10px;
         }
-        .doc-section { margin-top:12px; border-top:1px solid rgba(255,255,255,0.15); padding-top:12px; display:none; }
-        .doc-section-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:rgba(255,255,255,.6); margin-bottom:8px; }
-        .doc-item { background:rgba(255,255,255,.12); border-radius:8px; padding:9px 10px; margin-bottom:7px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
-        .doc-item-label { font-size:12px; font-weight:600; color:white; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .doc-item-meta { font-size:10px; color:rgba(255,255,255,.55); white-space:nowrap; }
-        .btn-tool { background:#f5724f; color:white; border:none; border-radius:6px; padding:5px 9px; font-size:11px; font-weight:700; cursor:pointer; flex-shrink:0; }
     </style>
 </head>
 <body>
@@ -129,9 +131,9 @@
         <h4>
             AI Form Filler
             <span class="badge badge-ai">AI</span>
-            <span class="badge badge-cache">CACHE</span>
+            <span class="badge badge-cache">SESSION</span>
         </h4>
-        <div style="text-align:center; font-size:10px; color:rgba(255,255,255,0.5); margin:-10px 0 10px; letter-spacing:.5px;">v4.6 — Forms & Document Tools</div>
+        <div style="text-align:center; font-size:10px; color:rgba(255,255,255,0.5); margin:-10px 0 10px; letter-spacing:.5px;">v5.2 — Session Scan Workflow</div>
 
         <!-- LOGIN / WALLET STATUS -->
         <div id="walletBar" style="background:rgba(0,0,0,.25);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;display:flex;align-items:center;justify-content:space-between;">
@@ -139,34 +141,26 @@
             <span id="walletAmt" style="font-weight:800;color:#8bc34a;"></span>
         </div>
 
-        <div class="mb-3">
-            <label for="customerId" class="form-label">Customer ID</label>
-            <input type="text" class="form-control" id="customerId" placeholder="e.g., CUS-1707123456" required>
-            <small style="color: rgba(255,255,255,0.7); font-size: 11px;">Find in My Customers</small>
-        </div>
-        
-        <button class="btn btn-primary" id="loadDataBtn">Load Customer Data</button>
-        
-        <div id="dataPreview" class="data-preview">
-            <p><strong>Name:</strong> <span id="previewName"></span></p>
-            <p><strong>Email:</strong> <span id="previewEmail"></span></p>
-            <p class="mb-0"><strong>Mobile:</strong> <span id="previewMobile"></span></p>
+        <div id="modeNote" class="mode-note">
+            Open the dashboard, scan a document, review the extracted fields, then send the session to this extension.
         </div>
 
-        <button class="btn btn-success" id="fillFormBtn" disabled>Fill Form with AI 🤖</button>
+        <div id="dataPreview" class="data-preview">
+            <p><strong>Source:</strong> <span id="previewSource"></span></p>
+            <p><strong>Name:</strong> <span id="previewName"></span></p>
+            <p><strong>Email:</strong> <span id="previewEmail"></span></p>
+            <p><strong>Mobile:</strong> <span id="previewMobile"></span></p>
+            <p class="mb-0"><strong>Fields Ready:</strong> <span id="previewFieldCount"></span></p>
+        </div>
+
+        <button class="btn btn-success" id="fillFormBtn" disabled>Fill Current Form ⚡</button>
         
-        <button class="btn btn-secondary" id="clearCacheBtn">Clear Cache</button>
+        <button class="btn btn-secondary" id="clearCacheBtn">Clear Local Session</button>
 
         <div id="statusMessages"></div>
 
-        <div id="docSection" class="doc-section">
-            <div class="doc-section-title">📄 Documents Required</div>
-            <div id="docList"></div>
-        </div>
-
-        <div class="cache-info">
-            💾 Forms cached after first fill<br>
-            ⚡ Next fill = Instant & FREE!
+        <div class="cache-info" id="footerNote">
+            Billing: ₹0.20 per filled field. Session data clears after successful use.
         </div>
     </div>
 

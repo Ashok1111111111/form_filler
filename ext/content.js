@@ -51,10 +51,19 @@ function discoverFormFields() {
             if (labelEl) label = labelEl.textContent.trim();
         }
 
-        // 2. Walk up to 4 levels looking for a <label> ancestor
+        // 2. aria-label / aria-labelledby
+        if (!label && element.getAttribute('aria-label')) {
+            label = element.getAttribute('aria-label').trim();
+        }
+        if (!label && element.getAttribute('aria-labelledby')) {
+            const labelEl = document.getElementById(element.getAttribute('aria-labelledby'));
+            if (labelEl) label = labelEl.textContent.trim();
+        }
+
+        // 3. Walk up to 5 levels looking for a <label> ancestor
         if (!label) {
             let parent = element.parentElement;
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < 5; i++) {
                 if (parent) {
                     const labels = parent.querySelectorAll('label');
                     if (labels.length > 0) { label = labels[0].textContent.trim(); break; }
@@ -63,7 +72,20 @@ function discoverFormFields() {
             }
         }
 
-        // 3. Table-based forms (ASP.NET / NIC portals) — previous <td> in same <tr>
+        // 4. Previous sibling div/span/p that looks like a label
+        if (!label) {
+            let prev = element.previousElementSibling;
+            for (let i = 0; i < 3 && prev; i++) {
+                const tag = prev.tagName.toLowerCase();
+                if (['div','span','p','td','th','dt','legend'].includes(tag)) {
+                    const txt = prev.textContent.trim();
+                    if (txt && txt.length < 150) { label = txt; break; }
+                }
+                prev = prev.previousElementSibling;
+            }
+        }
+
+        // 5. Table-based forms (ASP.NET / NIC portals) — previous <td> in same <tr>
         if (!label) {
             const td = element.closest('td');
             if (td) {
@@ -77,21 +99,39 @@ function discoverFormFields() {
             }
         }
 
-        // 4. title attribute
+        // 6. Parent div/fieldset text content (for React/Angular forms)
+        if (!label) {
+            let parent = element.parentElement;
+            for (let i = 0; i < 4; i++) {
+                if (parent) {
+                    const txt = (parent.childNodes[0]?.textContent || '').trim();
+                    if (txt && txt.length > 1 && txt.length < 100 && !/^\s*$/.test(txt)) {
+                        label = txt; break;
+                    }
+                    parent = parent.parentElement;
+                }
+            }
+        }
+
+        // 7. title attribute
         if (!label && element.title) label = element.title.trim();
 
-        // 5. placeholder
+        // 8. placeholder
         if (!label && element.placeholder) label = element.placeholder.trim();
 
+        const finalLabel = label || element.id || element.name || `Field ${index}`;
         fields.push({
             index: index,
             id:    element.id     || `field_${index}`,
             name:  element.name   || '',
             type:  element.type   || element.tagName.toLowerCase(),
-            label: label || element.id || element.name || `Field ${index}`,
+            label: finalLabel,
             element: element   // DOM ref — stripped before sending to server
         });
     });
+
+    // Debug: log all discovered labels so we can tune rules
+    console.log('📋 All discovered fields:', fields.map(f => `[${f.index}] ${f.type} | label="${f.label}" | name="${f.name}" | id="${f.id}"`));
 
     return fields;
 }
@@ -269,8 +309,11 @@ const VALUE_ALIASES = {
   // Marital
   'unmarried':'unmarried','single':'unmarried','married':'married','divorced':'divorced','widowed':'widowed','widow':'widowed',
   // Category
-  'gen':'general','general':'general','obc':'obc','obc-ncl':'obc-ncl','obc ncl':'obc-ncl',
-  'sc':'sc','st':'st','ews':'ews',
+  'gen':'general','general':'general',
+  'obc-ncl':'obc-ncl','obc ncl':'obc-ncl','obc(ncl)':'obc-ncl','obc (ncl)':'obc-ncl',
+  'obc non creamy layer':'obc-ncl','obc (non creamy layer)':'obc-ncl','obc(non-creamy layer)':'obc-ncl',
+  'obc':'obc','sc':'sc','st':'st','ews':'ews',
+  'scheduled caste':'sc','scheduled tribe':'st','other backward class':'obc',
   // Religion
   'hindu':'hindu','muslim':'muslim','islam':'muslim','christian':'christian','sikh':'sikh',
   'buddhist':'buddhist','jain':'jain','parsi':'parsi','others':'others','other':'others',
@@ -337,7 +380,14 @@ function fillSelect(element, value) {
         return false;
     }
 
-    return tryMatch(valueLower) || (valueResolved !== valueLower && tryMatch(valueResolved));
+    if (tryMatch(valueLower)) return true;
+    if (valueResolved !== valueLower && tryMatch(valueResolved)) return true;
+    // Try each word/part of the value separately (e.g. "OBC-NCL" → try "obc", "ncl")
+    const parts = valueLower.split(/[\s\-\/]+/).filter(p => p.length >= 2);
+    for (const part of parts) {
+        if (tryMatch(part)) return true;
+    }
+    return false;
 }
 
 function fillRadio(element, value) {
@@ -417,12 +467,21 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
                 }
             }
 
-            // Pass 2 — retry failed selects after 600ms (AJAX-loaded dropdown options)
+            // Pass 2 — retry failed selects after 800ms (AJAX-loaded dropdown options)
             if (pendingSelects.length > 0) {
-                await delay(600);
+                await delay(800);
+                const stillPending = [];
                 for (const { field, value } of pendingSelects) {
                     if (fillField(field, value)) filledCount++;
-                    else console.warn(`⚠️ Could not fill dropdown "${field.label}" with "${value}"`);
+                    else stillPending.push({ field, value });
+                }
+                // Pass 3 — final retry after 2s for slow dynamic dropdowns
+                if (stillPending.length > 0) {
+                    await delay(2000);
+                    for (const { field, value } of stillPending) {
+                        if (fillField(field, value)) filledCount++;
+                        else console.warn(`⚠️ Could not fill dropdown "${field.label}" with "${value}"`);
+                    }
                 }
             }
 
@@ -446,13 +505,33 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 
 // ── WEBSITE ↔ EXTENSION USER SYNC ────────────────────────────────────────────
 // Listens for login event from ai-workflows.cloud
-// Website sends: window.postMessage({ type: 'AIFF_SET_USER', userId }, '*')
+// Website sends: window.postMessage({ type: 'AIFF_SET_USER', userId, idToken }, '*')
 window.addEventListener('message', (event) => {
-    if (event.origin !== 'https://ai-workflows.cloud') return;
+    if (event.origin !== 'https://formfiller.ai-workflows.cloud') return;
     const msg = event.data;
     if (msg && msg.type === 'AIFF_SET_USER' && msg.userId) {
-        chrome.storage.local.set({ userId: msg.userId }, () => {
+        const nextAuthState = { userId: msg.userId };
+        if (msg.idToken) nextAuthState.fbIdToken = msg.idToken;
+        chrome.storage.local.set(nextAuthState, () => {
             console.log('✅ AI Form Agent: User synced —', msg.userId);
+        });
+    }
+    if (msg && msg.type === 'AIFF_SET_SESSION_SCAN' && msg.payload?.fields) {
+        chrome.storage.local.set({ sessionScanData: msg.payload }, () => {
+            console.log('✅ AI Form Agent: Session scan synced —', Object.keys(msg.payload.fields || {}).length, 'fields');
+            try {
+                window.localStorage.setItem('ai_form_filler_last_session_sent', JSON.stringify({
+                    fieldCount: msg.payload.fieldCount || Object.keys(msg.payload.fields || {}).length,
+                    createdAt: msg.payload.createdAt || '',
+                    source: msg.payload.source || 'dashboard_scan',
+                    confirmedAt: new Date().toISOString()
+                }));
+            } catch (_) {}
+        });
+    }
+    if (msg && msg.type === 'AIFF_CLEAR_SESSION_SCAN') {
+        chrome.storage.local.remove(['sessionScanData'], () => {
+            console.log('🧹 AI Form Agent: Session scan cleared');
         });
     }
 });

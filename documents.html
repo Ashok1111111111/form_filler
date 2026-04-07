@@ -113,6 +113,14 @@
         .lsp { width:44px; height:44px; border:3px solid #f0f0f0; border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; margin:0 auto 1rem; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
+        /* ── PAGE TRANSITIONS ── */
+        #main,#ldo{filter:blur(4px);transition:filter .35s ease-out,opacity .35s ease-out;}
+        #sidebar{transition:filter .2s ease-out,opacity .2s ease-out;}
+        body.page-ready #main,body.page-ready #ldo{filter:blur(0);}
+        body.page-exit #main,body.page-exit #sidebar{filter:blur(4px);opacity:0.3;transition-duration:.2s;}
+        @keyframes navPulse{0%{box-shadow:0 0 0 0 rgba(139,127,255,.5);background:rgba(91,79,245,.45);}60%{box-shadow:0 0 0 6px rgba(139,127,255,0);}100%{box-shadow:0 0 0 0 rgba(139,127,255,0);background:inherit;}}
+        .ni.active.pulse{animation:navPulse .5s ease forwards;}
+
         /* DOC STORAGE SECTION */
         .doc-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:1rem; }
         .doc-item { background:white; border:1px solid var(--border); border-radius:14px; padding:1.2rem; text-align:center; transition:all .25s; cursor:pointer; }
@@ -176,10 +184,10 @@
 
     <!-- TOOL TABS -->
     <div class="tool-tabs">
-        <button class="tool-tab active" onclick="switchTab('compress')"><i class="bi bi-file-zip"></i> Compress Image</button>
-        <button class="tool-tab" onclick="switchTab('resize')"><i class="bi bi-crop"></i> Resize Image</button>
-        <button class="tool-tab" onclick="switchTab('pdf')"><i class="bi bi-file-pdf"></i> Image → PDF</button>
-        <button class="tool-tab" onclick="switchTab('storage')"><i class="bi bi-cloud-arrow-up"></i> My Documents</button>
+        <button class="tool-tab active" onclick="switchTab('compress',this)"><i class="bi bi-file-zip"></i> Compress Image</button>
+        <button class="tool-tab" onclick="switchTab('resize',this)"><i class="bi bi-crop"></i> Resize Image</button>
+        <button class="tool-tab" onclick="switchTab('pdf',this)"><i class="bi bi-file-pdf"></i> Image → PDF</button>
+        <button class="tool-tab" onclick="switchTab('storage',this)"><i class="bi bi-cloud-arrow-up"></i> My Documents</button>
     </div>
 
     <!-- ── TAB 1: COMPRESS ── -->
@@ -395,11 +403,13 @@ let savedDocs      = JSON.parse(localStorage.getItem('aiFormDocs') || '[]');
 // Auth
 auth.onAuthStateChanged(user => {
     if (!user) { window.location.href = 'login.html'; return; }
-    document.getElementById('avInit').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
-    document.getElementById('sbName').textContent  = user.displayName || 'User';
-    document.getElementById('sbEmail').textContent = user.email;
-    document.getElementById('ldo').style.display   = 'none';
-    renderDocs();
+    try {
+        document.getElementById('avInit').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+        document.getElementById('sbName').textContent  = user.displayName || 'User';
+        document.getElementById('sbEmail').textContent = user.email;
+        renderDocs();
+    } catch(e) { console.error('Init error:', e); }
+    finally { hideLoader(); }
 });
 document.getElementById('logoutBtn').onclick = async () => { await auth.signOut(); window.location.href = 'login.html'; };
 
@@ -415,11 +425,11 @@ function toast(msg, type='info', ms=4000) {
 }
 
 // ── TABS ─────────────────────────────────────────────────────────────────
-function switchTab(name) {
+function switchTab(name, btn) {
     document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tool-tab').forEach(t => t.classList.remove('active'));
     document.getElementById('panel-' + name).classList.add('active');
-    event.target.classList.add('active');
+    if(btn) btn.classList.add('active');
 }
 
 // ── QUALITY SLIDER ────────────────────────────────────────────────────────
@@ -705,6 +715,27 @@ function loadImage(src) {
         img.src = src;
     });
 }
+
+function hideLoader(){
+    const el=document.getElementById('loading-overlay')||document.getElementById('ldo');
+    document.body.classList.add('page-ready');
+    const activeNav=document.querySelector('.ni.active,.nav-item-custom.active');
+    if(activeNav){activeNav.classList.add('pulse');setTimeout(()=>activeNav.classList.remove('pulse'),550);}
+    if(!el)return;
+    el.style.pointerEvents='none';
+    el.style.opacity='0';
+    setTimeout(()=>{el.style.display='none';},360);
+}
+document.querySelectorAll('a.ni,a.nav-item-custom,a.nav-link').forEach(link=>{
+    const href=link.getAttribute('href');
+    if(!href||href.startsWith('#')||href.startsWith('javascript'))return;
+    link.addEventListener('click',e=>{
+        e.preventDefault();
+        document.body.classList.remove('page-ready');
+        document.body.classList.add('page-exit');
+        setTimeout(()=>{window.location.href=href;},200);
+    });
+});
 </script>
 </body>
 </html>

@@ -33,12 +33,14 @@
     const auth = firebase.auth();
     </script>
 
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding-bottom: 50px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f4f7f6; margin: 0; padding-bottom: 50px; transition:filter .25s ease-out,opacity .25s ease-out; }
+        body.page-exit{filter:blur(4px);opacity:0.3;}
         .sticky-progress { position: sticky; top: 70px; z-index: 100; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .card { border: none; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .form-label { font-weight: 600; font-size: 0.9rem; color: #4a5568; }
-        .section-title { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 10px 20px; border-radius: 10px 10px 0 0; margin: -24px -24px 20px -24px; font-weight: bold; }
+        .form-label { font-weight: 600; font-size: 0.85rem; color: #4a5568; letter-spacing: 0.2px; }
+        .section-title { background: linear-gradient(135deg, #5b4ff5, #7c3aed); color: white; padding: 12px 22px; border-radius: 10px 10px 0 0; margin: -24px -24px 20px -24px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.95rem; letter-spacing: 0.3px; }
         
         /* Field Status Indicators */
         .field-container { position: relative; }
@@ -51,7 +53,57 @@
         .form-control:focus { box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2); }
         .nav-tabs .nav-link { color: #4a5568; font-weight: 600; border: none; padding: 12px 20px; }
         .nav-tabs .nav-link.active { color: #667eea; border-bottom: 3px solid #667eea; background: transparent; }
+
+        /* SCAN MODAL */
+        .btn-scan{display:inline-flex;align-items:center;gap:8px;padding:.65rem 1.2rem;background:#0891b2;color:white;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .2s;white-space:nowrap;}
+        .btn-scan:hover{background:#0e7490;}
+        .scan-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:800;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+        .scan-backdrop.open{display:flex;}
+        .scan-box{background:white;border-radius:20px;width:95%;max-width:780px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 25px 80px rgba(0,0,0,.25);overflow:hidden;}
+        .scan-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-bottom:1px solid #eee;}
+        .scan-head-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:.95rem;display:flex;align-items:center;}
+        .scan-close{background:none;border:none;font-size:1.1rem;cursor:pointer;color:#999;padding:6px;border-radius:8px;}
+        .scan-close:hover{background:#f3f3f3;color:#333;}
+        .scan-foot{padding:.8rem 1.4rem;border-top:1px solid #eee;display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap;}
+        .scan-btn{padding:.5rem 1rem;border-radius:10px;font-family:'Outfit',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;border:1.5px solid #e0e0f0;background:white;color:#0d0d14;transition:all .15s;}
+        .scan-btn:hover{background:#f3f3f3;}
+        .scan-btn.primary{background:linear-gradient(135deg,#5b4ff5,#7c6fff);color:white;border-color:transparent;box-shadow:0 4px 12px rgba(91,79,245,.3);}
+        .scan-btn.primary:hover{box-shadow:0 6px 18px rgba(91,79,245,.4);}
+        .scan-btn.primary:disabled{opacity:.5;cursor:not-allowed;}
+        .scan-btn.green{background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border-color:transparent;}
+        /* Bulk upload */
+        .bulk-dz{border:2px dashed #c4b5fd;border-radius:14px;padding:2.2rem 1rem;text-align:center;background:#faf9ff;cursor:pointer;transition:all .2s;}
+        .bulk-dz:hover,.bulk-dz.drag-over{border-color:#5b4ff5;background:#f0eeff;}
+        .fq-row{display:flex;align-items:center;gap:.7rem;padding:.5rem .7rem;border-radius:9px;background:#f8f8ff;margin-bottom:.4rem;}
+        .fq-ext{background:#5b4ff5;color:white;font-size:.6rem;font-weight:800;padding:.2rem .4rem;border-radius:4px;min-width:30px;text-align:center;flex-shrink:0;}
+        .fq-name{flex:1;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#0d0d14;}
+        .fq-remove{background:none;border:none;color:#6b6b80;cursor:pointer;padding:.2rem .4rem;border-radius:5px;line-height:1;font-size:.85rem;flex-shrink:0;}
+        .fq-remove:hover{background:#fee2e2;color:#dc2626;}
+        .sq-row{display:flex;align-items:center;gap:.6rem;padding:.65rem .85rem;border-radius:10px;background:#f8f8ff;margin-bottom:.5rem;}
+        .sq-name{flex:1;font-size:.83rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#0d0d14;}
+        .sq-type{font-size:.7rem;font-weight:700;padding:.18rem .5rem;border-radius:5px;background:rgba(91,79,245,.1);color:#5b4ff5;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis;}
+        .sq-badge{font-size:.7rem;font-weight:700;padding:.18rem .5rem;border-radius:5px;white-space:nowrap;flex-shrink:0;}
+        .sq-badge.pending{background:#f3f4f6;color:#6b7280;}
+        .sq-badge.converting,.sq-badge.scanning{background:rgba(91,79,245,.1);color:#5b4ff5;display:inline-flex;align-items:center;gap:.25rem;}
+        .sq-badge.done{background:#f0fff4;color:#16a34a;}
+        .sq-badge.error{background:#fef2f2;color:#dc2626;}
+        .sq-spin{width:11px;height:11px;border:2px solid rgba(91,79,245,.25);border-top-color:#5b4ff5;border-radius:50%;animation:scanSpin .7s linear infinite;flex-shrink:0;}
+        @keyframes scanSpin{to{transform:rotate(360deg);}}
+        /* Review */
+        .review-field{margin-bottom:.5rem;}
+        .review-field label{display:block;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6b6b80;margin-bottom:3px;}
+        .review-field input{width:100%;padding:.52rem .85rem;border:1.5px solid #e0e0f0;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.87rem;outline:none;transition:border-color .2s;color:#0d0d14;}
+        .review-field input:focus{border-color:#5b4ff5;}
+        .review-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.4rem 1rem;}
+        /* Conflict UI */
+        .conflict-box{background:#fef2f2;border:1px solid #fca5a5;border-radius:7px;padding:.45rem .7rem;margin-top:4px;font-size:.72rem;color:#7f1d1d;line-height:1.7;}
+        .conflict-tag{font-weight:800;color:#dc2626;margin-right:4px;}
+        .conflict-alt{display:inline-block;background:#fff;border:1.5px solid #fca5a5;border-radius:5px;padding:.12rem .45rem;margin:.15rem .2rem 0 0;cursor:pointer;font-weight:600;color:#b91c1c;transition:all .15s;font-size:.72rem;}
+        .conflict-alt:hover,.conflict-alt.chosen{background:#dc2626;border-color:#dc2626;color:#fff;}
+        .field-source{font-size:.67rem;color:#a0aec0;margin-top:2px;font-style:italic;}
+        .review-group-header{grid-column:1/-1;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#5b4ff5;border-bottom:2px solid #ede9fe;padding-bottom:4px;margin-top:.9rem;margin-bottom:.1rem;}
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 </head>
 <body>
 
@@ -76,7 +128,10 @@
             <h2 class="fw-bold mb-0">Master Customer Profile</h2>
             <p class="text-muted">Universal profile for SSC, Railways, Banking, UPSC & State Exams.</p>
         </div>
-        <div class="text-end">
+        <div class="text-end d-flex gap-2 justify-content-end">
+            <button type="button" class="btn-scan" onclick="openScanModal()">
+                <i class="bi bi-camera-fill"></i> Scan Documents
+            </button>
             <button type="button" class="btn btn-success btn-lg" onclick="saveMasterProfile()">
                 <i class="fas fa-save"></i> Save Everything
             </button>
@@ -99,7 +154,7 @@
         </div>
     </div>
 
-    <form id="masterProfileForm">
+    <form id="masterProfileForm" onsubmit="return false">
         <!-- Tabs for Sections -->
         <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
             <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#personal">Personal</a></li>
@@ -248,6 +303,16 @@
                         <div class="col-md-3 mb-3 field-container">
                             <label class="form-label">Certificate No</label>
                             <input type="text" class="form-control profile-field" name="pwdCertNo">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-3 mb-3 field-container">
+                            <label class="form-label">Disability Issue Date</label>
+                            <input type="date" class="form-control profile-field" name="disabilityIssueDate">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Disability Issuing Authority</label>
+                            <input type="text" class="form-control profile-field" name="disabilityAuthority">
                             <i class="status-icon fas fa-circle text-muted-custom"></i>
                         </div>
                     </div>
@@ -413,7 +478,7 @@
                         </div>
                     </div>
 
-                    <h5 class="text-primary">EWS / Income Certificate</h5>
+                    <h5 class="text-primary">Income Certificate</h5>
                     <div class="row">
                         <div class="col-md-4 mb-3 field-container">
                             <label class="form-label">Certificate Number</label>
@@ -428,6 +493,30 @@
                         <div class="col-md-4 mb-3 field-container">
                             <label class="form-label">Annual Family Income</label>
                             <input type="text" class="form-control profile-field" name="annualIncome">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+
+                    <h5 class="text-primary mt-3">EWS Certificate</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">EWS Certificate Number</label>
+                            <input type="text" class="form-control profile-field" name="ewsCertNo">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">EWS Date of Issue</label>
+                            <input type="date" class="form-control profile-field" name="ewsIssueDate">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Financial Year (e.g. 2023-24)</label>
+                            <input type="text" class="form-control profile-field" name="ewsFinYear">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-12 mb-3 field-container">
+                            <label class="form-label">EWS Issuing Authority</label>
+                            <input type="text" class="form-control profile-field" name="ewsAuthority">
                             <i class="status-icon fas fa-circle text-muted-custom"></i>
                         </div>
                     </div>
@@ -637,6 +726,11 @@
                                 <input type="text" class="form-control profile-field" name="pgPercent">
                                 <i class="status-icon fas fa-circle text-muted-custom"></i>
                             </div>
+                            <div class="col-md-4 mb-3 field-container">
+                                <label class="form-label">Issue / Convocation Date</label>
+                                <input type="date" class="form-control profile-field" name="pgIssueDate">
+                                <i class="status-icon fas fa-circle text-muted-custom"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -670,6 +764,18 @@
                         <div class="col-md-6 mb-3 field-container">
                             <label class="form-label">Passport Number</label>
                             <input type="text" class="form-control profile-field" name="passportNumber">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                    </div>
+                    <h5 class="text-primary mt-3">Birth Certificate</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Certificate / Registration Number</label>
+                            <input type="text" class="form-control profile-field" name="birthCertNo">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Place of Birth</label>
+                            <input type="text" class="form-control profile-field" name="birthPlace">
                             <i class="status-icon fas fa-circle text-muted-custom"></i>
                         </div>
                     </div>
@@ -734,6 +840,107 @@
                         <div class="col-md-6 mb-3 field-container">
                             <label class="form-label">Employment Exchange Reg No.</label>
                             <input type="text" class="form-control profile-field" name="empExchangeNo">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                    </div>
+
+                    <h5 class="text-primary mt-3">Experience / Service Certificate</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Designation / Post Held</label>
+                            <input type="text" class="form-control profile-field" name="expDesignation">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Organisation Name</label>
+                            <input type="text" class="form-control profile-field" name="expOrg">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Experience (Years)</label>
+                            <input type="text" class="form-control profile-field" name="expYears">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">From Date (Joining)</label>
+                            <input type="date" class="form-control profile-field" name="expFrom">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">To Date (Relieving)</label>
+                            <input type="date" class="form-control profile-field" name="expTo">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+
+                    <h5 class="text-primary">Marriage Certificate</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Spouse Name</label>
+                            <input type="text" class="form-control profile-field" name="spouseName">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Date of Marriage</label>
+                            <input type="date" class="form-control profile-field" name="marriageDate">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Marriage Cert No.</label>
+                            <input type="text" class="form-control profile-field" name="marriageCertNo">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Registrar / Issuing Authority</label>
+                            <input type="text" class="form-control profile-field" name="marriageAuthority">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-6 mb-3 field-container">
+                            <label class="form-label">Marriage District</label>
+                            <input type="text" class="form-control profile-field" name="marriageDistrict">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                    </div>
+
+                    <h5 class="text-primary">Salary Slip Details</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Employee ID</label>
+                            <input type="text" class="form-control profile-field" name="employeeId">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Designation / Post</label>
+                            <input type="text" class="form-control profile-field" name="designation">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-4 mb-3 field-container">
+                            <label class="form-label">Organisation / Department</label>
+                            <input type="text" class="form-control profile-field" name="orgName">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-3 mb-3 field-container">
+                            <label class="form-label">Basic Salary (&#8377;)</label>
+                            <input type="text" class="form-control profile-field" name="basicSalary">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-3 mb-3 field-container">
+                            <label class="form-label">Gross Salary (&#8377;)</label>
+                            <input type="text" class="form-control profile-field" name="grossSalary">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-3 mb-3 field-container">
+                            <label class="form-label">Net Salary (&#8377;)</label>
+                            <input type="text" class="form-control profile-field" name="netSalary">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-3 mb-3 field-container">
+                            <label class="form-label">Salary Month</label>
+                            <input type="text" class="form-control profile-field" name="salaryMonth" placeholder="e.g. March">
+                            <i class="status-icon fas fa-circle text-muted-custom"></i>
+                        </div>
+                        <div class="col-md-3 mb-3 field-container">
+                            <label class="form-label">Salary Year</label>
+                            <input type="text" class="form-control profile-field" name="salaryYear" placeholder="e.g. 2024">
                             <i class="status-icon fas fa-circle text-muted-custom"></i>
                         </div>
                     </div>
@@ -945,7 +1152,7 @@
             <div class="tab-pane fade" id="formlog">
                 <div class="card p-4">
                     <h4 class="section-title">8. Applied Forms History</h4>
-                    <p class="text-muted mb-3" style="font-size:.85rem">Every form filled via the extension is automatically logged here — portal, date, fields filled, and cost charged.</p>
+                    <p class="text-muted mb-3" style="font-size:.85rem">Every form filled via the extension is automatically logged here with portal, date, fields filled, revenue, AI cost, and actual margin.</p>
                     <div id="formlog-loading" class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">Loading form history...</p></div>
                     <div id="formlog-empty" style="display:none" class="text-center py-4">
                         <div style="font-size:2.5rem">📋</div>
@@ -956,7 +1163,9 @@
                         <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:.85rem">
                             <span>📝 Total Forms: <strong id="log-total-forms">0</strong></span>
                             <span>🔢 Total Fields: <strong id="log-total-fields">0</strong></span>
-                            <span>💰 Total Spent: <strong id="log-total-cost">₹0.00</strong></span>
+                            <span>💵 Revenue: <strong id="log-total-revenue">₹0.00</strong></span>
+                            <span>🤖 AI Cost: <strong id="log-total-ai-cost">₹0.00</strong></span>
+                            <span>📈 Margin: <strong id="log-total-margin">₹0.00</strong></span>
                             <span>🕐 Last Filled: <strong id="log-last-date">—</strong></span>
                         </div>
                     </div>
@@ -967,7 +1176,73 @@
     </form>
 </div>
 
+<!-- SCAN MODAL -->
+<div class="scan-backdrop" id="scanModal">
+    <div class="scan-box">
+        <div class="scan-head">
+            <div class="scan-head-title" id="scanModalTitle">
+                <i class="bi bi-camera-fill" style="color:#5b4ff5;margin-right:8px"></i>Scan Documents
+            </div>
+            <button class="scan-close" onclick="closeScanModal()"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <!-- PHASE 1: UPLOAD -->
+        <div id="uploadPhase" style="padding:1.2rem 1.5rem;overflow-y:auto;max-height:65vh">
+            <div class="bulk-dz" id="bulkDropzone"
+                 onclick="document.getElementById('bulkFileInput').click()"
+                 ondragover="event.preventDefault();this.classList.add('drag-over')"
+                 ondragleave="this.classList.remove('drag-over')"
+                 ondrop="handleBulkDrop(event)">
+                <i class="bi bi-cloud-arrow-up" style="font-size:2.2rem;color:#c4b5fd;display:block;margin-bottom:.6rem"></i>
+                <div style="font-weight:700;margin-bottom:.3rem;font-size:.95rem">Click or drag &amp; drop files here</div>
+                <div style="font-size:.78rem;color:#6b6b80">JPG, PNG, WEBP, PDF &nbsp;·&nbsp; Multiple files &nbsp;·&nbsp; Max 10MB each &nbsp;·&nbsp; AI auto-detects document type</div>
+            </div>
+            <input type="file" id="bulkFileInput" multiple accept="image/jpeg,image/png,image/webp,application/pdf" style="display:none" onchange="addBulkFiles(this.files)">
+            <div id="fileQueue" style="display:none;margin-top:1rem">
+                <div id="fileQueueList"></div>
+            </div>
+        </div>
+
+        <!-- PHASE 2: SCANNING -->
+        <div id="scanPhase" style="display:none;padding:1.2rem 1.5rem;overflow-y:auto;max-height:65vh">
+            <div id="scanQueueList"></div>
+        </div>
+
+        <!-- PHASE 3: REVIEW -->
+        <div id="reviewPhase" style="display:none;padding:1.4rem 1.7rem;overflow-y:auto;max-height:60vh">
+            <div style="display:flex;align-items:center;gap:8px;background:#f0fff4;border:1px solid #86efac;border-radius:10px;padding:.7rem 1rem;margin-bottom:1.1rem;font-size:.88rem;font-weight:600;color:#166534">
+                <i class="bi bi-check-circle-fill" style="color:#22c55e"></i>
+                <span id="reviewCountTxt"></span>
+            </div>
+            <div class="review-grid" id="reviewFields"></div>
+        </div>
+
+        <div class="scan-foot">
+            <!-- Upload footer -->
+            <div id="uploadFooter" style="display:flex;align-items:center;justify-content:space-between;gap:.6rem;width:100%;flex-wrap:wrap">
+                <span id="uploadCount" style="font-size:.78rem;color:#6b6b80">No files selected</span>
+                <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+                    <button class="scan-btn" onclick="closeScanModal()">Cancel</button>
+                    <button class="scan-btn primary" id="btnScanAll" onclick="scanAllDocs()" disabled><i class="bi bi-stars"></i> Scan All</button>
+                </div>
+            </div>
+            <!-- Scan footer -->
+            <div id="scanFooter" style="display:none;align-items:center;justify-content:space-between;gap:.6rem;width:100%;flex-wrap:wrap">
+                <span id="scanProgress" style="font-size:.78rem;color:#6b6b80"></span>
+                <button class="scan-btn green" id="btnReview" onclick="goToReview()" style="display:none"><i class="bi bi-check2-all"></i> Review &amp; Fill</button>
+            </div>
+            <!-- Review footer -->
+            <div id="reviewFooter" style="display:none;gap:.7rem;width:100%;justify-content:flex-end;flex-wrap:wrap">
+                <button class="scan-btn" onclick="backToUpload()"><i class="bi bi-arrow-left"></i> Back</button>
+                <button class="scan-btn primary" onclick="applyScannedFields()"><i class="bi bi-check-circle-fill"></i> Fill Form</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>if(window.pdfjsLib){pdfjsLib.GlobalWorkerOptions.workerSrc='pdf.worker.min.js';}</script>
 
 <script>
 let currentDocId = null;
@@ -1108,6 +1383,12 @@ auth.onAuthStateChanged(async (user) => {
                 });
             }
         } else {
+            // Check for scan prefill data from my-customers.html scan modal
+            const scanPrefill = sessionStorage.getItem('scanPrefill');
+            if (scanPrefill) {
+                sessionStorage.removeItem('scanPrefill');
+                try { fillFormData(JSON.parse(scanPrefill)); } catch(e) {}
+            }
             updateOverallProgress();
         }
     } else {
@@ -1146,13 +1427,23 @@ async function loadFormHistory(customerId) {
             return tb - ta;
         });
 
-        let totalForms=0, totalFields=0, totalCost=0, lastDate='—';
+        let totalForms=0, totalFields=0, totalRevenue=0, totalAiCost=0, totalMargin=0, lastDate='—';
         const rows = [];
 
         allDocs.forEach(d => {
+            const revenue = Number(d.revenueRs ?? d.cost ?? 0);
+            const hasMarginData = d.aiCostKnown !== undefined || d.aiCostRs !== undefined || d.grossMarginRs !== undefined;
+            const aiCostKnown = hasMarginData ? (d.aiCostKnown !== false) : false;
+            const aiCost = aiCostKnown ? Number(d.aiCostRs ?? 0) : null;
+            const margin = aiCostKnown ? Number(d.grossMarginRs ?? (revenue - (aiCost ?? 0))) : null;
+            const marginPerField = aiCostKnown ? Number(d.grossMarginPerFieldRs ?? 0) : null;
             totalForms++;
             totalFields += d.fieldsCount || 0;
-            totalCost   += d.cost || 0;
+            totalRevenue += revenue;
+            if (aiCostKnown && aiCost !== null) {
+                totalAiCost += aiCost;
+                totalMargin += margin ?? 0;
+            }
             const ts = d.timestamp?.toDate ? d.timestamp.toDate() : (d.timestamp ? new Date(d.timestamp) : new Date());
             if (totalForms === 1) lastDate = ts.toLocaleString('en-IN');
 
@@ -1171,12 +1462,17 @@ async function loadFormHistory(customerId) {
                       ${d.fieldsCount||0} fields
                     </span>
                     <span style="background:#fef3c7;color:#92400e;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:700;margin-left:4px">
-                      ₹${(d.cost||0).toFixed(2)}
+                      Rev ₹${revenue.toFixed(2)}
                     </span>
+                    ${aiCostKnown ? `<span style="background:#dbeafe;color:#1d4ed8;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:700;margin-left:4px">AI ₹${(aiCost||0).toFixed(2)}</span>` : ''}
+                    ${aiCostKnown ? `<span style="background:#ede9fe;color:#6d28d9;padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:700;margin-left:4px">Margin ₹${(margin||0).toFixed(2)}</span>` : ''}
                   </div>
                 </div>
                 <div style="font-size:.75rem;color:#94a3b8;margin-top:6px">
                   🕐 ${ts.toLocaleString('en-IN')}
+                </div>
+                <div style="font-size:.75rem;color:#64748b;margin-top:4px">
+                  ${aiCostKnown ? `Margin per field: ₹${(marginPerField||0).toFixed(2)}` : 'AI cost not available for this entry yet'}
                 </div>
               </div>`);
         });
@@ -1184,7 +1480,9 @@ async function loadFormHistory(customerId) {
         list.innerHTML = rows.join('');
         document.getElementById('log-total-forms').textContent  = totalForms;
         document.getElementById('log-total-fields').textContent = totalFields;
-        document.getElementById('log-total-cost').textContent   = '₹' + totalCost.toFixed(2);
+        document.getElementById('log-total-revenue').textContent = '₹' + totalRevenue.toFixed(2);
+        document.getElementById('log-total-ai-cost').textContent = '₹' + totalAiCost.toFixed(2);
+        document.getElementById('log-total-margin').textContent = '₹' + totalMargin.toFixed(2);
         document.getElementById('log-last-date').textContent    = lastDate;
         summary.style.display = 'block';
 
@@ -1200,15 +1498,51 @@ function escHtml(s) {
 
 function fillFormData(data) {
     const form = document.getElementById('masterProfileForm');
+    // Category mapping: scan output → form option values
+    // Pass-through for values that already match form options, map legacy variants
+    const categoryMap = {
+        'General':  'UR (General)',
+        'UR':       'UR (General)',
+        'General/UR': 'UR (General)',
+        'OBC':      'OBC-NCL',
+        'EBC':      'OBC-NCL',
+        'BC':       'OBC-NCL',
+        // already-correct values — map to themselves so the select-match logic below works
+        'OBC-NCL':  'OBC-NCL',
+        'OBC-CL':   'OBC-CL',
+        'SC':       'SC',
+        'ST':       'ST',
+        'EWS':      'EWS',
+    };
     Object.keys(data).forEach(key => {
-        const val = data[key];
+        let val = data[key];
+        // Skip Firestore metadata objects and internal scan fields
+        if (key === '_detectedType') return;
         // Skip Firestore metadata objects (Timestamp, nested maps, arrays)
         if (val === null || val === undefined || typeof val === 'object') return;
+        val = String(val);
         const input = form.querySelector(`[name="${key}"]`);
-        if (input) {
-            input.value = val;
-            updateFieldStatus(input);
+        if (!input) return;
+        // Convert DD/MM/YYYY → YYYY-MM-DD for date inputs
+        if (input.type === 'date' && /^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
+            const [dd, mm, yyyy] = val.split('/');
+            val = `${yyyy}-${mm}-${dd}`;
         }
+        // Map category values to form options
+        if (key === 'category' && categoryMap[val]) val = categoryMap[val];
+        // For selects, try exact match first, then case-insensitive partial match
+        if (input.tagName === 'SELECT') {
+            const opts = Array.from(input.options);
+            const exact = opts.find(o => o.value === val || o.text === val);
+            if (exact) { input.value = exact.value; }
+            else {
+                const partial = opts.find(o => o.text.toLowerCase().includes(val.toLowerCase()) || val.toLowerCase().includes(o.text.toLowerCase()));
+                if (partial) input.value = partial.value;
+            }
+        } else {
+            input.value = val;
+        }
+        updateFieldStatus(input);
     });
     updateOverallProgress();
 }
@@ -1216,6 +1550,361 @@ function fillFormData(data) {
 function handleLogout() {
     auth.signOut().then(() => window.location.href = 'login.html');
 }
+
+// ── SCAN DOCUMENTS ──────────────────────────────────────────────────────
+const SCAN_LABELS={
+    fullName:'Full Name',fatherName:"Father's Name",motherName:"Mother's Name",husbandName:"Husband's Name",
+    dob:'Date of Birth',gender:'Gender',category:'Category/Caste',religion:'Religion',
+    nationality:'Nationality',maritalStatus:'Marital Status',
+    identMark1:'Identification Mark 1',identMark2:'Identification Mark 2',
+    isPwd:'Person with Disability?',disabilityType:'Disability Type',disabilityPercent:'Disability %',
+    pwdCertNo:'Disability Cert No',disabilityIssueDate:'Disability Issue Date',disabilityAuthority:'Disability Authority',
+    mobileNumber:'Mobile Number',altMobile:'Alternate Mobile',emailId:'Email ID',
+    permAddr1:'Perm Addr Line 1',permAddr2:'Perm Addr Line 2',permPO:'Post Office',permPS:'Police Station',
+    permDistrict:'District',permState:'State',permPin:'PIN Code',
+    corrAddr1:'Corr Addr Line 1',corrAddr2:'Corr Addr Line 2',corrPO:'Corr Post Office',corrPS:'Corr Police Station',
+    corrDistrict:'Corr District',corrState:'Corr State',corrPin:'Corr PIN',
+    aadhaarNumber:'Aadhaar Number',panNumber:'PAN Number',voterId:'Voter ID',dlNumber:'Driving Licence',passportNumber:'Passport No',
+    tenthBoard:'10th Board',tenthYear:'10th Year',tenthRoll:'10th Roll No',tenthCertNo:'10th Cert No',
+    tenthTotal:'10th Total Marks',tenthObtained:'10th Marks Obtained',tenthPercent:'10th Percentage',tenthDivision:'10th Division',
+    twelfthBoard:'12th Board',twelfthYear:'12th Year',twelfthRoll:'12th Roll No',twelfthCertNo:'12th Cert No',
+    twelfthTotal:'12th Total Marks',twelfthObtained:'12th Marks Obtained',twelfthPercent:'12th Percentage',twelfthStream:'12th Stream',
+    diplomaBoard:'Diploma Board',diplomaTrade:'Trade/Branch',diplomaYear:'Diploma Year',diplomaRoll:'Diploma Roll No',diplomaPercent:'Diploma %',
+    gradDegree:'Degree',gradUniv:'University',gradYear:'Grad Year',gradRoll:'Grad Roll No',gradPercent:'Grad %',gradIssueDate:'Grad Issue Date',
+    pgDegree:'PG Degree',pgUniv:'PG University',pgYear:'PG Year',pgRoll:'PG Roll No',pgPercent:'PG %',pgIssueDate:'PG Issue Date',
+    casteCertNo:'Caste Cert No',casteIssueDate:'Caste Issue Date',casteAuthority:'Caste Authority',casteIssueDistrict:'Caste Issue District',
+    domicileCertNo:'Domicile Cert No',domicileIssueDate:'Domicile Issue Date',domicileAuthority:'Domicile Authority',
+    incomeCertNo:'Income Cert No',incomeIssueDate:'Income Issue Date',annualIncome:'Annual Income',
+    ewsCertNo:'EWS Cert No',ewsIssueDate:'EWS Issue Date',ewsFinYear:'EWS Financial Year',ewsAuthority:'EWS Authority',
+    bankAcc:'Bank Account No',bankIFSC:'IFSC Code',bankName:'Bank Name',bankBranch:'Branch Name',
+    birthCertNo:'Birth Cert No',birthPlace:'Place of Birth',
+    rationCardNumber:'Ration Card No',rationCardType:'Card Type',familyMemberCount:'Family Members',
+    khasraNumber:'Khasra No',khatauniNumber:'Khatauni No',landArea:'Land Area',tehsil:'Tehsil/Taluka',gramSabha:'Gram Sabha',
+    expDesignation:'Designation',expOrg:'Organisation',expFrom:'From Date',expTo:'To Date',expYears:'Experience (Yrs)',
+    spouseName:'Spouse Name',marriageDate:'Marriage Date',marriageCertNo:'Marriage Cert No',
+    marriageAuthority:'Marriage Authority',marriageDistrict:'Marriage District',
+    employeeId:'Employee ID',designation:'Post/Designation',orgName:'Organisation',
+    basicSalary:'Basic Salary',grossSalary:'Gross Salary',netSalary:'Net Salary',salaryMonth:'Salary Month',salaryYear:'Salary Year',
+};
+
+const SCAN_GROUPS={
+    '👤 Personal Info':['fullName','fatherName','motherName','husbandName','dob','gender','category','religion','nationality','maritalStatus','identMark1','identMark2'],
+    '♿ Disability (PwD)':['isPwd','disabilityType','disabilityPercent','pwdCertNo','disabilityIssueDate','disabilityAuthority'],
+    '📞 Contact':['mobileNumber','altMobile','emailId'],
+    '🏠 Permanent Address':['permAddr1','permAddr2','permPO','permPS','permDistrict','permState','permPin'],
+    '📬 Correspondence Address':['corrAddr1','corrAddr2','corrPO','corrPS','corrDistrict','corrState','corrPin'],
+    '🪢 Identity Documents':['aadhaarNumber','panNumber','voterId','dlNumber','passportNumber'],
+    '📘 10th / Matriculation':['tenthBoard','tenthYear','tenthRoll','tenthCertNo','tenthTotal','tenthObtained','tenthPercent','tenthDivision'],
+    '📗 12th / Intermediate':['twelfthBoard','twelfthYear','twelfthRoll','twelfthCertNo','twelfthTotal','twelfthObtained','twelfthPercent','twelfthStream'],
+    '📙 Diploma':['diplomaBoard','diplomaTrade','diplomaYear','diplomaRoll','diplomaPercent'],
+    '🎓 Graduation':['gradDegree','gradUniv','gradYear','gradRoll','gradPercent','gradIssueDate'],
+    '🎓 Post Graduation':['pgDegree','pgUniv','pgYear','pgRoll','pgPercent','pgIssueDate'],
+    '📜 Caste Certificate':['casteCertNo','casteIssueDate','casteAuthority','casteIssueDistrict'],
+    '🏡 Domicile Certificate':['domicileCertNo','domicileIssueDate','domicileAuthority'],
+    '💰 Income / EWS':['incomeCertNo','incomeIssueDate','annualIncome','ewsCertNo','ewsIssueDate','ewsFinYear','ewsAuthority'],
+    '🏦 Bank Details':['bankAcc','bankIFSC','bankName','bankBranch'],
+    '👶 Birth Certificate':['birthCertNo','birthPlace'],
+    '🛒 Ration Card':['rationCardNumber','rationCardType','familyMemberCount'],
+    '🌾 Land / Farmer':['khasraNumber','khatauniNumber','landArea','tehsil','gramSabha'],
+    '💼 Experience':['expDesignation','expOrg','expFrom','expTo','expYears'],
+    '💍 Marriage':['spouseName','marriageDate','marriageCertNo','marriageAuthority','marriageDistrict'],
+    '🧾 Salary Slip':['employeeId','designation','orgName','basicSalary','grossSalary','netSalary','salaryMonth','salaryYear'],
+};
+
+// ── BULK SCAN STATE ────────────────────────────────────────────────────────────
+let bulkScanFiles=[], scanMergedFields={}, scanFieldSources={}, scanFieldConflicts={};
+
+function openScanModal(){
+    bulkScanFiles=[];scanMergedFields={};scanFieldSources={};scanFieldConflicts={};
+    renderScanFileQueue();
+    showScanPhase('upload');
+    document.getElementById('scanModal').classList.add('open');
+}
+let scanRunning=false;
+function closeScanModal(){if(scanRunning){if(!confirm('Scan is still running. Close anyway?'))return;}document.getElementById('scanModal').classList.remove('open');}
+document.getElementById('scanModal').addEventListener('click',e=>{if(e.target===e.currentTarget&&!scanRunning)closeScanModal();});
+
+function showScanPhase(phase){
+    ['upload','scan','review'].forEach(p=>{
+        document.getElementById(p+'Phase').style.display='none';
+        document.getElementById(p+'Footer').style.display='none';
+    });
+    document.getElementById(phase+'Phase').style.display='block';
+    document.getElementById(phase+'Footer').style.display='flex';
+    const titles={
+        upload:'<i class="bi bi-camera-fill" style="color:#5b4ff5;margin-right:8px"></i>Scan Documents',
+        scan:'<i class="bi bi-stars" style="color:#5b4ff5;margin-right:8px"></i>Scanning Documents\u2026',
+        review:'<i class="bi bi-clipboard2-check-fill" style="color:#5b4ff5;margin-right:8px"></i>Review Extracted Data',
+    };
+    document.getElementById('scanModalTitle').innerHTML=titles[phase];
+}
+
+function handleBulkDrop(e){
+    e.preventDefault();
+    document.getElementById('bulkDropzone').classList.remove('drag-over');
+    addBulkFiles(e.dataTransfer.files);
+}
+
+function addBulkFiles(fileList){
+    for(const file of fileList){
+        if(!file.type.startsWith('image/')&&file.type!=='application/pdf')continue;
+        if(file.size>10*1024*1024){alert(`${file.name}: too large (max 10MB)`);continue;}
+        bulkScanFiles.push({file,name:file.name,status:'pending',detectedType:null,fields:null,error:null,fieldCount:0,_pageStatus:null});
+    }
+    renderScanFileQueue();
+    document.getElementById('bulkFileInput').value='';
+}
+
+function removeBulkFile(idx){bulkScanFiles.splice(idx,1);renderScanFileQueue();}
+
+function renderScanFileQueue(){
+    const list=document.getElementById('fileQueueList');
+    const queue=document.getElementById('fileQueue');
+    const btn=document.getElementById('btnScanAll');
+    const countEl=document.getElementById('uploadCount');
+    if(!bulkScanFiles.length){queue.style.display='none';btn.disabled=true;countEl.textContent='No files selected';return;}
+    queue.style.display='block';btn.disabled=false;
+    countEl.textContent=`${bulkScanFiles.length} file${bulkScanFiles.length!==1?'s':''} selected`;
+    list.innerHTML='';
+    bulkScanFiles.forEach((f,idx)=>{
+        const ext=f.name.split('.').pop().toUpperCase().slice(0,4);
+        const row=document.createElement('div');row.className='fq-row';
+        row.innerHTML=`<span class="fq-ext">${ext}</span><span class="fq-name" title="${f.name}">${f.name}</span><button class="fq-remove" onclick="removeBulkFile(${idx})"><i class="bi bi-x-lg"></i></button>`;
+        list.appendChild(row);
+    });
+}
+
+// Compress a canvas to JPEG ≤ 1800px on the longer side (~200–600 KB result)
+function compressCanvas(canvas, quality=0.85){
+    const MAX=1800;
+    if(canvas.width<=MAX && canvas.height<=MAX) return canvas.toDataURL('image/jpeg',quality);
+    const scale=MAX/Math.max(canvas.width,canvas.height);
+    const c=document.createElement('canvas');
+    c.width=Math.round(canvas.width*scale); c.height=Math.round(canvas.height*scale);
+    c.getContext('2d').drawImage(canvas,0,0,c.width,c.height);
+    return c.toDataURL('image/jpeg',quality);
+}
+
+// Compress an image File to JPEG ≤ 1800px — keeps OCR quality, avoids PHP post_max_size limit
+async function compressImage(file, quality=0.85){
+    return new Promise((resolve,reject)=>{
+        const reader=new FileReader();
+        reader.onerror=reject;
+        reader.onload=e=>{
+            const img=new Image();
+            img.onerror=reject;
+            img.onload=()=>{
+                const MAX=1800;
+                let w=img.width, h=img.height;
+                if(w>MAX||h>MAX){const s=MAX/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+                const canvas=document.createElement('canvas');
+                canvas.width=w; canvas.height=h;
+                canvas.getContext('2d').drawImage(img,0,0,w,h);
+                resolve(canvas.toDataURL('image/jpeg',quality));
+            };
+            img.src=e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// Convert file to array of base64 images (1 per page, max 3 pages for PDFs)
+async function fileToPages(file){
+    if(file.type==='application/pdf'){
+        // Send PDF to scan-document.php with isPdf flag — server converts to image
+        const reader=new FileReader();
+        const pdfBase64=await new Promise((resolve,reject)=>{
+            reader.onload=e=>resolve(e.target.result);
+            reader.onerror=reject;
+            reader.readAsDataURL(file);
+        });
+        return [{base64:pdfBase64,label:'PDF',isPdf:true}];
+    }
+    const base64=await compressImage(file);
+    return [{base64,label:null}];
+}
+
+/// Smart merge: first document to set a field wins; later docs record conflicts
+function smartMerge(newFields,sourceName){
+    for(const [key,val] of Object.entries(newFields)){
+        // Skip internal/meta fields
+        if(key==='_detectedType')continue;
+        if(!val||String(val).trim()==='')continue;
+        if(!scanMergedFields[key]){
+            scanMergedFields[key]=String(val).trim();
+            scanFieldSources[key]=sourceName;
+        }else{
+            const existing=String(scanMergedFields[key]).toLowerCase().trim();
+            const incoming=String(val).toLowerCase().trim();
+            if(existing!==incoming){
+                if(!scanFieldConflicts[key])scanFieldConflicts[key]=[];
+                const dup=scanFieldConflicts[key].some(c=>c.value.toLowerCase().trim()===incoming);
+                if(!dup)scanFieldConflicts[key].push({source:sourceName,value:String(val).trim()});
+            }
+        }
+    }
+}
+
+function buildScanSqRowHtml(f){
+    const statusMap={
+        pending:'<span class="sq-badge pending">Waiting</span>',
+        converting:'<span class="sq-badge converting"><span class="sq-spin"></span>Converting\u2026</span>',
+        scanning:`<span class="sq-badge scanning"><span class="sq-spin"></span>${f._pageStatus||'Scanning\u2026'}</span>`,
+        done:`<span class="sq-badge done">${f.fieldCount} fields</span>`,
+        error:`<span class="sq-badge error" title="${(f.error||'').replace(/"/g,'&quot;')}">Error</span>`,
+    };
+    const typeTag=f.detectedType?`<span class="sq-type" title="${f.detectedType}">${f.detectedType}</span>`:'';
+    return `<span class="sq-name" title="${f.name}">${f.name}</span>${typeTag}${statusMap[f.status]||''}`;
+}
+
+function renderScanProgressQueue(){
+    const list=document.getElementById('scanQueueList');list.innerHTML='';
+    bulkScanFiles.forEach((f,idx)=>{
+        const row=document.createElement('div');row.className='sq-row';row.id=`sqrs-${idx}`;
+        row.innerHTML=buildScanSqRowHtml(f);list.appendChild(row);
+    });
+}
+
+function updateScanSqRow(idx){
+    const row=document.getElementById(`sqrs-${idx}`);
+    if(row)row.innerHTML=buildScanSqRowHtml(bulkScanFiles[idx]);
+}
+
+async function scanAllDocs(){
+    try{
+    if(!bulkScanFiles.length){alert('No files to scan');return;}
+    // Close modal and show progress on the main page
+    document.getElementById('scanModal').classList.remove('open');
+    scanRunning=true;
+    document.title='SCANNING...';
+    const statusEl=document.getElementById('autoSaveStatus');
+    const origStatus=statusEl.innerHTML;
+    const allFields={};
+    for(let i=0;i<bulkScanFiles.length;i++){
+        const f=bulkScanFiles[i];
+        statusEl.innerHTML='<i class="fas fa-spinner fa-spin"></i> Scanning file '+(i+1)+' of '+bulkScanFiles.length+'... please wait';
+        // Convert file to data URL
+        const dataUrl=await new Promise((resolve,reject)=>{
+            const r=new FileReader();r.onload=e=>resolve(e.target.result);r.onerror=reject;r.readAsDataURL(f.file);
+        });
+        // For images, compress first
+        let image=dataUrl;
+        let isPdf=false;
+        if(f.file.type==='application/pdf'){
+            isPdf=true;
+        }else{
+            image=await compressImage(f.file);
+        }
+        // Send to scan-document.php
+        const payload={image,docType:'all_in_one'};
+        if(isPdf)payload.isPdf=true;
+        const res=await fetch('scan-document.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+        const data=await res.json();
+        if(data.success&&data.fields){
+            Object.assign(allFields,data.fields);
+        }
+    }
+    // Fill the form with extracted data
+    const fieldCount=Object.keys(allFields).length;
+    document.title='Comprehensive Customer Profile - AI Form Filler';
+    if(fieldCount>0){
+        fillFormData(allFields);
+        statusEl.innerHTML='<i class="fas fa-check text-success"></i> Scanned! '+fieldCount+' fields filled.';
+    }else{
+        statusEl.innerHTML='<i class="fas fa-times text-danger"></i> No fields extracted';
+    }
+    setTimeout(()=>{statusEl.innerHTML=origStatus;},5000);
+    }catch(err){
+        document.title='Comprehensive Customer Profile - AI Form Filler';
+        alert('Scan error: '+err.message+'\n\nStack: '+err.stack);
+        const s=document.getElementById('autoSaveStatus');
+        if(s)s.innerHTML='<i class="fas fa-times text-danger"></i> Scan error: '+err.message;
+    }finally{scanRunning=false;}
+}
+
+function goToReview(){
+    if(!Object.keys(scanMergedFields).length){alert('No data extracted yet');return;}
+    const done=bulkScanFiles.filter(f=>f.status==='done').length;
+    const count=Object.keys(scanMergedFields).length;
+    const conflicts=Object.keys(scanFieldConflicts).length;
+    let summaryHtml=`${count} fields extracted from ${done} document${done!==1?'s':''}.`;
+    if(conflicts>0)summaryHtml+=` <span style="color:#dc2626;font-weight:700">\u26a0\ufe0f ${conflicts} conflict${conflicts!==1?'s':''} \u2014 review carefully.</span>`;
+    else summaryHtml+=' Review and correct if needed.';
+    document.getElementById('reviewCountTxt').innerHTML=summaryHtml;
+    const grid=document.getElementById('reviewFields');grid.innerHTML='';
+    const allGrouped=Object.values(SCAN_GROUPS).flat();
+    // Render grouped fields
+    for(const [groupName,keys] of Object.entries(SCAN_GROUPS)){
+        const groupKeys=keys.filter(k=>scanMergedFields[k]||scanFieldConflicts[k]);
+        if(!groupKeys.length)continue;
+        const hdr=document.createElement('div');
+        hdr.className='review-group-header';
+        hdr.style.cssText='grid-column:1/-1;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#5b4ff5;border-bottom:2px solid #ede9fe;padding-bottom:4px;margin-top:.9rem;margin-bottom:.1rem;';
+        hdr.textContent=groupName;
+        grid.appendChild(hdr);
+        for(const key of groupKeys){
+            const val=scanMergedFields[key]||'';
+            const src=scanFieldSources[key]||'';
+            const alts=scanFieldConflicts[key]||[];
+            const hasConflict=alts.length>0;
+            const div=document.createElement('div');div.className='review-field';
+            let extraHtml='';
+            if(hasConflict){
+                const altBtns=alts.map(a=>`<span class="conflict-alt" onclick="pickConflict('${key}','${a.value.replace(/'/g,"\\'").replace(/</g,'&lt;')}',this)" title="From: ${a.source}">${a.value}</span>`).join('');
+                extraHtml=`<div class="conflict-box"><span class="conflict-tag">\u26a0\ufe0f Conflict</span>From <em>${src}</em>. Alternatives: ${altBtns}</div>`;
+            }else if(src){
+                extraHtml=`<div class="field-source">\ud83d\udcc4 ${src}</div>`;
+            }
+            div.innerHTML=`<label>${SCAN_LABELS[key]||key}${hasConflict?' <span style="color:#dc2626">\u26a0</span>':''}</label><input type="text" data-key="${key}" value="${String(val).replace(/"/g,'&quot;').replace(/</g,'&lt;')}">${extraHtml}`;
+            grid.appendChild(div);
+        }
+    }
+    // Ungrouped fallback
+    const ungrouped=Object.keys(scanMergedFields).filter(k=>!allGrouped.includes(k));
+    if(ungrouped.length){
+        const hdr=document.createElement('div');
+        hdr.className='review-group-header';
+        hdr.style.cssText='grid-column:1/-1;font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#5b4ff5;border-bottom:2px solid #ede9fe;padding-bottom:4px;margin-top:.9rem;margin-bottom:.1rem;';
+        hdr.textContent='📋 Other Fields';
+        grid.appendChild(hdr);
+        ungrouped.forEach(key=>{
+            const div=document.createElement('div');div.className='review-field';
+            div.innerHTML=`<label>${SCAN_LABELS[key]||key}</label><input type="text" data-key="${key}" value="${String(scanMergedFields[key]).replace(/"/g,'&quot;').replace(/</g,'&lt;')}">`;            grid.appendChild(div);
+        });
+    }
+    showScanPhase('review');
+}
+
+function pickConflict(key,value,btnEl){
+    const inp=document.querySelector(`#reviewFields input[data-key="${key}"]`);
+    if(inp)inp.value=value;
+    scanMergedFields[key]=value;
+    btnEl.closest('.conflict-box').querySelectorAll('.conflict-alt').forEach(el=>el.classList.remove('chosen'));
+    btnEl.classList.add('chosen');
+}
+
+function backToUpload(){showScanPhase('upload');}
+
+function applyScannedFields(){
+    const fields={};
+    document.querySelectorAll('#reviewFields input[data-key]').forEach(inp=>{
+        const val=inp.value.trim();
+        if(val)fields[inp.dataset.key]=val;
+    });
+    fillFormData(fields);
+    closeScanModal();
+}
+
+
+document.querySelectorAll('a.ni,a.nav-item-custom,a.nav-link').forEach(link=>{
+    const href=link.getAttribute('href');
+    if(!href||href.startsWith('#')||href.startsWith('javascript'))return;
+    link.addEventListener('click',e=>{
+        e.preventDefault();
+        document.body.classList.add('page-exit');
+        setTimeout(()=>{window.location.href=href;},200);
+    });
+});
 </script>
 
 </body>

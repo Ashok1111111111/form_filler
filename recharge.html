@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recharge Credits – AI Form Filler</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <style>
@@ -19,32 +19,41 @@
             --sidebar-w: 260px;
         }
         * { box-sizing: border-box; }
-        body { font-family: 'DM Sans', sans-serif; background: #f6f6fa; margin: 0; color: var(--ink); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background: #f6f6fa; margin: 0; color: var(--ink); }
 
-        /* SIDEBAR — matches dashboard */
+        /* SIDEBAR */
         #sidebar {
             position: fixed; top: 0; left: 0; height: 100vh; width: var(--sidebar-w);
             background: linear-gradient(160deg, #1a1535 0%, #0d0d14 100%);
             color: white; padding: 0; z-index: 200; display: flex; flex-direction: column;
-            box-shadow: 4px 0 30px rgba(0,0,0,0.15);
+            box-shadow: 4px 0 40px rgba(0,0,0,0.25);
         }
-        .sidebar-logo { padding: 1.8rem 1.5rem 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 0.5rem; }
-        .sidebar-logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: white; }
+        #sidebar::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 22px 22px; pointer-events: none;
+        }
+        .sidebar-logo { padding: 1.8rem 1.5rem 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 0.5rem; position: relative; z-index: 1; }
+        .sidebar-logo-text { font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px; font-size: 1.4rem; color: white; }
         .sidebar-logo-text span { color: #8b7fff; }
-        .sidebar-tagline { font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-top: 3px; }
-        .sidebar-nav { flex: 1; padding: 0.5rem 1rem; }
+        .sidebar-tagline { font-size: 0.73rem; color: rgba(255,255,255,0.35); margin-top: 3px; }
+        .sidebar-nav { flex: 1; padding: 0.5rem 1rem; position: relative; z-index: 1; }
         .nav-item-custom {
-            display: flex; align-items: center; gap: 12px; padding: 0.75rem 1rem;
-            border-radius: 12px; text-decoration: none; color: rgba(255,255,255,0.6);
-            font-weight: 500; font-size: 0.9rem; margin-bottom: 4px; transition: all 0.2s;
+            display: flex; align-items: center; gap: 12px; padding: 0.72rem 1rem;
+            border-radius: 12px; text-decoration: none; color: rgba(255,255,255,0.55);
+            font-weight: 500; font-size: 0.88rem; margin-bottom: 3px; transition: all 0.2s;
         }
         .nav-item-custom i { width: 20px; text-align: center; font-size: 1rem; }
-        .nav-item-custom:hover { background: rgba(255,255,255,0.08); color: white; }
-        .nav-item-custom.active { background: rgba(139,127,255,0.2); color: white; border: 1px solid rgba(139,127,255,0.3); }
-        .nav-item-custom.active i { color: #8b7fff; }
-        .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
+        .nav-item-custom:hover { background: rgba(255,255,255,0.07); color: white; transform: translateX(3px); }
+        .nav-item-custom.active {
+            background: linear-gradient(135deg, rgba(91,79,245,0.3), rgba(91,79,245,0.15));
+            color: white; border: 1px solid rgba(139,127,255,0.35);
+            box-shadow: 0 4px 12px rgba(91,79,245,0.15);
+        }
+        .nav-item-custom.active i { color: #a29bff; }
+        .sidebar-footer { padding: 1rem; border-top: 1px solid rgba(255,255,255,0.07); position: relative; z-index: 1; }
         .user-chip { display: flex; align-items: center; gap: 10px; padding: 0.75rem 1rem; background: rgba(255,255,255,0.06); border-radius: 12px; margin-bottom: 0.5rem; }
-        .user-avatar { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.9rem; color: white; flex-shrink: 0; }
+        .user-avatar { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px; font-size: 0.9rem; color: white; flex-shrink: 0; }
         .user-name { font-size: 0.85rem; font-weight: 600; color: white; }
         .user-email-small { font-size: 0.72rem; color: rgba(255,255,255,0.4); }
         .btn-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 0.65rem 1rem; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: rgba(255,255,255,0.5); font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: left; }
@@ -53,21 +62,32 @@
         /* MAIN */
         #main { margin-left: var(--sidebar-w); min-height: 100vh; padding: 2rem; }
         .top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
-        .page-title { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; }
+        .page-title { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; }
         .page-sub { font-size: 0.9rem; color: var(--ink-muted); margin-top: 2px; }
 
         /* CREDITS HERO CARD */
         .credits-hero {
-            background: linear-gradient(135deg, #5b4ff5 0%, #7c3aed 100%);
-            border-radius: 20px; padding: 2rem; color: white;
+            background: linear-gradient(135deg, #4338ca 0%, #5b4ff5 40%, #7c3aed 100%);
+            border-radius: 24px; padding: 2.2rem; color: white;
             display: flex; align-items: center; justify-content: space-between;
             flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
-            box-shadow: 0 12px 40px var(--accent-glow);
+            box-shadow: 0 20px 60px rgba(91,79,245,0.35);
+            position: relative; overflow: hidden;
         }
-        .credits-hero-left h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-        .credits-big { font-family: 'Syne', sans-serif; font-size: 4rem; font-weight: 800; line-height: 1; }
-        .credits-label { font-size: 0.9rem; opacity: 0.7; }
-        .credits-hero-right { text-align: right; }
+        .credits-hero::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(245,114,79,0.15), transparent 70%);
+        }
+        .credits-hero::after {
+            content: '₹'; position: absolute; right: -20px; bottom: -30px;
+            font-size: 10rem; font-weight: 900; opacity: 0.06;
+            font-family: 'Outfit', sans-serif; line-height: 1; color: white;
+        }
+        .credits-hero-left { position: relative; z-index: 1; }
+        .credits-hero-left h2 { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.78rem; opacity: 0.65; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+        .credits-big { font-family: 'Outfit', sans-serif; font-size: 4.5rem; font-weight: 800; line-height: 1; text-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        .credits-label { font-size: 0.85rem; opacity: 0.65; margin-top: 4px; }
+        .credits-hero-right { text-align: right; position: relative; z-index: 1; }
         .credits-hero-right p { opacity: 0.75; font-size: 0.85rem; margin-bottom: 1rem; }
 
         /* PACKAGE CARDS */
@@ -76,13 +96,14 @@
         @media (max-width: 550px) { .packages-grid { grid-template-columns: 1fr; } }
 
         .pkg-card {
-            background: white; border: 2px solid var(--border); border-radius: 20px;
-            padding: 1.5rem; text-align: center; cursor: pointer;
+            background: white; border: 2px solid #eeeeff; border-radius: 22px;
+            padding: 1.7rem; text-align: center; cursor: pointer;
             transition: all 0.25s; position: relative; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(91,79,245,0.06);
         }
-        .pkg-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--accent), #7c3aed); opacity: 0; transition: opacity 0.25s; z-index: 0; }
-        .pkg-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 12px 30px var(--accent-glow); }
-        .pkg-card.selected { border-color: var(--accent); box-shadow: 0 12px 30px var(--accent-glow); }
+        .pkg-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, #4338ca, #7c3aed); opacity: 0; transition: opacity 0.25s; z-index: 0; }
+        .pkg-card:hover { transform: translateY(-6px); border-color: var(--accent); box-shadow: 0 20px 50px var(--accent-glow); }
+        .pkg-card.selected { border-color: var(--accent); box-shadow: 0 16px 50px var(--accent-glow); transform: translateY(-3px); }
         .pkg-card.selected::before { opacity: 1; }
         .pkg-card > * { position: relative; z-index: 1; }
         .pkg-card.selected .pkg-name,
@@ -94,8 +115,8 @@
             font-size: 0.68rem; font-weight: 700; padding: 3px 10px;
             border-radius: 50px; color: white;
         }
-        .pkg-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--ink-muted); margin-bottom: 0.8rem; }
-        .pkg-price { font-family: 'Syne', sans-serif; font-size: 2.4rem; font-weight: 800; color: var(--ink); line-height: 1; }
+        .pkg-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--ink-muted); margin-bottom: 0.8rem; }
+        .pkg-price { font-family: 'Outfit', sans-serif; font-size: 2.4rem; font-weight: 800; color: var(--ink); line-height: 1; }
         .pkg-credits { font-size: 1rem; font-weight: 700; color: var(--accent); margin: 0.4rem 0 0.2rem; }
         .pkg-per { font-size: 0.78rem; color: var(--ink-muted); }
         .pkg-save { display: inline-block; background: rgba(34,197,94,0.12); color: #16a34a; border-radius: 50px; padding: 2px 10px; font-size: 0.72rem; font-weight: 700; margin-top: 0.5rem; }
@@ -106,7 +127,7 @@
         @media (max-width: 768px) { .payment-grid { grid-template-columns: 1fr; } }
 
         .pay-card { background: white; border-radius: 20px; padding: 1.8rem; border: 1px solid var(--border); }
-        .pay-card h4 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; }
+        .pay-card h4 { font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px; font-size: 1rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; }
 
         /* QR */
         .qr-wrapper { text-align: center; }
@@ -115,21 +136,21 @@
         .btn-copy { background: transparent; border: 1px solid var(--border); border-radius: 8px; padding: 4px 12px; font-size: 0.8rem; font-weight: 600; color: var(--accent); cursor: pointer; transition: all 0.2s; }
         .btn-copy:hover { background: var(--accent); color: white; border-color: var(--accent); }
         .pay-amount-display { background: linear-gradient(135deg, var(--accent), #7c3aed); color: white; border-radius: 10px; padding: 0.75rem 1rem; text-align: center; margin-bottom: 1rem; }
-        .pay-amount-display .amount { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; }
+        .pay-amount-display .amount { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 800; }
         .pay-amount-display small { opacity: 0.8; font-size: 0.78rem; }
 
         /* SUBMIT FORM */
         .form-label-custom { font-size: 0.82rem; font-weight: 600; color: var(--ink-muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
-        .form-input-custom { width: 100%; padding: 0.8rem 1rem; border: 1.5px solid #e0e0f0; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; margin-bottom: 1rem; }
+        .form-input-custom { width: 100%; padding: 0.8rem 1rem; border: 1.5px solid #e0e0f0; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-size: 0.95rem; outline: none; transition: border-color 0.2s; margin-bottom: 1rem; }
         .form-input-custom:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-        .btn-submit-pay { width: 100%; padding: 0.9rem; background: linear-gradient(135deg, var(--accent), #7c3aed); color: white; border: none; border-radius: 12px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 20px var(--accent-glow); }
+        .btn-submit-pay { width: 100%; padding: 0.9rem; background: linear-gradient(135deg, var(--accent), #7c3aed); color: white; border: none; border-radius: 12px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 20px var(--accent-glow); }
         .btn-submit-pay:hover { transform: translateY(-2px); box-shadow: 0 10px 28px var(--accent-glow); }
         .btn-submit-pay:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
         /* STEPS */
         .steps-row { display: flex; gap: 0; margin: 1.2rem 0; }
         .step-box { flex: 1; text-align: center; padding: 0.8rem 0.5rem; }
-        .step-num-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; }
+        .step-num-circle { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: white; font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; }
         .step-txt { font-size: 0.75rem; color: var(--ink-muted); line-height: 1.3; }
         .step-arrow { display: flex; align-items: center; color: var(--border); font-size: 1.2rem; padding-top: 0.5rem; }
 
@@ -142,7 +163,7 @@
 
         /* TRANSACTIONS TABLE */
         .txn-section { background: white; border-radius: 20px; padding: 1.5rem; border: 1px solid var(--border); }
-        .section-head { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; margin-bottom: 1rem; }
+        .section-head { font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px; font-size: 1rem; margin-bottom: 1rem; }
         .table { font-size: 0.88rem; }
         .table th { font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-muted); border-bottom: 2px solid var(--border); padding: 0.75rem; }
         .table td { padding: 0.75rem; vertical-align: middle; border-color: rgba(0,0,0,0.04); }
@@ -154,9 +175,18 @@
         .badge-recharge { background: rgba(91,79,245,0.1); color: var(--accent); }
 
         /* LOADING */
-        #loading-overlay { position: fixed; inset: 0; background: white; display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        .loading-spinner { width: 44px; height: 44px; border: 3px solid #f0f0f0; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+        #loading-overlay { position: fixed; inset: 0; background: linear-gradient(135deg,#0d0b1e,#1a1535); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .loading-brand { font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px; font-size: 1.4rem; color: white; margin-bottom: 1.5rem; text-align: center; }
+        .loading-brand span { color: #8b7fff; }
+        .loading-spinner { width: 44px; height: 44px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #8b7fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        /* ── PAGE TRANSITIONS ── */
+        #main,#loading-overlay{filter:blur(4px);transition:filter .35s ease-out,opacity .35s ease-out;}
+        #sidebar{transition:filter .2s ease-out,opacity .2s ease-out;}
+        body.page-ready #main,body.page-ready #loading-overlay{filter:blur(0);}
+        body.page-exit #main,body.page-exit #sidebar{filter:blur(4px);opacity:0.3;transition-duration:.2s;}
+        @keyframes navPulse{0%{box-shadow:0 0 0 0 rgba(139,127,255,.5);background:rgba(91,79,245,.45);}60%{box-shadow:0 0 0 6px rgba(139,127,255,0);}100%{box-shadow:0 0 0 0 rgba(139,127,255,0);background:inherit;}}
+        .nav-item-custom.active.pulse{animation:navPulse .5s ease forwards;}
     </style>
 </head>
 <body>
@@ -164,8 +194,9 @@
 <!-- LOADING -->
 <div id="loading-overlay">
     <div style="text-align:center">
+        <div class="loading-brand">AI<span>Form</span>Filler</div>
         <div class="loading-spinner"></div>
-        <p style="font-size:0.9rem;color:var(--ink-muted)">Loading...</p>
+        <p style="font-size:0.9rem;color:rgba(255,255,255,0.4)">Loading your wallet...</p>
     </div>
 </div>
 
@@ -215,9 +246,9 @@
             <div class="credits-label">rupees available</div>
         </div>
         <div class="credits-hero-right">
-            <p>Each form fill costs only <strong>₹2</strong><br>New users get ₹100 FREE to start</p>
+            <p>Each filled field costs only <strong>₹0.20</strong><br>New users get ₹100 FREE to start</p>
             <div style="background:rgba(255,255,255,0.15);border-radius:10px;padding:0.6rem 1rem;font-size:0.82rem;font-weight:600;">
-                <i class="bi bi-lightning-fill me-1"></i> Only ₹2 per form fill — lowest in market!
+                <i class="bi bi-lightning-fill me-1"></i> Only 20 paise per filled field
             </div>
         </div>
     </div>
@@ -228,29 +259,29 @@
         <div class="pkg-card" data-amount="50" onclick="selectPackage(this)">
             <div class="pkg-name">Starter</div>
             <div class="pkg-price">₹50</div>
-            <div class="pkg-credits">25 Fills</div>
-            <div class="pkg-per">₹2 per form fill</div>
+            <div class="pkg-credits">250 Fields</div>
+            <div class="pkg-per">₹0.20 per field</div>
         </div>
         <div class="pkg-card selected" data-amount="100" onclick="selectPackage(this)">
             <span class="pkg-badge" style="background:linear-gradient(135deg,#5b4ff5,#7c3aed)">🔥 Popular</span>
             <div class="pkg-name">Basic</div>
             <div class="pkg-price">₹100</div>
-            <div class="pkg-credits">50 Fills</div>
-            <div class="pkg-per">₹2 per form fill</div>
+            <div class="pkg-credits">500 Fields</div>
+            <div class="pkg-per">₹0.20 per field</div>
         </div>
         <div class="pkg-card" data-amount="200" onclick="selectPackage(this)">
             <span class="pkg-badge" style="background:linear-gradient(135deg,#22c55e,#16a34a)">Best Value</span>
             <div class="pkg-name">Premium</div>
             <div class="pkg-price">₹200</div>
-            <div class="pkg-credits">100 Fills</div>
-            <div class="pkg-per">₹2 per form fill</div>
+            <div class="pkg-credits">1000 Fields</div>
+            <div class="pkg-per">₹0.20 per field</div>
         </div>
         <div class="pkg-card" data-amount="500" onclick="selectPackage(this)">
             <span class="pkg-badge" style="background:linear-gradient(135deg,#f5724f,#e55a38)">Bulk</span>
             <div class="pkg-name">Bulk</div>
             <div class="pkg-price">₹500</div>
-            <div class="pkg-credits">250 Fills</div>
-            <div class="pkg-per">₹2 per form fill</div>
+            <div class="pkg-credits">2500 Fields</div>
+            <div class="pkg-per">₹0.20 per field</div>
         </div>
     </div>
 
@@ -295,7 +326,7 @@
                 </div>
                 <img src="upi-qr-code.jpeg" alt="UPI QR Code - Ashok Kumar" class="qr-img">
                 <div class="upi-id-box">
-                    <span>9296914511@pthdfc</span>
+                    <span>7999614511@pthdfc</span>
                     <button class="btn-copy" onclick="copyUPI()"><i class="bi bi-clipboard"></i> Copy</button>
                 </div>
                 <div style="font-size:0.78rem;color:var(--ink-muted);text-align:center">
@@ -374,7 +405,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-const COST_PER_FILL = 2;
+const COST_PER_FIELD = 0.20;
 let currentUser = null;
 let selectedAmt = 100;
 
@@ -392,20 +423,22 @@ function showToast(msg, type = 'info', duration = 4000) {
 // ─── AUTH ────────────────────────────────────────────────────────────────
 auth.onAuthStateChanged(async (user) => {
     if (!user) { window.location.href = 'login.html'; return; }
-    currentUser = user;
-    document.getElementById('avatarInitial').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
-    document.getElementById('sidebarName').textContent = user.displayName || 'User';
-    document.getElementById('sidebarEmail').textContent = user.email;
-    document.getElementById('submitterName').value = user.displayName || '';
+    try {
+        currentUser = user;
+        document.getElementById('avatarInitial').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+        document.getElementById('sidebarName').textContent = user.displayName || 'User';
+        document.getElementById('sidebarEmail').textContent = user.email;
+        document.getElementById('submitterName').value = user.displayName || '';
 
-    // Live wallet balance listener
-    db.collection('users').doc(user.uid).onSnapshot(doc => {
-        const bal = (doc.data()?.walletBalance ?? 0).toFixed(2);
-        document.getElementById('creditsDisplay').textContent = '₹' + bal;
-    });
+        // Live wallet balance listener
+        db.collection('users').doc(user.uid).onSnapshot(doc => {
+            const bal = (doc.data()?.walletBalance ?? 0).toFixed(2);
+            document.getElementById('creditsDisplay').textContent = '₹' + bal;
+        });
 
-    loadTransactions();
-    document.getElementById('loading-overlay').style.display = 'none';
+        loadTransactions();
+    } catch(e) { console.error('Init error:', e); }
+    finally { hideLoader(); }
 });
 
 document.getElementById('logoutBtn').onclick = async () => {
@@ -430,8 +463,8 @@ function applyCustomAmt(val) {
     }
     document.querySelectorAll('.pkg-card').forEach(c => c.classList.remove('selected'));
     selectedAmt = amt;
-    const fills = Math.floor(amt / COST_PER_FILL);
-    document.getElementById('customFillCount').textContent = `= ${fills} form fills`;
+    const fields = Math.floor(amt / COST_PER_FIELD);
+    document.getElementById('customFillCount').textContent = `= ${fields} fields`;
     updatePayDisplay(amt);
 }
 
@@ -443,9 +476,9 @@ function updatePayDisplay(amt) {
 
 // ─── COPY UPI ─────────────────────────────────────────────────────────────
 function copyUPI() {
-    navigator.clipboard.writeText('9296914511@pthdfc')
+    navigator.clipboard.writeText('7999614511@pthdfc')
         .then(() => showToast('UPI ID copied to clipboard!', 'success'))
-        .catch(() => showToast('Please copy manually: 9296914511@pthdfc', 'warn'));
+        .catch(() => showToast('Please copy manually: 7999614511@pthdfc', 'warn'));
 }
 
 // ─── SUBMIT RECHARGE ──────────────────────────────────────────────────────
@@ -522,11 +555,16 @@ async function loadTransactions() {
 
             const amtColor = isRecharge ? '#16a34a' : '#c2410c';
             const amtPrefix = isRecharge ? '+' : '−';
+            const hasMarginData = d.aiCostKnown !== undefined || d.aiCostRs !== undefined || d.grossMarginRs !== undefined;
+            const aiCostKnown = hasMarginData ? (d.aiCostKnown !== false) : false;
+            const marginLine = !isRecharge
+                ? `<div style="font-size:0.74rem;color:var(--ink-muted);margin-top:4px">${aiCostKnown ? `AI ₹${Number(d.aiCostRs ?? 0).toFixed(2)} | Margin ₹${Number(d.grossMarginRs ?? 0).toFixed(2)} | ${Number(d.grossMarginPerFieldRs ?? 0).toFixed(2)}/field` : 'AI cost not available for this entry yet'}</div>`
+                : '';
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td style="white-space:nowrap">${date}</td>
                 <td>${typeBadge}</td>
-                <td style="max-width:180px;word-break:break-word">${d.description || '—'}</td>
+                <td style="max-width:180px;word-break:break-word">${d.description || '—'}${marginLine}</td>
                 <td style="font-weight:700;color:${amtColor}">${amtPrefix}₹${d.amount ?? '—'}</td>
                 <td>${isRecharge ? statusBadge : '<span class="badge-status badge-done">✓ Done</span>'}</td>
                 <td style="font-size:0.75rem;color:var(--ink-muted)">${d.userUpiTransactionId || '—'}</td>
@@ -538,6 +576,28 @@ async function loadTransactions() {
         console.error(e);
     }
 }
+
+// ── PAGE TRANSITION HELPERS ───────────────────────────────────────────────
+function hideLoader(){
+    const el=document.getElementById('loading-overlay')||document.getElementById('ldo');
+    document.body.classList.add('page-ready');
+    const activeNav=document.querySelector('.ni.active,.nav-item-custom.active');
+    if(activeNav){activeNav.classList.add('pulse');setTimeout(()=>activeNav.classList.remove('pulse'),550);}
+    if(!el)return;
+    el.style.pointerEvents='none';
+    el.style.opacity='0';
+    setTimeout(()=>{el.style.display='none';},360);
+}
+document.querySelectorAll('a.ni,a.nav-item-custom,a.nav-link').forEach(link=>{
+    const href=link.getAttribute('href');
+    if(!href||href.startsWith('#')||href.startsWith('javascript'))return;
+    link.addEventListener('click',e=>{
+        e.preventDefault();
+        document.body.classList.remove('page-ready');
+        document.body.classList.add('page-exit');
+        setTimeout(()=>{window.location.href=href;},200);
+    });
+});
 </script>
 </body>
 </html>

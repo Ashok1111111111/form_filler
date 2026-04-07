@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html><body>
+<h2>Scan Test</h2>
+<input type="file" id="f" accept=".pdf,image/*">
+<button onclick="doTest()">Test Scan</button>
+<pre id="out" style="white-space:pre-wrap;max-width:800px;word-break:break-all"></pre>
+<script>
+function log(msg){document.getElementById('out').textContent+=msg+'\n';console.log(msg);}
+async function doTest(){
+    const file=document.getElementById('f').files[0];
+    if(!file){log('No file selected');return;}
+    log('File: '+file.name+' type='+file.type+' size='+file.size);
+    
+    // Read as data URL
+    const dataUrl=await new Promise((resolve,reject)=>{
+        const r=new FileReader();r.onload=e=>resolve(e.target.result);r.onerror=reject;r.readAsDataURL(file);
+    });
+    log('Data URL length: '+dataUrl.length);
+    
+    const payload={image:dataUrl,docType:'all_in_one'};
+    if(file.type==='application/pdf') payload.isPdf=true;
+    const bodyStr=JSON.stringify(payload);
+    log('JSON payload size: '+bodyStr.length+' bytes');
+    log('isPdf: '+!!payload.isPdf);
+    log('Sending to scan-document.php...');
+    
+    try{
+        const res=await fetch('scan-document.php',{method:'POST',headers:{'Content-Type':'application/json'},body:bodyStr});
+        log('Response status: '+res.status);
+        const text=await res.text();
+        log('Response body (first 500 chars): '+text.substring(0,500));
+    }catch(e){
+        log('FETCH ERROR: '+e.name+': '+e.message);
+    }
+}
+</script>
+</body></html>

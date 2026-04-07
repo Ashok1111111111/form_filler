@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Cafe Complete Test Form</title>
+<style>
+:root{
+  --bg:#f6f8fc;
+  --card:#ffffff;
+  --ink:#162033;
+  --muted:#66758a;
+  --line:#d8e1ee;
+  --accent:#2563eb;
+  --accent-soft:#e9f1ff;
+  --accent-2:#0f766e;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Segoe UI,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at top left, rgba(37,99,235,.10), transparent 28%),
+    linear-gradient(180deg, #eef4ff 0, #f6f8fc 220px);
+}
+.wrap{max-width:1380px;margin:0 auto;padding:24px 16px 48px}
+.hero{
+  background:linear-gradient(135deg,#163b8f,#2563eb 55%,#0891b2);
+  color:#fff;
+  border-radius:24px;
+  padding:28px;
+  box-shadow:0 20px 50px rgba(37,99,235,.22);
+}
+.hero h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3rem);line-height:1.08}
+.hero p{margin:0;max-width:980px;color:rgba(255,255,255,.88);line-height:1.7}
+.hero-grid{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:12px;
+}
+.hero-stat{
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:16px;
+  padding:14px 16px;
+}
+.hero-stat strong{display:block;margin-bottom:4px}
+.hero-stat span{font-size:.88rem;color:rgba(255,255,255,.84)}
+.layout{
+  display:grid;
+  grid-template-columns:280px minmax(0,1fr);
+  gap:18px;
+  margin-top:20px;
+}
+.panel,.section{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:20px;
+  box-shadow:0 10px 26px rgba(15,23,42,.05);
+}
+.panel{
+  position:sticky;
+  top:18px;
+  height:max-content;
+  padding:18px;
+}
+.panel h2{margin:0 0 10px;font-size:1rem}
+.panel p{margin:0 0 14px;color:var(--muted);font-size:.92rem;line-height:1.65}
+.nav{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.nav a{
+  text-decoration:none;
+  color:var(--ink);
+  background:#f8fbff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:.88rem;
+}
+.callout{
+  margin-bottom:16px;
+  background:#f8fbff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px 13px;
+  font-size:.85rem;
+  line-height:1.6;
+}
+.callout strong{display:block;margin-bottom:4px}
+.stack{display:flex;flex-direction:column;gap:18px}
+.section{padding:18px}
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--line);
+}
+.section-head h3{margin:0;font-size:1.05rem}
+.section-head span{font-size:.82rem;color:var(--muted)}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:14px;
+}
+.field{grid-column:span 4;display:flex;flex-direction:column;gap:6px}
+.field.wide{grid-column:span 6}
+.field.full{grid-column:1 / -1}
+.field.narrow{grid-column:span 3}
+label{
+  font-size:.79rem;
+  font-weight:700;
+  color:#334155;
+  letter-spacing:.02em;
+}
+input,select,textarea{
+  width:100%;
+  border:1px solid #ccd7e5;
+  border-radius:12px;
+  padding:11px 12px;
+  font:inherit;
+  color:var(--ink);
+  background:#fff;
+}
+textarea{min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(37,99,235,.12);
+}
+.choice-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  min-height:46px;
+  padding:10px 12px;
+  border:1px solid #ccd7e5;
+  border-radius:12px;
+  background:#fff;
+}
+.choice-row label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:.88rem;
+  font-weight:600;
+}
+.helper{font-size:.75rem;color:var(--muted);line-height:1.45}
+.footer-actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:6px;
+}
+.btn{
+  border:none;
+  border-radius:999px;
+  padding:12px 18px;
+  font-weight:700;
+  cursor:pointer;
+}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#4f46e5);color:#fff}
+.btn-soft{background:var(--accent-soft);color:#1d4ed8;border:1px solid #cfe0ff}
+@media (max-width: 980px){
+  .layout{grid-template-columns:1fr}
+  .panel{position:static}
+}
+@media (max-width: 760px){
+  .field,.field.wide,.field.narrow{grid-column:1 / -1}
+  .wrap{padding:16px 12px 36px}
+  .hero{padding:22px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>Cyber Cafe Complete Test Form</h1>
+    <p>
+      This page is designed for end-to-end testing of your dashboard scan flow and Chrome extension autofill.
+      It uses canonical field names wherever possible so personal, academic, certificate, bank, and service data can be tested from one form.
+    </p>
+    <div class="hero-grid">
+      <div class="hero-stat"><strong>Personal + Address</strong><span>Name, DOB, category, mobile, email, permanent and correspondence address</span></div>
+      <div class="hero-stat"><strong>Identity + Certificates</strong><span>Aadhaar, PAN, voter, passport, caste, domicile, income, EWS, disability</span></div>
+      <div class="hero-stat"><strong>Education + Exam</strong><span>10th, 12th, diploma, graduation, PG, enrollment, semester, subjects</span></div>
+      <div class="hero-stat"><strong>Bank + Work + Uploads</strong><span>DBT banking, salary, experience, land records, file uploads, declarations</span></div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <aside class="panel">
+      <h2>How To Use</h2>
+      <p>Open this page in the browser where your extension is installed, then test fill using either a saved customer profile or the dashboard session scan flow.</p>
+
+      <div class="callout">
+        <strong>Why this page works well</strong>
+        Labels and field names match the app’s common data keys, so it is much better for autofill testing than a generic demo form.
+      </div>
+
+      <div class="callout">
+        <strong>Good for testing</strong>
+        Cyber cafe workflows like caste/income/domicile certificates, scholarship forms, student exam portals, job portals, and bank-linked beneficiary schemes.
+      </div>
+
+      <nav class="nav">
+        <a href="#personal">1. Personal & Family</a>
+        <a href="#contact">2. Contact & Address</a>
+        <a href="#identity">3. Identity & Certificates</a>
+        <a href="#education">4. Education & Exam</a>
+        <a href="#employment">5. Employment & Experience</a>
+        <a href="#banking">6. Banking & Land</a>
+        <a href="#uploads">7. Uploads & Declaration</a>
+      </nav>
+    </aside>
+
+    <main class="stack">
+      <form id="cyberCafeCompleteForm" class="stack" autocomplete="off">
+        <section class="section" id="personal">
+          <div class="section-head">
+            <h3>1. Personal & Family Details</h3>
+            <span>Common applicant profile fields</span>
+          </div>
+          <div class="grid">
+            <div class="field"><label for="firstName">First Name</label><input id="firstName" name="firstName" type="text"></div>
+            <div class="field"><label for="middleName">Middle Name</label><input id="middleName" name="middleName" type="text"></div>
+            <div class="field"><label for="lastName">Last Name</label><input id="lastName" name="lastName" type="text"></div>
+            <div class="field wide"><label for="fullName">Full Name</label><input id="fullName" name="fullName" type="text"></div>
+            <div class="field"><label for="fatherName">Father's Name</label><input id="fatherName" name="fatherName" type="text"></div>
+            <div class="field"><label for="motherName">Mother's Name</label><input id="motherName" name="motherName" type="text"></div>
+            <div class="field"><label for="husbandName">Husband's Name</label><input id="husbandName" name="husbandName" type="text"></div>
+            <div class="field"><label for="spouseName">Spouse Name</label><input id="spouseName" name="spouseName" type="text"></div>
+            <div class="field"><label for="dob">Date of Birth</label><input id="dob" name="dob" type="date"></div>
+            <div class="field narrow"><label for="age">Age</label><input id="age" name="age" type="number" min="0" max="120"></div>
+            <div class="field">
+              <label>Gender</label>
+              <div class="choice-row">
+                <label><input type="radio" name="gender" value="Male"> Male</label>
+                <label><input type="radio" name="gender" value="Female"> Female</label>
+                <label><input type="radio" name="gender" value="Transgender"> Transgender</label>
+              </div>
+            </div>
+            <div class="field"><label for="maritalStatus">Marital Status</label><select id="maritalStatus" name="maritalStatus"><option value="">Select</option><option>Unmarried</option><option>Married</option><option>Widow</option><option>Divorced</option></select></div>
+            <div class="field"><label for="category">Category</label><select id="category" name="category"><option value="">Select</option><option>UR</option><option>EWS</option><option>OBC-NCL</option><option>OBC-CL</option><option>SC</option><option>ST</option></select></div>
+            <div class="field"><label for="religion">Religion</label><select id="religion" name="religion"><option value="">Select</option><option>Hindu</option><option>Muslim</option><option>Christian</option><option>Sikh</option><option>Buddhist</option><option>Jain</option><option>Other</option></select></div>
+            <div class="field"><label for="nationality">Nationality</label><input id="nationality" name="nationality" type="text" value="Indian"></div>
+            <div class="field"><label for="identMark1">Identification Mark 1</label><input id="identMark1" name="identMark1" type="text"></div>
+            <div class="field"><label for="identMark2">Identification Mark 2</label><input id="identMark2" name="identMark2" type="text"></div>
+            <div class="field"><label for="annualIncome">Annual Income</label><input id="annualIncome" name="annualIncome" type="number" min="0"></div>
+            <div class="field">
+              <label>Person with Disability</label>
+              <div class="choice-row">
+                <label><input type="radio" name="isPwd" value="Yes"> Yes</label>
+                <label><input type="radio" name="isPwd" value="No"> No</label>
+              </div>
+            </div>
+            <div class="field"><label for="disabilityType">Disability Type</label><input id="disabilityType" name="disabilityType" type="text"></div>
+            <div class="field"><label for="disabilityPercent">Disability Percent</label><input id="disabilityPercent" name="disabilityPercent" type="number" min="0" max="100"></div>
+            <div class="field"><label for="pwdCertNo">PwD Certificate No</label><input id="pwdCertNo" name="pwdCertNo" type="text"></div>
+            <div class="field"><label for="disabilityIssueDate">Disability Issue Date</label><input id="disabilityIssueDate" name="disabilityIssueDate" type="date"></div>
+            <div class="field wide"><label for="disabilityAuthority">Disability Authority</label><input id="disabilityAuthority" name="disabilityAuthority" type="text"></div>
+          </div>
+        </section>
+
+        <section class="section" id="contact">
+          <div class="section-head">
+            <h3>2. Contact & Address Details</h3>
+            <span>Mobile, email, permanent and correspondence address</span>
+          </div>
+          <div class="grid">
+            <div class="field"><label for="mobileNumber">Mobile Number</label><input id="mobileNumber" name="mobileNumber" type="tel" maxlength="10"></div>
+            <div class="field"><label for="confirmMobile">Confirm Mobile Number</label><input id="confirmMobile" name="confirmMobile" type="tel" maxlength="10"></div>
+            <div class="field"><label for="altMobile">Alternate Mobile</label><input id="altMobile" name="altMobile" type="tel" maxlength="10"></div>
+            <div class="field wide"><label for="emailId">Email ID</label><input id="emailId" name="emailId" type="email"></div>
+            <div class="field wide"><label for="confirmEmail">Confirm Email ID</label><input id="confirmEmail" name="confirmEmail" type="email"></div>
+
+            <div class="field full"><label for="permAddr1">Permanent Address Line 1</label><textarea id="permAddr1" name="permAddr1"></textarea></div>
+            <div class="field wide"><label for="permAddr2">Permanent Address Line 2</label><input id="permAddr2" name="permAddr2" type="text"></div>
+            <div class="field"><label for="permPO">Permanent Post Office</label><input id="permPO" name="permPO" type="text"></div>
+            <div class="field"><label for="permPS">Permanent Police Station</label><input id="permPS" name="permPS" type="text"></div>
+            <div class="field"><label for="permDistrict">Permanent District</label><input id="permDistrict" name="permDistrict" type="text"></div>
+            <div class="field"><label for="permState">Permanent State</label><input id="permState" name="permState" type="text"></div>
+            <div class="field"><label for="permPin">Permanent PIN</label><input id="permPin" name="permPin" type="text" maxlength="6"></div>
+
+            <div class="field full">
+              <label>Correspondence Address Same as Permanent?</label>
+              <div class="choice-row">
+                <label><input type="radio" name="sameAddress" value="Yes"> Yes</label>
+                <label><input type="radio" name="sameAddress" value="No"> No</label>
+              </div>
+            </div>
+
+            <div class="field full"><label for="corrAddr1">Correspondence Address Line 1</label><textarea id="corrAddr1" name="corrAddr1"></textarea></div>
+            <div class="field wide"><label for="corrAddr2">Correspondence Address Line 2</label><input id="corrAddr2" name="corrAddr2" type="text"></div>
+            <div class="field"><label for="corrPO">Correspondence Post Office</label><input id="corrPO" name="corrPO" type="text"></div>
+            <div class="field"><label for="corrPS">Correspondence Police Station</label><input id="corrPS" name="corrPS" type="text"></div>
+            <div class="field"><label for="corrDistrict">Correspondence District</label><input id="corrDistrict" name="corrDistrict" type="text"></div>
+            <div class="field"><label for="corrState">Correspondence State</label><input id="corrState" name="corrState" type="text"></div>
+            <div class="field"><label for="corrPin">Correspondence PIN</label><input id="corrPin" name="corrPin" type="text" maxlength="6"></div>
+          </div>
+        </section>
+
+        <section class="section" id="identity">
+          <div class="section-head">
+            <h3>3. Identity, Reservation & Certificate Details</h3>
+            <span>Common KYC and certificate form fields</span>
+          </div>
+          <div class="grid">
+            <div class="field"><label for="aadhaarNumber">Aadhaar Number</label><input id="aadhaarNumber" name="aadhaarNumber" type="text" maxlength="12"></div>
+            <div class="field"><label for="panNumber">PAN Number</label><input id="panNumber" name="panNumber" type="text" maxlength="10"></div>
+            <div class="field"><label for="voterId">Voter ID</label><input id="voterId" name="voterId" type="text"></div>
+            <div class="field"><label for="passportNumber">Passport Number</label><input id="passportNumber" name="passportNumber" type="text"></div>
+            <div class="field"><label for="dlNumber">Driving Licence Number</label><input id="dlNumber" name="dlNumber" type="text"></div>
+            <div class="field"><label for="rationCardNumber">Ration Card Number</label><input id="rationCardNumber" name="rationCardNumber" type="text"></div>
+            <div class="field"><label for="rationCardType">Ration Card Type</label><select id="rationCardType" name="rationCardType"><option value="">Select</option><option>APL</option><option>BPL</option><option>AAY</option><option>PHH</option><option>NPHH</option></select></div>
+            <div class="field"><label for="familyMemberCount">Family Member Count</label><input id="familyMemberCount" name="familyMemberCount" type="number" min="0"></div>
+            <div class="field"><label for="birthCertNo">Birth Certificate No</label><input id="birthCertNo" name="birthCertNo" type="text"></div>
+            <div class="field"><label for="birthPlace">Birth Place</label><input id="birthPlace" name="birthPlace" type="text"></div>
+
+            <div class="field"><label for="casteCertNo">Caste Certificate No</label><input id="casteCertNo" name="casteCertNo" type="text"></div>
+            <div class="field"><label for="casteIssueDate">Caste Issue Date</label><input id="casteIssueDate" name="casteIssueDate" type="date"></div>
+            <div class="field wide"><label for="casteAuthority">Caste Authority</label><input id="casteAuthority" name="casteAuthority" type="text"></div>
+            <div class="field"><label for="casteIssueDistrict">Caste Issue District</label><input id="casteIssueDistrict" name="casteIssueDistrict" type="text"></div>
+
+            <div class="field"><label for="domicileCertNo">Domicile Certificate No</label><input id="domicileCertNo" name="domicileCertNo" type="text"></div>
+            <div class="field"><label for="domicileIssueDate">Domicile Issue Date</label><input id="domicileIssueDate" name="domicileIssueDate" type="date"></div>
+            <div class="field wide"><label for="domicileAuthority">Domicile Authority</label><input id="domicileAuthority" name="domicileAuthority" type="text"></div>
+
+            <div class="field"><label for="incomeCertNo">Income Certificate No</label><input id="incomeCertNo" name="incomeCertNo" type="text"></div>
+            <div class="field"><label for="incomeIssueDate">Income Issue Date</label><input id="incomeIssueDate" name="incomeIssueDate" type="date"></div>
+            <div class="field"><label for="ewsCertNo">EWS Certificate No</label><input id="ewsCertNo" name="ewsCertNo" type="text"></div>
+            <div class="field"><label for="ewsIssueDate">EWS Issue Date</label><input id="ewsIssueDate" name="ewsIssueDate" type="date"></div>
+            <div class="field"><label for="ewsFinYear">EWS Financial Year</label><input id="ewsFinYear" name="ewsFinYear" type="text" placeholder="2025-26"></div>
+            <div class="field wide"><label for="ewsAuthority">EWS Authority</label><input id="ewsAuthority" name="ewsAuthority" type="text"></div>
+          </div>
+        </section>
+
+        <section class="section" id="education">
+          <div class="section-head">
+            <h3>4. Education & Exam Details</h3>
+            <span>Student admissions, scholarship, result, and exam form fields</span>
+          </div>
+          <div class="grid">
+            <div class="field"><label for="tenthBoard">10th Board</label><input id="tenthBoard" name="tenthBoard" type="text"></div>
+            <div class="field"><label for="tenthYear">10th Year</label><input id="tenthYear" name="tenthYear" type="text"></div>
+            <div class="field"><label for="tenthRoll">10th Roll No</label><input id="tenthRoll" name="tenthRoll" type="text"></div>
+            <div class="field"><label for="tenthCertNo">10th Certificate No</label><input id="tenthCertNo" name="tenthCertNo" type="text"></div>
+            <div class="field"><label for="tenthTotal">10th Total Marks</label><input id="tenthTotal" name="tenthTotal" type="number" min="0"></div>
+            <div class="field"><label for="tenthObtained">10th Obtained Marks</label><input id="tenthObtained" name="tenthObtained" type="number" min="0"></div>
+            <div class="field"><label for="tenthPercent">10th Percentage</label><input id="tenthPercent" name="tenthPercent" type="number" step="0.01" min="0"></div>
+            <div class="field"><label for="tenthDivision">10th Division</label><input id="tenthDivision" name="tenthDivision" type="text"></div>
+
+            <div class="field"><label for="twelfthBoard">12th Board</label><input id="twelfthBoard" name="twelfthBoard" type="text"></div>
+            <div class="field"><label for="twelfthYear">12th Year</label><input id="twelfthYear" name="twelfthYear" type="text"></div>
+            <div class="field"><label for="twelfthRoll">12th Roll No</label><input id="twelfthRoll" name="twelfthRoll" type="text"></div>
+            <div class="field"><label for="twelfthCertNo">12th Certificate No</label><input id="twelfthCertNo" name="twelfthCertNo" type="text"></div>
+            <div class="field"><label for="twelfthTotal">12th Total Marks</label><input id="twelfthTotal" name="twelfthTotal" type="number" min="0"></div>
+            <div class="field"><label for="twelfthObtained">12th Obtained Marks</label><input id="twelfthObtained" name="twelfthObtained" type="number" min="0"></div>
+            <div class="field"><label for="twelfthPercent">12th Percentage</label><input id="twelfthPercent" name="twelfthPercent" type="number" step="0.01" min="0"></div>
+            <div class="field"><label for="twelfthStream">12th Stream</label><input id="twelfthStream" name="twelfthStream" type="text"></div>
+
+            <div class="field"><label for="diplomaBoard">Diploma Board / Institute</label><input id="diplomaBoard" name="diplomaBoard" type="text"></div>
+            <div class="field"><label for="diplomaTrade">Diploma Trade</label><input id="diplomaTrade" name="diplomaTrade" type="text"></div>
+            <div class="field"><label for="diplomaYear">Diploma Year</label><input id="diplomaYear" name="diplomaYear" type="text"></div>
+            <div class="field"><label for="diplomaRoll">Diploma Roll No</label><input id="diplomaRoll" name="diplomaRoll" type="text"></div>
+            <div class="field"><label for="diplomaPercent">Diploma Percentage</label><input id="diplomaPercent" name="diplomaPercent" type="number" step="0.01" min="0"></div>
+
+            <div class="field"><label for="enrollmentNumber">Enrollment Number</label><input id="enrollmentNumber" name="enrollmentNumber" type="text"></div>
+            <div class="field wide"><label for="applicationName">Application / Exam Name</label><input id="applicationName" name="applicationName" type="text"></div>
+            <div class="field"><label for="studentType">Student Type</label><input id="studentType" name="studentType" type="text"></div>
+            <div class="field"><label for="academicSession">Academic Session</label><input id="academicSession" name="academicSession" type="text"></div>
+            <div class="field"><label for="semester">Semester</label><input id="semester" name="semester" type="text"></div>
+            <div class="field"><label for="stream">Stream</label><input id="stream" name="stream" type="text"></div>
+            <div class="field"><label for="universityRollNumber">University Roll Number</label><input id="universityRollNumber" name="universityRollNumber" type="text"></div>
+            <div class="field"><label for="registrationNumber">Registration Number</label><input id="registrationNumber" name="registrationNumber" type="text"></div>
+            <div class="field"><label for="rollNumber">Roll Number</label><input id="rollNumber" name="rollNumber" type="text"></div>
+            <div class="field"><label for="mjcSubject">MJC Subject</label><input id="mjcSubject" name="mjcSubject" type="text"></div>
+            <div class="field"><label for="micSubject">MIC Subject</label><input id="micSubject" name="micSubject" type="text"></div>
+            <div class="field"><label for="mdcSubject">MDC Subject</label><input id="mdcSubject" name="mdcSubject" type="text"></div>
+            <div class="field"><label for="aecSubject">AEC Subject</label><input id="aecSubject" name="aecSubject" type="text"></div>
+            <div class="field"><label for="secSubject">SEC Subject</label><input id="secSubject" name="secSubject" type="text"></div>
+            <div class="field"><label for="vacSubject">VAC Subject</label><input id="vacSubject" name="vacSubject" type="text"></div>
+
+            <div class="field"><label for="gradDegree">Graduation Degree</label><input id="gradDegree" name="gradDegree" type="text"></div>
+            <div class="field wide"><label for="gradUniv">Graduation University</label><input id="gradUniv" name="gradUniv" type="text"></div>
+            <div class="field"><label for="gradYear">Graduation Year</label><input id="gradYear" name="gradYear" type="text"></div>
+            <div class="field"><label for="gradRoll">Graduation Roll / Enrollment</label><input id="gradRoll" name="gradRoll" type="text"></div>
+            <div class="field"><label for="gradPercent">Graduation Percentage / CGPA</label><input id="gradPercent" name="gradPercent" type="number" step="0.01" min="0"></div>
+            <div class="field"><label for="gradIssueDate">Graduation Issue Date</label><input id="gradIssueDate" name="gradIssueDate" type="date"></div>
+
+            <div class="field"><label for="pgDegree">Post Graduation Degree</label><input id="pgDegree" name="pgDegree" type="text"></div>
+            <div class="field wide"><label for="pgUniv">Post Graduation University</label><input id="pgUniv" name="pgUniv" type="text"></div>
+            <div class="field"><label for="pgYear">Post Graduation Year</label><input id="pgYear" name="pgYear" type="text"></div>
+            <div class="field"><label for="pgRoll">Post Graduation Roll</label><input id="pgRoll" name="pgRoll" type="text"></div>
+            <div class="field"><label for="pgPercent">Post Graduation Percentage / CGPA</label><input id="pgPercent" name="pgPercent" type="number" step="0.01" min="0"></div>
+            <div class="field"><label for="pgIssueDate">Post Graduation Issue Date</label><input id="pgIssueDate" name="pgIssueDate" type="date"></div>
+          </div>
+        </section>
+
+        <section class="section" id="employment">
+          <div class="section-head">
+            <h3>5. Employment, Salary & Experience</h3>
+            <span>Common service certificate and pay-slip style fields</span>
+          </div>
+          <div class="grid">
+            <div class="field"><label for="employeeId">Employee ID</label><input id="employeeId" name="employeeId" type="text"></div>
+            <div class="field"><label for="designation">Designation</label><input id="designation" name="designation" type="text"></div>
+            <div class="field wide"><label for="orgName">Organisation Name</label><input id="orgName" name="orgName" type="text"></div>
+            <div class="field"><label for="basicSalary">Basic Salary</label><input id="basicSalary" name="basicSalary" type="number" min="0"></div>
+            <div class="field"><label for="grossSalary">Gross Salary</label><input id="grossSalary" name="grossSalary" type="number" min="0"></div>
+            <div class="field"><label for="netSalary">Net Salary</label><input id="netSalary" name="netSalary" type="number" min="0"></div>
+            <div class="field"><label for="salaryMonth">Salary Month</label><input id="salaryMonth" name="salaryMonth" type="text"></div>
+            <div class="field"><label for="salaryYear">Salary Year</label><input id="salaryYear" name="salaryYear" type="text"></div>
+
+            <div class="field"><label for="expDesignation">Experience Designation</label><input id="expDesignation" name="expDesignation" type="text"></div>
+            <div class="field wide"><label for="expOrg">Experience Organisation</label><input id="expOrg" name="expOrg" type="text"></div>
+            <div class="field"><label for="expFrom">Experience From</label><input id="expFrom" name="expFrom" type="date"></div>
+            <div class="field"><label for="expTo">Experience To</label><input id="expTo" name="expTo" type="date"></div>
+            <div class="field"><label for="expYears">Total Experience Years</label><input id="expYears" name="expYears" type="number" step="0.1" min="0"></div>
+            <div class="field"><label for="marriageDate">Marriage Date</label><input id="marriageDate" name="marriageDate" type="date"></div>
+            <div class="field"><label for="marriageCertNo">Marriage Certificate No</label><input id="marriageCertNo" name="marriageCertNo" type="text"></div>
+            <div class="field wide"><label for="marriageAuthority">Marriage Authority</label><input id="marriageAuthority" name="marriageAuthority" type="text"></div>
+            <div class="field"><label for="marriageDistrict">Marriage District</label><input id="marriageDistrict" name="marriageDistrict" type="text"></div>
+          </div>
+        </section>
+
+        <section class="section" id="banking">
+          <div class="section-head">
+            <h3>6. Banking, Beneficiary & Land Record Details</h3>
+            <span>Useful for DBT, scheme, PM-Kisan, and bank-linked service testing</span>
+          </div>
+          <div class="grid">
+            <div class="field"><label for="bankAcc">Bank Account Number</label><input id="bankAcc" name="bankAcc" type="text"></div>
+            <div class="field"><label for="bankIFSC">Bank IFSC</label><input id="bankIFSC" name="bankIFSC" type="text"></div>
+            <div class="field"><label for="bankName">Bank Name</label><input id="bankName" name="bankName" type="text"></div>
+            <div class="field"><label for="bankBranch">Bank Branch</label><input id="bankBranch" name="bankBranch" type="text"></div>
+            <div class="field"><label for="accountHolderName">Account Holder Name</label><input id="accountHolderName" name="accountHolderName" type="text"></div>
+            <div class="field"><label for="confirmAccountNumber">Confirm Account Number</label><input id="confirmAccountNumber" name="confirmAccountNumber" type="text"></div>
+            <div class="field"><label for="upiId">UPI ID</label><input id="upiId" name="upiId" type="text"></div>
+            <div class="field"><label for="beneficiaryName">Beneficiary / Nominee Name</label><input id="beneficiaryName" name="beneficiaryName" type="text"></div>
+            <div class="field"><label for="beneficiaryRelation">Beneficiary Relation</label><input id="beneficiaryRelation" name="beneficiaryRelation" type="text"></div>
+            <div class="field"><label for="emergencyContactName">Emergency Contact Name</label><input id="emergencyContactName" name="emergencyContactName" type="text"></div>
+            <div class="field"><label for="emergencyContactMobile">Emergency Contact Mobile</label><input id="emergencyContactMobile" name="emergencyContactMobile" type="tel" maxlength="10"></div>
+
+            <div class="field"><label for="khasraNumber">Khasra Number</label><input id="khasraNumber" name="khasraNumber" type="text"></div>
+            <div class="field"><label for="khatauniNumber">Khatauni Number</label><input id="khatauniNumber" name="khatauniNumber" type="text"></div>
+            <div class="field"><label for="landArea">Land Area</label><input id="landArea" name="landArea" type="text"></div>
+            <div class="field"><label for="tehsil">Tehsil</label><input id="tehsil" name="tehsil" type="text"></div>
+            <div class="field"><label for="gramSabha">Gram Sabha / Village</label><input id="gramSabha" name="gramSabha" type="text"></div>
+          </div>
+        </section>
+
+        <section class="section" id="uploads">
+          <div class="section-head">
+            <h3>7. Uploads, Declaration & Consent</h3>
+            <span>Typical upload and checkbox fields used in portals</span>
+          </div>
+          <div class="grid">
+            <div class="field"><label for="photoUpload">Passport Photo Upload</label><input id="photoUpload" name="photoUpload" type="file" accept=".jpg,.jpeg,.png"></div>
+            <div class="field"><label for="signatureUpload">Signature Upload</label><input id="signatureUpload" name="signatureUpload" type="file" accept=".jpg,.jpeg,.png"></div>
+            <div class="field"><label for="thumbUpload">Thumb Upload</label><input id="thumbUpload" name="thumbUpload" type="file" accept=".jpg,.jpeg,.png"></div>
+            <div class="field"><label for="aadhaarUpload">Aadhaar Upload</label><input id="aadhaarUpload" name="aadhaarUpload" type="file" accept=".pdf,.jpg,.jpeg,.png"></div>
+            <div class="field"><label for="certificateUpload">Certificate Upload</label><input id="certificateUpload" name="certificateUpload" type="file" accept=".pdf,.jpg,.jpeg,.png"></div>
+            <div class="field"><label for="marksheetUpload">Marksheet Upload</label><input id="marksheetUpload" name="marksheetUpload" type="file" accept=".pdf,.jpg,.jpeg,.png"></div>
+
+            <div class="field full">
+              <label>Declaration and Consent</label>
+              <div class="choice-row">
+                <label><input type="checkbox" name="declaredCorrect" value="Yes"> Information is correct</label>
+                <label><input type="checkbox" name="acceptedTerms" value="Yes"> Terms accepted</label>
+                <label><input type="checkbox" name="consentAadhaar" value="Yes"> Aadhaar consent</label>
+                <label><input type="checkbox" name="consentDbt" value="Yes"> DBT consent</label>
+              </div>
+            </div>
+
+            <div class="field"><label for="place">Place</label><input id="place" name="place" type="text"></div>
+            <div class="field"><label for="applicationDate">Application Date</label><input id="applicationDate" name="applicationDate" type="date"></div>
+            <div class="field"><label for="operatorName">Operator / Cyber Cafe Name</label><input id="operatorName" name="operatorName" type="text"></div>
+            <div class="field full"><label for="declarationText">Declaration Text</label><textarea id="declarationText" name="declarationText">I hereby declare that the information given above is true and correct to the best of my knowledge.</textarea></div>
+            <div class="field full"><div class="helper">Use this page for autofill testing only. It does not submit data to a server.</div></div>
+          </div>
+
+          <div class="footer-actions">
+            <button type="submit" class="btn btn-primary">Submit Test Form</button>
+            <button type="reset" class="btn btn-soft">Reset Form</button>
+          </div>
+        </section>
+      </form>
+    </main>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('cyberCafeCompleteForm');
+  const sameAddressRadios = document.querySelectorAll('input[name="sameAddress"]');
+  const permMap = [
+    ['permAddr1', 'corrAddr1'],
+    ['permAddr2', 'corrAddr2'],
+    ['permPO', 'corrPO'],
+    ['permPS', 'corrPS'],
+    ['permDistrict', 'corrDistrict'],
+    ['permState', 'corrState'],
+    ['permPin', 'corrPin']
+  ];
+
+  function syncCorrespondenceAddress() {
+    const sameYes = document.querySelector('input[name="sameAddress"][value="Yes"]');
+    if (!sameYes || !sameYes.checked) return;
+    permMap.forEach(([from, to]) => {
+      const source = document.getElementById(from);
+      const target = document.getElementById(to);
+      if (source && target) target.value = source.value;
+    });
+  }
+
+  sameAddressRadios.forEach((radio) => {
+    radio.addEventListener('change', syncCorrespondenceAddress);
+  });
+
+  permMap.forEach(([from]) => {
+    const source = document.getElementById(from);
+    if (source) source.addEventListener('input', syncCorrespondenceAddress);
+  });
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    alert('Cyber Cafe Complete Test Form submitted locally. Use this page for scan and autofill testing.');
+  });
+});
+</script>
+</body>
+</html>

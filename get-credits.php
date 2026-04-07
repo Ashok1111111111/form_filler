@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit(0); }
 
 require_once __DIR__ . '/firestore-helper.php';
@@ -20,10 +20,14 @@ $doc = getDoc('users', $userId);
 if ($doc === null) {
     // User doc missing — create with ₹100 free welcome balance
     $walletBalance = 100.0;
+    $todayKey = (new DateTimeImmutable('now', new DateTimeZone('Asia/Kolkata')))->format('Y-m-d');
     addDocWithId('users', $userId, [
         'walletBalance'         => $walletBalance,
         'credits'               => 0,
         'totalFormsFilledCount' => 0,
+        'dailyStatsDate'        => $todayKey,
+        'dailyFormsFilledCount' => 0,
+        'dailyAmountSpent'      => 0,
     ]);
     echo json_encode(['walletBalance' => $walletBalance, 'totalFormsFilledCount' => 0, 'name' => '', 'found' => false]);
     exit;

@@ -10,6 +10,19 @@ set_error_handler(function($errno, $errstr) {
     exit();
 });
 
+// Load .env (provides OPENAI_API_KEY)
+$envFile = __DIR__ . '/.env';
+if (file_exists($envFile)) {
+    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        if (strpos(trim($line), '#') === 0) continue;
+        if (strpos($line, '=') === false) continue;
+        [$k, $v] = array_map('trim', explode('=', $line, 2));
+        putenv("$k=$v");
+    }
+}
+
+require_once __DIR__ . '/openai-cost-helper.php';
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -374,7 +387,113 @@ function localRuleMapping(array $fields, array $customerData): array {
     return $mapping;
 }
 
-$localMapping = localRuleMapping($fields, $customerData);
+// ── NAME-BASED RULES (for education grids, SSB-style forms) ──────────────────
+// Many forms use same label for all columns — match by field name/id instead
+function nameBasedMapping(array $fields, array $customerData): array {
+    $mapping = [];
+
+    // Map: field name pattern → customer data key
+    $nameRules = [
+        // ── Education: Matriculation / 10th ──
+        'university_1'       => 'tenthBoard',
+        'edu_year_1'         => 'tenthYear',
+        'edu_rollno_1'       => 'tenthRoll',
+        'edu_certno_1'       => 'tenthCertNo',
+        'edu_marks_1'        => 'tenthPercent',
+        'stream_1'           => 'tenthDivision',
+        // ── Education: 10+2 / 12th ──
+        'university_plus2'   => 'twelfthBoard',
+        'edu_year_plus2'     => 'twelfthYear',
+        'edu_rollno_plus2'   => 'twelfthRoll',
+        'edu_certno_plus2'   => 'twelfthCertNo',
+        'edu_marks_plus2'    => 'twelfthPercent',
+        'stream_plus2'       => 'twelfthStream',
+        // ── Education: Diploma ──
+        'university_diploma' => 'diplomaBoard',
+        'university_5'       => 'diplomaBoard',
+        'edu_year_5'         => 'diplomaYear',
+        'edu_rollno_5'       => 'diplomaRoll',
+        'edu_certno_5'       => 'twelfthCertNo',
+        'edu_marks_5'        => 'diplomaPercent',
+        'stream_5'           => 'diplomaTrade',
+        // ── Education: Graduation ──
+        'university_3'       => 'gradUniv',
+        'edu_year_3'         => 'gradYear',
+        'edu_rollno_3'       => 'gradRoll',
+        'edu_marks_3'        => 'gradPercent',
+        'stream_3'           => 'gradDegree',
+        // ── Education: Post Graduation ──
+        'university_4'       => 'pgUniv',
+        'edu_year_4'         => 'pgYear',
+        'edu_rollno_4'       => 'pgRoll',
+        'edu_marks_4'        => 'pgPercent',
+        'stream_4'           => 'pgDegree',
+        // ── Caste Certificate ──
+        'cat_cert_no'        => 'casteCertNo',
+        'cat_date_issue'     => 'casteIssueDate',
+        'cat_issue_authority'=> 'casteAuthority',
+        // ── Identification ──
+        'identification_mark'=> 'identMark1',
+        'id_mark'            => 'identMark1',
+        'id_mark_1'          => 'identMark1',
+        'id_mark_2'          => 'identMark2',
+        // ── Address ──
+        'tehsil'             => 'tehsil',
+        'tehsil1'            => 'tehsil',
+        // ── Radio: Yes/No fields ──
+        'debarment'          => 'debarred',
+        'fir_cases'          => 'criminalCase',
+        'fir_cases_pending'  => 'criminalCase',
+        'arrested'           => 'criminalCase',
+        'criminal_case_acquitted' => 'criminalCase',
+        'good_behavior_bond' => 'criminalCase',
+        'middle_name'        => 'middleName',
+    ];
+
+    foreach ($fields as $field) {
+        $idx      = (string)$field['index'];
+        $fname    = strtolower($field['name'] ?? '');
+        $fid      = strtolower($field['id']   ?? '');
+
+        foreach ($nameRules as $pattern => $dataKey) {
+            if (empty($customerData[$dataKey])) continue;
+            if ($fname === $pattern || $fid === $pattern) {
+                $mapping[$idx] = $dataKey;
+                break;
+            }
+        }
+    }
+    return $mapping;
+}
+
+function openaiContentToText($content): string {
+    if (is_string($content)) {
+        return $content;
+    }
+
+    if (is_array($content)) {
+        $chunks = [];
+        foreach ($content as $item) {
+            if (is_string($item)) {
+                $chunks[] = $item;
+                continue;
+            }
+            if (is_array($item) && isset($item['text']) && is_string($item['text'])) {
+                $chunks[] = $item['text'];
+            }
+        }
+        return implode("\n", $chunks);
+    }
+
+    return '';
+}
+
+$localMapping    = localRuleMapping($fields, $customerData);
+$nameMapping     = nameBasedMapping($fields, $customerData);
+// Merge: label rules win, name rules fill gaps
+foreach ($nameMapping as $idx => $key) {
+    if (!isset($localMapping[$idx])) $localMapping[$idx] = $key;
+}
 
 // ── FIND UNMAPPED FIELDS ──────────────────────────────────────────────────────
 $unmappedFields = [];
@@ -387,8 +506,12 @@ foreach ($fields as $field) {
 // ── AI AGENT FOR UNMAPPED FIELDS ─────────────────────────────────────────────
 // Sends all unmapped fields + full customer data to AI for intelligent mapping.
 // AI understands Hindi/English labels, field intent, and context — not just keywords.
+// Debug log — writes what AI sees and returns
+$debugLog = __DIR__ . '/cache/debug_' . $formSig . '.json';
+
 $aiMapping = [];
-if (!empty($unmappedFields)) {
+$aiMetrics = null;
+if (!empty($unmappedFields) && function_exists('curl_init')) {
     // Build clean customer data with descriptions for AI context
     $cleanData = [];
     foreach ($customerData as $k => $v) {
@@ -446,50 +569,87 @@ if (!empty($unmappedFields)) {
         . "Use null for fields that should not be filled.\n"
         . "Example: {\"5\": \"permDistrict\", \"6\": null, \"7\": \"permState\"}";
 
-    $payload = json_encode([
-        'model'       => 'gpt-4o-mini',
-        'messages'    => [
-            ['role' => 'system', 'content' => 'You are a precise form-filling AI. Return only valid JSON. Never explain, never add text outside JSON.'],
-            ['role' => 'user',   'content' => $prompt],
+    $openaiApiKey = getenv('OPENAI_API_KEY');
+    $openaiTextModel = getenv('OPENAI_TEXT_MODEL') ?: 'gpt-4o-mini';
+    $openaiEndpoint = getenv('OPENAI_API_ENDPOINT') ?: 'https://api.openai.com/v1/chat/completions';
+
+    $basePayload = [
+        'model' => $openaiTextModel,
+        'messages' => [
+            ['role' => 'system', 'content' => 'You are a precise form-filling AI for Indian government forms. Return only valid JSON. Never explain, never add text outside JSON. Use ONLY the exact data keys from CUSTOMER DATA.'],
+            ['role' => 'user', 'content' => $prompt],
         ],
         'temperature' => 0.0,
-        'max_tokens'  => 3000,
-    ]);
+        'max_tokens' => 6000,
+    ];
+    $attemptPayloads = [
+        $basePayload + ['response_format' => ['type' => 'json_object']],
+        $basePayload,
+    ];
+    $raw = '';
+    $decoded = [];
 
-    $openaiApiKey = getenv('OPENAI_API_KEY');
+    foreach ($attemptPayloads as $attemptPayload) {
+        $payload = json_encode($attemptPayload, JSON_UNESCAPED_UNICODE);
+        if ($payload === false) {
+            continue;
+        }
 
-    $ch = curl_init('https://api.openai.com/v1/chat/completions');
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => $payload,
-        CURLOPT_HTTPHEADER     => [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $openaiApiKey,
-        ],
-        CURLOPT_TIMEOUT        => 20,
-    ]);
-    $resp     = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+        $ch = curl_init($openaiEndpoint);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $openaiApiKey,
+            ],
+            CURLOPT_TIMEOUT => 45,
+        ]);
+        $resp = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-    if ($httpCode === 200 && $resp) {
+        if ($httpCode !== 200 || !$resp) {
+            continue;
+        }
+
         $oaiData = json_decode($resp, true);
-        $raw     = $oaiData['choices'][0]['message']['content'] ?? '{}';
-        $raw     = preg_replace('/```json\s*/i', '', $raw);
-        $raw     = preg_replace('/```\s*/i', '', $raw);
-        $raw     = trim($raw);
+        if (is_array($oaiData)) {
+            $aiMetrics = openaiBuildUsageMeta($openaiTextModel, $oaiData);
+        }
+
+        $raw = openaiContentToText($oaiData['choices'][0]['message']['content'] ?? '{}');
+        $raw = preg_replace('/^```(?:json)?\s*/i', '', $raw);
+        $raw = preg_replace('/\s*```$/', '', $raw);
+        $raw = trim($raw);
+
         $decoded = json_decode($raw, true);
+        if (!is_array($decoded) && preg_match('/\{[\s\S]*\}/', $raw, $m)) {
+            $decoded = json_decode($m[0], true);
+        }
+
         if (is_array($decoded)) {
-            // Filter out null values — only keep actual data key mappings
+            // Only accept keys that actually exist in customerData — prevents wrong key names
+            $validKeys = array_keys($cleanData);
             foreach ($decoded as $idx => $key) {
-                if (!is_null($key) && $key !== '' && is_string($key)) {
+                if (!is_null($key) && $key !== '' && is_string($key) && in_array($key, $validKeys, true)) {
                     $aiMapping[$idx] = $key;
                 }
             }
+            break;
         }
     }
     // If AI fails: aiMapping stays [] — local rules are still returned
+
+    // Write debug log
+    file_put_contents($debugLog, json_encode([
+        'unmapped_fields_sent_to_ai' => $fieldsForAI,
+        'ai_raw_response'            => $raw ?? '',
+        'ai_mapping_returned'        => $decoded ?? [],
+        'ai_mapping_accepted'        => $aiMapping,
+        'ai_metrics'                 => $aiMetrics,
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 }
 
 // ── MERGE — local rules win over AI ──────────────────────────────────────────
@@ -513,4 +673,5 @@ echo json_encode([
     'cached'      => false,
     'mappedCount' => count($finalMapping),
     'aiUsed'      => !empty($aiMapping),
+    'metrics'     => ['agentAi' => $aiMetrics],
 ]);

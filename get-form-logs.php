@@ -62,6 +62,11 @@ foreach ($res['body'] as $row) {
         'portalName'  => $fields['portalName']['stringValue']  ?? '',
         'fieldsCount' => (int)($fields['fieldsCount']['integerValue'] ?? $fields['fieldsCount']['doubleValue'] ?? 0),
         'cost'        => (float)($fields['cost']['doubleValue'] ?? $fields['cost']['integerValue'] ?? 0),
+        'revenueRs'   => (float)($fields['revenueRs']['doubleValue'] ?? $fields['revenueRs']['integerValue'] ?? $fields['cost']['doubleValue'] ?? $fields['cost']['integerValue'] ?? 0),
+        'aiCostKnown' => (bool)($fields['aiCostKnown']['booleanValue'] ?? false),
+        'aiCostRs'    => (float)($fields['aiCostRs']['doubleValue'] ?? $fields['aiCostRs']['integerValue'] ?? 0),
+        'grossMarginRs' => (float)($fields['grossMarginRs']['doubleValue'] ?? $fields['grossMarginRs']['integerValue'] ?? 0),
+        'grossMarginPerFieldRs' => (float)($fields['grossMarginPerFieldRs']['doubleValue'] ?? $fields['grossMarginPerFieldRs']['integerValue'] ?? 0),
         'timestamp'   => $ts,
     ];
 }
@@ -69,12 +74,18 @@ foreach ($res['body'] as $row) {
 // Summary stats
 $totalFields = array_sum(array_column($logs, 'fieldsCount'));
 $totalCost   = array_sum(array_column($logs, 'cost'));
+$totalRevenue = array_sum(array_column($logs, 'revenueRs'));
+$totalAiCost = array_sum(array_column($logs, 'aiCostRs'));
+$totalMargin = array_sum(array_column($logs, 'grossMarginRs'));
 
 echo json_encode([
     'success'     => true,
     'count'       => count($logs),
     'totalFields' => $totalFields,
     'totalCost'   => round($totalCost, 2),
+    'totalRevenue' => round($totalRevenue, 2),
+    'totalAiCost' => round($totalAiCost, 2),
+    'totalMargin' => round($totalMargin, 2),
     'logs'        => $logs,
 ]);
 ?>

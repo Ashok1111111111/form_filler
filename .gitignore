@@ -14,6 +14,15 @@ cache/
 
 # ZIP builds
 *.zip
+*.tar.gz
+*.jar
+
+# Local tooling / caches
+.codex
+.claude/
+.user.ini
+__pycache__/
+pylibs/
 
 # OS
 .DS_Store

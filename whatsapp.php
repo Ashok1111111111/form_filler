@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-$allowedOrigin = 'https://ai-workflows.cloud';
+$allowedOrigin = 'https://formfiller.ai-workflows.cloud';
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 if ($origin === $allowedOrigin) {
     header('Access-Control-Allow-Origin: ' . $allowedOrigin);
@@ -137,13 +137,13 @@ function handleIncoming(array $data): void {
             $reply .= "🐛 *ERROR* — Troubleshooting guide\n";
             $reply .= "🆘 *SUPPORT* — Talk to our team\n";
             $reply .= "🚫 *STOP* — Unsubscribe from promos\n\n";
-            $reply .= "👉 Visit: *ai-workflows.cloud*";
+            $reply .= "👉 Visit: *formfiller.ai-workflows.cloud*";
             sendText($from, $reply);
 
         } elseif ($text === 'HELP') {
             $reply  = "📖 *How to Use AI Form Filler*\n\n";
             $reply .= "*Step 1: Install Extension*\n";
-            $reply .= "Download from: ai-workflows.cloud/download-extension.html\n\n";
+            $reply .= "Download from: formfiller.ai-workflows.cloud/download-extension.html\n\n";
             $reply .= "*Step 2: Add Customer Profile*\n";
             $reply .= "Go to 'Create Profile' → fill all 112 fields\n\n";
             $reply .= "*Step 3: Open Any Government Form*\n";
@@ -156,7 +156,7 @@ function handleIncoming(array $data): void {
 
         } elseif ($text === 'INSTALL') {
             $reply  = "🔧 *Chrome Extension Install Steps*\n\n";
-            $reply .= "1. Open: ai-workflows.cloud/download-extension.html\n";
+            $reply .= "1. Open: formfiller.ai-workflows.cloud/download-extension.html\n";
             $reply .= "2. Click 'Download Extension' → save ZIP file\n";
             $reply .= "3. Extract the ZIP to a folder\n";
             $reply .= "4. Open Chrome → go to chrome://extensions\n";
@@ -185,7 +185,7 @@ function handleIncoming(array $data): void {
 
         } elseif ($text === 'RECHARGE') {
             $reply  = "💳 *How to Recharge Credits*\n\n";
-            $reply .= "*Step 1:* Visit ai-workflows.cloud/recharge.html\n\n";
+            $reply .= "*Step 1:* Visit formfiller.ai-workflows.cloud/recharge.html\n\n";
             $reply .= "*Step 2:* Select a package:\n";
             $reply .= "• 10cr=₹50 | 25cr=₹100 | 50cr=₹150 | 100cr=₹250\n\n";
             $reply .= "*Step 3:* Pay via UPI:\n";
@@ -279,7 +279,7 @@ function handleIncoming(array $data): void {
             $reply .= "• *RECHARGE* — add credits\n";
             $reply .= "• *PORTALS* — supported portals\n";
             $reply .= "• *SUPPORT* — talk to our team\n\n";
-            $reply .= "🌐 ai-workflows.cloud 🚀";
+            $reply .= "🌐 formfiller.ai-workflows.cloud 🚀";
             sendText($from, $reply);
         }
 
@@ -331,7 +331,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $msg .= "2. Add a customer profile\n";
             $msg .= "3. Open any form → click Fill!\n\n";
             $msg .= "Reply *HELP* anytime for assistance 🙏\n";
-            $msg .= "🌐 ai-workflows.cloud";
+            $msg .= "🌐 formfiller.ai-workflows.cloud";
             $result = sendText($phone, $msg);
             break;
 

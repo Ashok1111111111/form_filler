@@ -10,7 +10,7 @@ const fs    = require('fs');
 const http  = require('http');
 const CUSTOMER = require('./test-data.js');
 
-const SERVER_URL  = 'https://formfiller.ai-workflows.cloud';
+const SERVER_URL  = 'http://127.0.0.1:8877';
 const FORMS_DIR   = path.join(__dirname, 'forms');
 const REPORT_FILE = path.join(__dirname, 'report.html');
 
